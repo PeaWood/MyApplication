@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:background="@color/backgroundcolor"
+    n1:orientation="vertical">
+
+    <ScrollView
+        n1:layout_width="fill_parent"
+        n1:layout_height="fill_parent"
+        n1:layout_above="@id/llybuttom"
+        n1:fadingEdge="none">
+
+        <LinearLayout
+            n1:id="@+id/linearLayout_blueteeth"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:orientation="vertical">
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="50.0dip"
+                n1:background="@color/colorPrimary"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_gravity="center"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:text="用户评价"
+                    n1:textColor="@color/white"
+                    n1:textSize="20.0sp" />
+
+                <EditText
+                    n1:id="@+id/msgText"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_gravity="center"
+                    n1:layout_weight="3.0"
+                    n1:editable="false"
+                    n1:text=""
+                    n1:textColor="@color/white"
+                    n1:textSize="15.0sp" />
+
+                <ImageView
+                    n1:id="@+id/imageView_search"
+                    n1:layout_width="30.0dip"
+                    n1:layout_height="30.0dip"
+                    n1:layout_alignParentRight="true"
+                    n1:layout_marginRight="10.0dip"
+                    n1:layout_marginTop="10.0dip"
+                    n1:src="@drawable/abs__menu_dropdown_panel_holo_light" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="fill_parent"
+                n1:orientation="horizontal">
+
+                <ImageView
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:src="@drawable/nfc_read" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginLeft="10.0dip"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginTop="10.0dip"
+                    n1:layout_weight="1.0"
+                    n1:text="评价结果："
+                    n1:textColor="@color/colorPrimary"
+                    n1:textSize="30.0sp" />
+
+                <TextView
+                    n1:id="@+id/textView_evaluateResult"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginTop="10.0dip"
+                    n1:layout_weight="1.0"
+                    n1:text="满意"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="30.0sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        n1:id="@+id/llybuttom"
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:layout_alignParentBottom="true"
+        n1:layout_marginBottom="5.0dip"
+        n1:orientation="vertical">
+
+        <Button
+            n1:id="@+id/button_next"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_marginLeft="15.0dip"
+            n1:layout_marginRight="15.0dip"
+            n1:layout_marginTop="0.0dip"
+            n1:background="@drawable/button_select"
+            n1:padding="10.0dip"
+            n1:text="评价提交"
+            n1:textColor="@color/white"
+            n1:textSize="20.0sp" />
+    </LinearLayout>
+</RelativeLayout>

@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:background="@color/backgroundcolor"
+    n1:orientation="vertical">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        n1:id="@+id/main_srl"
+        n1:layout_width="wrap_content"
+        n1:layout_height="wrap_content"
+        n1:layout_marginBottom="50.0dip">
+
+        <ScrollView
+            n1:layout_width="fill_parent"
+            n1:layout_height="fill_parent"
+            n1:layout_above="@id/llybuttom"
+            n1:fadingEdge="none">
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:orientation="vertical">
+
+                <LinearLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="50.0dip"
+                    n1:background="@color/colorPrimary"
+                    n1:orientation="horizontal">
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_gravity="center"
+                        n1:layout_marginLeft="16.0dip"
+                        n1:layout_weight="1.0"
+                        n1:text="按斤订单支付"
+                        n1:textColor="@color/white"
+                        n1:textSize="25.0sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:orientation="horizontal"
+                    n1:visibility="visible">
+
+                    <TextView
+                        n1:id="@+id/textView_goodsNameStatic"
+                        n1:layout_width="fill_parent"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="16.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:layout_weight="1.0"
+                        n1:gravity="center_vertical"
+                        n1:text="支付详情"
+                        n1:textColor="@color/black"
+                        n1:textSize="20.0sp" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="派工单上传"
+                        n1:textColor="@color/colorPrimaryDark"
+                        n1:textSize="20.0sp" />
+
+                    <ImageView
+                        n1:id="@+id/imageView_pic"
+                        n1:layout_width="30.0dip"
+                        n1:layout_height="30.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:src="@drawable/icon_camera" />
+                </LinearLayout>
+
+                <RelativeLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginTop="10.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center_vertical"
+                    n1:orientation="horizontal">
+
+                    <ImageView
+                        n1:layout_width="34.0dip"
+                        n1:layout_height="38.0dip"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:src="@drawable/icon_pay_status" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="53.0dip"
+                        n1:layout_marginTop="5.0dip"
+                        n1:text="支付状态："
+                        n1:textColor="@color/black"
+                        n1:textSize="15.0sp" />
+
+                    <TextView
+                        n1:id="@+id/textview_payStatus"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="140.0dip"
+                        n1:layout_marginTop="5.0dip"
+                        n1:text="支付状态"
+                        n1:textSize="15.0sp" />
+                </RelativeLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_marginTop="5.0dip"
+                    n1:background="@color/textgray" />
+
+                <LinearLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginTop="10.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center_vertical"
+                    n1:orientation="horizontal">
+
+                    <ImageView
+                        n1:layout_width="34.0dip"
+                        n1:layout_height="38.0dip"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:src="@drawable/icon_goods_mount" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="原本价格："
+                        n1:textColor="@color/black"
+                        n1:textSize="15.0sp" />
+
+                    <TextView
+                        n1:id="@+id/textview_orginalFee"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="原本价格"
+                        n1:textSize="15.0sp" />
+                </LinearLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_marginTop="5.0dip"
+                    n1:background="@color/textgray" />
+
+                <LinearLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginTop="10.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center_vertical"
+                    n1:orientation="horizontal">
+
+                    <ImageView
+                        n1:layout_width="34.0dip"
+                        n1:layout_height="38.0dip"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:src="@drawable/icon_goods_mount" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="优惠金额："
+                        n1:textColor="@color/black"
+                        n1:textSize="15.0sp" />
+
+                    <TextView
+                        n1:id="@+id/textview_couponAmount"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="优惠金额"
+                        n1:textSize="15.0sp" />
+                </LinearLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_marginTop="5.0dip"
+                    n1:background="@color/textgray" />
+
+                <LinearLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginTop="10.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center_vertical"
+                    n1:orientation="horizontal">
+
+                    <ImageView
+                        n1:layout_width="34.0dip"
+                        n1:layout_height="38.0dip"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:src="@drawable/icon_goods_mount" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="残气抵扣："
+                        n1:textColor="@color/black"
+                        n1:textSize="15.0sp" />
+
+                    <TextView
+                        n1:id="@+id/textview_residualGasFee"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="残气抵扣"
+                        n1:textSize="15.0sp" />
+                </LinearLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_marginTop="5.0dip"
+                    n1:background="@color/textgray" />
+
+                <LinearLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginTop="10.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center_vertical"
+                    n1:orientation="horizontal">
+
+                    <ImageView
+                        n1:layout_width="34.0dip"
+                        n1:layout_height="38.0dip"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:src="@drawable/icon_goods_mount" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="应收金额："
+                        n1:textColor="@color/black"
+                        n1:textSize="15.0sp" />
+
+                    <TextView
+                        n1:id="@+id/textview_totalFee"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="应收金额"
+                        n1:textSize="15.0sp" />
+                </LinearLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_marginTop="5.0dip"
+                    n1:background="@color/textgray" />
+
+                <LinearLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginTop="10.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center_vertical"
+                    n1:orientation="horizontal">
+
+                    <ImageView
+                        n1:layout_width="34.0dip"
+                        n1:layout_height="38.0dip"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:src="@drawable/icon_pay_type" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="支付方式："
+                        n1:textColor="@color/black"
+                        n1:textSize="15.0sp" />
+
+                    <FrameLayout
+                        n1:layout_width="fill_parent"
+                        n1:layout_height="fill_parent"
+                        n1:layout_marginTop="5.0dip">
+
+                        <TextView
+                            n1:id="@+id/textview_payType"
+                            n1:layout_width="fill_parent"
+                            n1:layout_height="wrap_content" />
+
+                        <Spinner
+                            n1:id="@+id/spinner_payType"
+                            n1:layout_width="fill_parent"
+                            n1:layout_height="wrap_content"
+                            n1:entries="@array/spinner_array_payType" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_marginTop="5.0dip"
+                    n1:background="@color/textgray" />
+
+                <LinearLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginTop="10.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center_vertical"
+                    n1:orientation="horizontal">
+
+                    <ImageView
+                        n1:layout_width="34.0dip"
+                        n1:layout_height="38.0dip"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:src="@drawable/icon_goods_mount" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="押金实收："
+                        n1:textColor="@color/black"
+                        n1:textSize="15.0sp" />
+
+                    <TextView
+                        n1:id="@+id/textview_YJSSFee"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="10.0dip"
+                        n1:text="押金实收"
+                        n1:textColor="@color/colorAccent"
+                        n1:textSize="16.0sp" />
+                </LinearLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_marginTop="5.0dip"
+                    n1:background="@color/textgray" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginTop="30.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center_vertical"
+                    n1:text="抵扣详情"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_marginTop="5.0dip"
+                    n1:background="@color/textgray" />
+
+                <ListView
+                    n1:id="@+id/listview_kp"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_marginTop="5.0dip"
+                    n1:background="@color/textgray" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_marginTop="5.0dip"
+                    n1:background="@color/textgray" />
+
+                <LinearLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:orientation="horizontal"
+                    n1:visibility="visible">
+
+                    <TextView
+                        n1:id="@+id/textView_sign"
+                        n1:layout_width="fill_parent"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="16.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:layout_weight="1.0"
+                        n1:gravity="center_vertical"
+                        n1:text="客户签名"
+                        n1:textColor="@color/black"
+                        n1:textSize="20.0sp" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="上传签名"
+                        n1:textColor="@color/colorPrimaryDark"
+                        n1:textSize="20.0sp" />
+
+                    <ImageView
+                        n1:id="@+id/imageSign_pic"
+                        n1:layout_width="30.0dip"
+                        n1:layout_height="30.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:src="@drawable/icon_camera" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        n1:id="@+id/llybuttom"
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:layout_alignParentBottom="true"
+        n1:layout_marginBottom="5.0dip"
+        n1:orientation="vertical">
+
+        <Button
+            n1:id="@+id/button_next"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_marginLeft="15.0dip"
+            n1:layout_marginRight="15.0dip"
+            n1:layout_marginTop="0.0dip"
+            n1:background="@drawable/button_select"
+            n1:padding="10.0dip"
+            n1:text="提交订单"
+            n1:textColor="@color/white"
+            n1:textSize="20.0sp" />
+    </LinearLayout>
+</RelativeLayout>

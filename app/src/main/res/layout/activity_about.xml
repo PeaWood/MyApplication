@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:background="#ffeeeeee"
+    n1:orientation="vertical">
+
+    <LinearLayout
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:gravity="center"
+        n1:orientation="vertical">
+
+        <ImageView
+            n1:layout_width="60.0dip"
+            n1:layout_height="60.0dip"
+            n1:layout_marginTop="18.0dip"
+            n1:scaleType="fitCenter"
+            n1:src="@drawable/icon_app" />
+    </LinearLayout>
+
+    <TextView
+        n1:id="@+id/tv_about_us_show_version"
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:layout_marginTop="10.0dip"
+        n1:gravity="center"
+        n1:text="智慧配送"
+        n1:textSize="16.0sp" />
+
+    <View
+        n1:layout_width="fill_parent"
+        n1:layout_height="0.5dip"
+        n1:layout_marginTop="35.0dip"
+        n1:background="#ffcccccc" />
+
+    <Button
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:background="#ffffffff"
+        n1:gravity="left"
+        n1:onClick="update"
+        n1:paddingBottom="15.0dip"
+        n1:paddingLeft="30.0dip"
+        n1:paddingTop="10.0dip"
+        n1:text="版本编号:     v1.71.01(Beta版)"
+        n1:textColor="#ff000000"
+        n1:textSize="16.0sp" />
+
+    <LinearLayout
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:background="#ffffffff">
+
+        <View
+            n1:layout_width="fill_parent"
+            n1:layout_height="0.5dip"
+            n1:layout_marginLeft="15.0dip"
+            n1:background="#ffcccccc" />
+    </LinearLayout>
+
+    <Button
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:background="#ffffffff"
+        n1:gravity="left"
+        n1:onClick="boot"
+        n1:paddingBottom="15.0dip"
+        n1:paddingLeft="30.0dip"
+        n1:paddingTop="15.0dip"
+        n1:text="版本日期:     2020-05-15"
+        n1:textColor="#ff000000"
+        n1:textSize="16.0sp" />
+
+    <View
+        n1:layout_width="fill_parent"
+        n1:layout_height="0.5dip"
+        n1:background="#ffcccccc" />
+
+    <LinearLayout
+        n1:layout_width="fill_parent"
+        n1:layout_height="0.0dip"
+        n1:layout_marginTop="30.0dip"
+        n1:layout_weight="1.0"
+        n1:orientation="vertical">
+
+        <TextView
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_marginBottom="10.0dip"
+            n1:gravity="center"
+            n1:text="中电智慧  版权所有"
+            n1:textSize="15.0sp" />
+
+        <TextView
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:gravity="center"
+            n1:text="Copyright 2018-2020 cetc All Rights Reserved."
+            n1:textSize="15.0sp" />
+    </LinearLayout>
+</LinearLayout>

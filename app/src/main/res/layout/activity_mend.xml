@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:background="@color/backgroundcolor"
+    n1:orientation="vertical">
+
+    <ScrollView
+        n1:layout_width="fill_parent"
+        n1:layout_height="fill_parent"
+        n1:layout_above="@+id/llybuttom"
+        n1:fadingEdge="none">
+
+        <LinearLayout
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:orientation="vertical">
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="30.0dip"
+                n1:background="@color/colorPrimary"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_gravity="center"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:text="读卡器状态"
+                    n1:textColor="@color/white"
+                    n1:textSize="20.0sp" />
+
+                <TextView
+                    n1:id="@+id/msgText"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_gravity="center"
+                    n1:layout_weight="3.0"
+                    n1:text="读卡器状态"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="18.0sp" />
+
+                <ImageView
+                    n1:id="@+id/imageView_search"
+                    n1:layout_width="30.0dip"
+                    n1:layout_height="30.0dip"
+                    n1:layout_alignParentRight="true"
+                    n1:layout_marginRight="10.0dip"
+                    n1:src="@drawable/abs__menu_dropdown_panel_holo_light" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="150.0dip"
+                n1:layout_weight="1.0"
+                n1:background="@color/colorPrimaryDark"
+                n1:gravity="center_vertical"
+                n1:orientation="vertical"
+                n1:visibility="visible">
+
+                <TextView
+                    n1:id="@+id/items_orderSn"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_marginTop="10.0dip"
+                    n1:textColor="@color/white"
+                    n1:textSize="18.0sp" />
+
+                <LinearLayout
+                    n1:id="@+id/linearLayout_orderFirst"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:orientation="horizontal">
+
+                    <TextView
+                        n1:id="@+id/items_creatTime"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="16.0dip"
+                        n1:layout_marginTop="0.0dip"
+                        n1:layout_weight="1.0"
+                        n1:textColor="@color/white"
+                        n1:textSize="14.0sp" />
+
+                    <TextView
+                        n1:id="@+id/items_passedTime"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="0.0dip"
+                        n1:layout_marginTop="0.0dip"
+                        n1:layout_weight="1.0"
+                        n1:textColor="@color/colorAccent"
+                        n1:textSize="14.0sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    n1:id="@+id/linearLayout_orderSecond"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_below="@id/linearLayout_orderFirst"
+                    n1:orientation="horizontal">
+
+                    <ImageView
+                        n1:id="@+id/items_imageUserIcon"
+                        n1:layout_width="30.0dip"
+                        n1:layout_height="30.0dip"
+                        n1:layout_below="@id/linearLayout_orderFirst"
+                        n1:layout_marginLeft="16.0dip"
+                        n1:src="@drawable/icon_order" />
+
+                    <TextView
+                        n1:id="@+id/items_userId"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="5.0dip"
+                        n1:layout_marginTop="8.0dip"
+                        n1:layout_weight="1.0"
+                        n1:textColor="@color/white"
+                        n1:textSize="14.0sp" />
+
+                    <TextView
+                        n1:id="@+id/items_userPhone"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginTop="8.0dip"
+                        n1:layout_weight="1.0"
+                        n1:textColor="@color/white"
+                        n1:textSize="14.0sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    n1:id="@+id/linearLayout_orderThird"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_below="@id/linearLayout_orderSecond"
+                    n1:orientation="horizontal">
+
+                    <TextView
+                        n1:id="@+id/items_addressStatic"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_below="@id/linearLayout_orderSecond"
+                        n1:layout_marginLeft="16.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:hint="地 址："
+                        n1:textColorHint="@color/white"
+                        n1:textSize="14.0sp" />
+
+                    <TextView
+                        n1:id="@+id/items_address"
+                        n1:layout_width="fill_parent"
+                        n1:layout_height="wrap_content"
+                        n1:layout_below="@id/linearLayout_orderSecond"
+                        n1:layout_marginTop="10.0dip"
+                        n1:layout_toRightOf="@id/items_addressStatic"
+                        n1:layout_weight="10.0"
+                        n1:textColor="@color/white"
+                        n1:textSize="14.0sp" />
+
+                    <ImageView
+                        n1:id="@+id/imageView_call"
+                        n1:layout_width="50.0dip"
+                        n1:layout_height="50.0dip"
+                        n1:layout_alignParentRight="true"
+                        n1:layout_marginRight="10.0dip"
+                        n1:layout_weight="1.0"
+                        n1:clickable="false"
+                        n1:padding="5.0dip"
+                        n1:src="@mipmap/icon_call" />
+
+                    <ImageView
+                        n1:id="@+id/imageView_nav"
+                        n1:layout_width="50.0dip"
+                        n1:layout_height="50.0dip"
+                        n1:layout_alignParentRight="true"
+                        n1:layout_marginRight="10.0dip"
+                        n1:layout_weight="1.0"
+                        n1:clickable="false"
+                        n1:padding="5.0dip"
+                        n1:src="@mipmap/icon_maps" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:orientation="horizontal"
+                n1:visibility="visible">
+
+                <TextView
+                    n1:id="@+id/textView_goodsNameStatic"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_marginTop="10.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center_vertical"
+                    n1:text="报修单"
+                    n1:textColor="@color/black"
+                    n1:textSize="20.0sp" />
+
+                <TextView
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginTop="10.0dip"
+                    n1:text="照片上传"
+                    n1:textColor="@color/colorPrimaryDark"
+                    n1:textSize="20.0sp" />
+
+                <ImageView
+                    n1:id="@+id/imageView_pic"
+                    n1:layout_width="30.0dip"
+                    n1:layout_height="30.0dip"
+                    n1:layout_marginTop="10.0dip"
+                    n1:src="@drawable/icon_camera" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="fill_parent"
+                n1:layout_marginTop="10.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <ImageView
+                    n1:layout_width="34.0dip"
+                    n1:layout_height="38.0dip"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:src="@drawable/icon_time" />
+
+                <TextView
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:text="预约时间："
+                    n1:textColor="@color/black"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:id="@+id/textview_reserveTime"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:text=""
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="fill_parent"
+                n1:layout_marginTop="10.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <ImageView
+                    n1:layout_width="34.0dip"
+                    n1:layout_height="38.0dip"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:src="@drawable/icon_pay_status" />
+
+                <TextView
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:text="报修类型："
+                    n1:textColor="@color/black"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:id="@+id/textview_checkType"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:text=""
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="fill_parent"
+                n1:layout_marginTop="10.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <ImageView
+                    n1:layout_width="34.0dip"
+                    n1:layout_height="38.0dip"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:src="@drawable/icon_order_status" />
+
+                <TextView
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:text="报修详情："
+                    n1:textColor="@color/black"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:id="@+id/textview_checkDetail"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:text=""
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="fill_parent"
+                n1:layout_marginTop="10.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <ImageView
+                    n1:layout_width="34.0dip"
+                    n1:layout_height="38.0dip"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:src="@drawable/icon_ps" />
+
+                <TextView
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:text="处理结果："
+                    n1:textColor="@color/black"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/input_note"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:background="#00000000"
+                    n1:hint="结果"
+                    n1:padding="5.0dip"
+                    n1:textSize="16.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        n1:id="@+id/llybuttom"
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:layout_alignParentBottom="true"
+        n1:layout_marginBottom="5.0dip"
+        n1:orientation="vertical">
+
+        <Button
+            n1:id="@+id/button_next"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_marginLeft="15.0dip"
+            n1:layout_marginRight="15.0dip"
+            n1:layout_marginTop="0.0dip"
+            n1:background="@drawable/button_select"
+            n1:padding="10.0dip"
+            n1:text="报修完成"
+            n1:textColor="@color/white"
+            n1:textSize="20.0sp" />
+    </LinearLayout>
+</RelativeLayout>

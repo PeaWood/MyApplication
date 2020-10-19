@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:descendantFocusability="blocksDescendants"
+    n1:orientation="horizontal">
+
+    <ImageView
+        n1:id="@+id/items_imageView1"
+        n1:layout_width="40.0dip"
+        n1:layout_height="45.0dip"
+        n1:layout_marginLeft="10.0dip"
+        n1:layout_marginTop="0.0dip"
+        n1:src="@drawable/icon_bottle" />
+
+    <TextView
+        n1:id="@+id/items_number"
+        n1:layout_width="160.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="50.0dip"
+        n1:layout_marginTop="10.0dip"
+        n1:textColor="@color/textColorPrimary" />
+
+    <TextView
+        n1:id="@+id/items_spec"
+        n1:layout_width="wrap_content"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="210.0dip"
+        n1:layout_marginTop="10.0dip"
+        n1:textColor="@color/textColorPrimary" />
+
+    <TextView
+        n1:id="@+id/items_weight"
+        n1:layout_width="wrap_content"
+        n1:layout_height="wrap_content"
+        n1:layout_alignParentRight="true"
+        n1:layout_marginRight="10.0dip"
+        n1:layout_marginTop="10.0dip"
+        n1:textColor="@color/textColorPrimary" />
+</RelativeLayout>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="wrap_content"
+    n1:orientation="vertical">
+
+    <LinearLayout
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:layout_margin="10.0dip"
+        n1:orientation="vertical">
+
+        <TextView
+            n1:id="@+id/tv_album"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:background="@drawable/shape_album"
+            n1:gravity="center"
+            n1:padding="15.0dip"
+            n1:text="相册"
+            n1:textSize="16.0sp" />
+
+        <View
+            n1:layout_width="fill_parent"
+            n1:layout_height="1.0dip"
+            n1:background="#fff5f5f5" />
+
+        <TextView
+            n1:id="@+id/tv_camera"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:background="@drawable/shape_camera"
+            n1:gravity="center"
+            n1:padding="15.0dip"
+            n1:text="拍照"
+            n1:textSize="16.0sp" />
+
+        <TextView
+            n1:id="@+id/tv_cancel"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_marginTop="10.0dip"
+            n1:background="@drawable/shape_cancel"
+            n1:gravity="center"
+            n1:padding="15.0dip"
+            n1:text="取消"
+            n1:textSize="16.0sp" />
+    </LinearLayout>
+</LinearLayout>

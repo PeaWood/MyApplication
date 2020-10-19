@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="spinner_array_checkType">
+        <item>损坏，需更换</item>
+        <item>进水，需更换</item>
+        <item>重启正常</item>
+        <item>未使用</item>
+        <item>其它</item>
+    </string-array>
+    <string-array name="spinner_array_gp_head">
+        <item>KMA2B</item>
+        <item>KMA2BA</item>
+        <item>KMA2BB</item>
+        <item>KMA2BC</item>
+        <item>KMA2BD</item>
+        <item>KMA2BE</item>
+        <item>KMA2BF</item>
+        <item></item>
+    </string-array>
+    <string-array name="spinner_array_payType">
+        <item>现金支付</item>
+        <item>赊销</item>
+        <item>微信线下扫码支付</item>
+    </string-array>
+    <string-array name="spinner_array_payType_special">
+        <item>现金支付</item>
+    </string-array>
+</resources>

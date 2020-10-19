@@ -1,0 +1,934 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    n1:layout_width="fill_parent"
+    n1:layout_height="wrap_content"
+    n1:orientation="vertical"
+    n1:tag="layout/show_deposit_slip_0">
+
+    <ScrollView
+        n1:id="@+id/llyview"
+        n1:layout_width="fill_parent"
+        n1:layout_height="fill_parent"
+        n1:fadingEdge="none">
+
+        <LinearLayout
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_marginBottom="20.0dip"
+            n1:layout_marginLeft="20.0dip"
+            n1:layout_marginRight="20.0dip"
+            n1:layout_marginTop="20.0dip"
+            n1:background="@drawable/radius_drawable_bg"
+            n1:orientation="vertical"
+            n1:padding="10.0dip">
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginTop="10.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:text="瓶换瓶"
+                n1:textSize="10.0sp" />
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:gravity="center"
+                    n1:text="规格"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="数量"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:hint="  5Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_ptp_5kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:hint="15Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_ptp_15kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:hint="50Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_ptp_50kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginTop="10.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:text="欠瓶"
+                n1:textSize="10.0sp" />
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:gravity="center"
+                    n1:text="规格"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="数量"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:hint="  5Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_qp_5kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:hint="15Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_qp_15kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:hint="50Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_qp_50kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginTop="10.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:text="还瓶"
+                n1:textSize="10.0sp" />
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:gravity="center"
+                    n1:text="规格"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="数量"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:hint="  5Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_hp_5kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:hint="15Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_hp_15kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:hint="50Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_hp_50kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginTop="0.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:text="押金瓶"
+                n1:textSize="10.0sp" />
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="规格"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="数量"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="押金(元)"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:hint="  5Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_yjp_5kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_yjp_5kg_ys"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:hint="15Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_yjp_15kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_yjp_15kg_ys"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:hint="50Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_yjp_50kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_yjp_50kg_ys"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginTop="0.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:text="钢检瓶"
+                n1:textSize="10.0sp" />
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="规格"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="数量"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="金额(元)"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:hint="  5Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_gjp_5kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_gjp_5kg_ys"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:hint="15Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_gjp_15kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_gjp_15kg_ys"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:hint="50Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_gjp_50kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_gjp_50kg_ys"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginTop="0.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:text="报废瓶"
+                n1:textSize="10.0sp" />
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="规格"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="数量"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:text="金额(元)"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:hint="  5Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_bfp_5kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_bfp_5kg_ys"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:id="@+id/input_layout_15kg"
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:hint="15Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_bfp_15kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_bfp_15kg_ys"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="1.0"
+                    n1:hint="50Kg"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_bfp_50kg_quantity"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+
+                <EditText
+                    n1:id="@+id/textView_bfp_50kg_ys"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginTop="0.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:text="合计(元)"
+                n1:textSize="10.0sp" />
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:gravity="center_vertical"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_weight="3.0"
+                    n1:hint="实收"
+                    n1:textColorHint="@color/textColorPrimary"
+                    n1:textSize="15.0sp" />
+
+                <TextView
+                    n1:id="@+id/textView_ys"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:layout_weight="1.0"
+                    n1:gravity="center"
+                    n1:hint="0"
+                    n1:inputType="number"
+                    n1:padding="5.0dip"
+                    n1:textSize="15.0sp" />
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/white" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

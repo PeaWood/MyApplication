@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:orientation="vertical"
+    n1:tag="layout/activity_qianzi_0">
+
+
+    <com.venusic.handwrite.view.HandWriteView xmlns:n2="http://schemas.android.com/apk/res-auto"
+        n1:id="@+id/view"
+        n1:layout_width="fill_parent"
+        n1:layout_height="fill_parent"
+        n2:paintColor="#ff000000"
+        n2:paintMaxWidth="20.0px"
+        n2:paintMinWidth="10.0px" />
+
+    <LinearLayout
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:layout_alignParentBottom="true"
+        n1:orientation="horizontal">
+
+        <Button
+            n1:id="@+id/save"
+            n1:layout_width="wrap_content"
+            n1:layout_height="wrap_content"
+            n1:text="保存" />
+
+        <Button
+            n1:id="@+id/clear"
+            n1:layout_width="wrap_content"
+            n1:layout_height="wrap_content"
+            n1:layout_marginLeft="250.0dip"
+            n1:text="清除" />
+    </LinearLayout>
+</RelativeLayout>

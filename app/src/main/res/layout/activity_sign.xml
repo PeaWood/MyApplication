@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:id="@+id/llyview"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:fadingEdge="none"
+    n1:tag="layout/activity_sign_0">
+
+    <RelativeLayout
+        n1:layout_width="fill_parent"
+        n1:layout_height="fill_parent"
+        n1:background="@color/backgroundcolor"
+        n1:orientation="vertical">
+
+        <LinearLayout
+            n1:id="@+id/llytop"
+            n1:layout_width="fill_parent"
+            n1:layout_height="150.0dip"
+            n1:background="@color/colorPrimaryDark"
+            n1:gravity="center_vertical"
+            n1:orientation="vertical"
+            n1:visibility="visible">
+
+            <TextView
+                n1:id="@+id/items_orderSn"
+                n1:layout_width="wrap_content"
+                n1:layout_height="wrap_content"
+                n1:layout_marginLeft="16.0dip"
+                n1:layout_marginTop="0.0dip"
+                n1:textColor="@color/white"
+                n1:textSize="14.0sp" />
+
+            <LinearLayout
+                n1:id="@+id/linearLayout_orderFirst"
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:id="@+id/items_creatTime"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:layout_marginTop="0.0dip"
+                    n1:layout_weight="1.0"
+                    n1:textColor="@color/white"
+                    n1:textSize="14.0sp" />
+
+                <TextView
+                    n1:id="@+id/items_passedTime"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="0.0dip"
+                    n1:layout_marginTop="0.0dip"
+                    n1:layout_weight="1.0"
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="14.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:id="@+id/linearLayout_orderSecond"
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_below="@id/linearLayout_orderFirst"
+                n1:orientation="horizontal">
+
+                <ImageView
+                    n1:id="@+id/items_imageUserIcon"
+                    n1:layout_width="30.0dip"
+                    n1:layout_height="30.0dip"
+                    n1:layout_below="@id/linearLayout_orderFirst"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:src="@drawable/icon_order" />
+
+                <TextView
+                    n1:id="@+id/items_userId"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:layout_marginTop="8.0dip"
+                    n1:layout_weight="1.0"
+                    n1:textColor="@color/white"
+                    n1:textSize="14.0sp" />
+
+                <TextView
+                    n1:id="@+id/items_userPhone"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginTop="8.0dip"
+                    n1:layout_weight="1.0"
+                    n1:textColor="@color/white"
+                    n1:textSize="14.0sp" />
+
+                <TextView
+                    n1:id="@+id/items_userCredit"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginTop="8.0dip"
+                    n1:layout_weight="1.0"
+                    n1:textColor="@color/white"
+                    n1:textSize="14.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:id="@+id/linearLayout_orderThird"
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_below="@id/linearLayout_orderSecond"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:id="@+id/items_addressStatic"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_below="@id/linearLayout_orderSecond"
+                    n1:layout_marginLeft="16.0dip"
+                    n1:hint="地 址："
+                    n1:textColorHint="@color/white"
+                    n1:textSize="14.0sp" />
+
+                <TextView
+                    n1:id="@+id/items_address"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_below="@id/linearLayout_orderSecond"
+                    n1:layout_toRightOf="@id/items_addressStatic"
+                    n1:layout_weight="10.0"
+                    n1:textColor="@color/white"
+                    n1:textSize="14.0sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            n1:id="@+id/llytop2"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_below="@id/llytop"
+            n1:orientation="vertical">
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:orientation="vertical"
+                n1:visibility="visible">
+
+                <RelativeLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:descendantFocusability="blocksDescendants"
+                    n1:orientation="horizontal">
+
+                    <TextView
+                        n1:layout_width="200.0dip"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="20.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="商品名称"
+                        n1:textColor="@color/popup_main_background" />
+
+                    <TextView
+                        n1:layout_width="50.0dip"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="150.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="数量"
+                        n1:textColor="@color/popup_main_background" />
+
+                    <TextView
+                        n1:layout_width="50.0dip"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="210.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="原价"
+                        n1:textColor="@color/popup_main_background" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_alignParentRight="true"
+                        n1:layout_marginRight="10.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="成交价"
+                        n1:textColor="@color/popup_main_background" />
+                </RelativeLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_below="@id/textView_goodsNameStatic"
+                    n1:layout_marginTop="10.0dip"
+                    n1:background="@color/textgray" />
+
+                <ListView
+                    n1:id="@+id/listview"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content" />
+
+                <RelativeLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:descendantFocusability="blocksDescendants"
+                    n1:orientation="horizontal">
+
+                    <TextView
+                        n1:layout_width="200.0dip"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="20.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="商品合计"
+                        n1:textColor="@color/popup_main_background" />
+
+                    <TextView
+                        n1:id="@+id/items_totalQuantity"
+                        n1:layout_width="50.0dip"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="150.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="数量"
+                        n1:textColor="@color/popup_main_background" />
+
+                    <TextView
+                        n1:id="@+id/items_totalMountOrignal"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="210.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="价格"
+                        n1:textColor="@color/colorAccent" />
+
+                    <TextView
+                        n1:id="@+id/items_totalMountDeal"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_alignParentRight="true"
+                        n1:layout_marginRight="10.0dip"
+                        n1:layout_marginTop="5.0dip"
+                        n1:text="商品金额"
+                        n1:textColor="@color/colorAccent"
+                        n1:textSize="20.0dip" />
+                </RelativeLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="1.0dip"
+                    n1:layout_marginTop="10.0dip"
+                    n1:background="@color/colorPrimary" />
+
+                <RelativeLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:descendantFocusability="blocksDescendants"
+                    n1:orientation="horizontal">
+
+                    <TextView
+                        n1:layout_width="200.0dip"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="20.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="钢瓶种类"
+                        n1:textColor="@color/popup_main_background" />
+
+                    <TextView
+                        n1:layout_width="50.0dip"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="180.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="数量"
+                        n1:textColor="@color/popup_main_background" />
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_alignParentRight="true"
+                        n1:layout_marginRight="10.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="钢瓶金额"
+                        n1:textColor="@color/popup_main_background" />
+                </RelativeLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="0.5dip"
+                    n1:layout_below="@id/textView_goodsNameStatic"
+                    n1:layout_marginTop="10.0dip"
+                    n1:background="@color/textgray" />
+
+                <ListView
+                    n1:id="@+id/yjlistview"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content" />
+
+                <RelativeLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:descendantFocusability="blocksDescendants"
+                    n1:orientation="horizontal">
+
+                    <TextView
+                        n1:layout_width="200.0dip"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="20.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="钢瓶合计"
+                        n1:textColor="@color/popup_main_background" />
+
+                    <TextView
+                        n1:id="@+id/items_totalQuantityGp"
+                        n1:layout_width="50.0dip"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="180.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="数量"
+                        n1:textColor="@color/popup_main_background" />
+
+                    <TextView
+                        n1:id="@+id/items_totalMountDealGp"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_alignParentRight="true"
+                        n1:layout_marginRight="10.0dip"
+                        n1:layout_marginTop="5.0dip"
+                        n1:text="金额"
+                        n1:textColor="@color/colorAccent"
+                        n1:textSize="20.0dip" />
+                </RelativeLayout>
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="1.0dip"
+                    n1:layout_marginTop="10.0dip"
+                    n1:background="@color/colorPrimary" />
+
+                <RelativeLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:descendantFocusability="blocksDescendants"
+                    n1:orientation="horizontal">
+
+                    <TextView
+                        n1:layout_width="200.0dip"
+                        n1:layout_height="wrap_content"
+                        n1:layout_marginLeft="20.0dip"
+                        n1:layout_marginTop="10.0dip"
+                        n1:text="总收合计"
+                        n1:textColor="@color/popup_main_background"
+                        n1:textSize="20.0dip" />
+
+                    <TextView
+                        n1:id="@+id/items_totalAcount"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_alignParentRight="true"
+                        n1:layout_marginRight="10.0dip"
+                        n1:layout_marginTop="5.0dip"
+                        n1:text="总收"
+                        n1:textColor="@color/colorAccent"
+                        n1:textSize="20.0dip" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="1.0dip"
+                n1:layout_marginTop="10.0dip"
+                n1:background="@color/colorPrimary" />
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="fill_parent"
+                n1:layout_marginTop="0.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:text="空瓶回收"
+                n1:textColor="@color/black"
+                n1:textSize="15.0sp" />
+
+            <ListView
+                n1:id="@+id/listview_kp"
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content" />
+
+            <RelativeLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="fill_parent"
+                n1:descendantFocusability="blocksDescendants"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="200.0dip"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="20.0dip"
+                    n1:layout_marginTop="10.0dip"
+                    n1:text="合计"
+                    n1:textColor="@color/popup_main_background" />
+
+                <TextView
+                    n1:id="@+id/items_totalCountKP"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_alignParentRight="true"
+                    n1:layout_marginRight="10.0dip"
+                    n1:text=""
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="20.0dip" />
+            </RelativeLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="fill_parent"
+                n1:layout_marginTop="0.0dip"
+                n1:layout_weight="1.0"
+                n1:gravity="center_vertical"
+                n1:text="重瓶录入"
+                n1:textColor="@color/black"
+                n1:textSize="15.0sp" />
+
+            <ListView
+                n1:id="@+id/listview_zp"
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content" />
+
+            <RelativeLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="fill_parent"
+                n1:descendantFocusability="blocksDescendants"
+                n1:orientation="horizontal">
+
+                <TextView
+                    n1:layout_width="200.0dip"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="20.0dip"
+                    n1:layout_marginTop="10.0dip"
+                    n1:text="合计"
+                    n1:textColor="@color/popup_main_background" />
+
+                <TextView
+                    n1:id="@+id/items_totalCountZP"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_alignParentRight="true"
+                    n1:layout_marginRight="10.0dip"
+                    n1:text=""
+                    n1:textColor="@color/colorAccent"
+                    n1:textSize="20.0dip" />
+            </RelativeLayout>
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="0.5dip"
+                n1:layout_marginTop="5.0dip"
+                n1:background="@color/textgray" />
+        </LinearLayout>
+
+        <LinearLayout
+            n1:id="@+id/llybuttom3"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_below="@id/llytop2"
+            n1:orientation="vertical">
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:orientation="vertical">
+
+                <TextView
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="fill_parent"
+                    n1:text="安全提示："
+                    n1:textColor="@color/black" />
+
+                <CheckBox
+                    style="@style/CustomCheckboxTheme"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:text="胶管不合格，请予更换"
+                    n1:textColor="@color/black"
+                    n1:textSize="18.0dip" />
+
+                <CheckBox
+                    style="@style/CustomCheckboxTheme"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:text="调压阀不合格，请予更换"
+                    n1:textColor="@color/black"
+                    n1:textSize="18.0dip" />
+
+                <CheckBox
+                    style="@style/CustomCheckboxTheme"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:text="灶具不合格，请予更换"
+                    n1:textColor="@color/black"
+                    n1:textSize="18.0dip" />
+
+                <CheckBox
+                    style="@style/CustomCheckboxTheme"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:text="用气环境不合格，请予更换"
+                    n1:textColor="@color/black"
+                    n1:textSize="18.0dip" />
+
+                <CheckBox
+                    style="@style/CustomCheckboxTheme"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:text="自换"
+                    n1:textColor="@color/black"
+                    n1:textSize="18.0dip" />
+
+                <CheckBox
+                    style="@style/CustomCheckboxTheme"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:text="安全检查无泄漏"
+                    n1:textColor="@color/black"
+                    n1:textSize="18.0dip" />
+
+                <CheckBox
+                    style="@style/CustomCheckboxTheme"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:text="重瓶封口完整"
+                    n1:textColor="@color/black"
+                    n1:textSize="18.0dip" />
+
+                <CheckBox
+                    style="@style/CustomCheckboxTheme"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:text="已对用户做用气安全培训"
+                    n1:textColor="@color/black"
+                    n1:textSize="18.0dip" />
+
+                <CheckBox
+                    style="@style/CustomCheckboxTheme"
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:text="为了保障您的用气安全，请自觉遵守用气安全规定。"
+                    n1:textColor="@color/black"
+                    n1:textSize="18.0dip" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:orientation="horizontal">
+
+                <CheckBox
+                    n1:id="@+id/checkbox"
+                    style="@style/CustomCheckboxTheme"
+                    n1:layout_width="250.0dip"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="5.0dip"
+                    n1:text="我已确认订单信息"
+                    n1:textColor="@color/black"
+                    n1:textSize="20.0sp" />
+
+                <Button
+                    n1:id="@+id/btn1"
+                    n1:layout_width="100.0dip"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginLeft="10.0dip"
+                    n1:background="@drawable/checkbtn"
+                    n1:padding="1.0dip"
+                    n1:text="签名"
+                    n1:textColor="@color/white"
+                    n1:textSize="20.0sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            n1:id="@+id/llybuttom2"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_below="@id/llybuttom3"
+            n1:orientation="vertical">
+
+            <ImageView
+                n1:id="@+id/img1"
+                n1:layout_width="fill_parent"
+                n1:layout_height="160.0dip"
+                n1:background="#ffffffff"
+                n1:scaleType="centerInside" />
+        </LinearLayout>
+
+        <LinearLayout
+            n1:id="@+id/llybuttom1"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_below="@id/llybuttom2"
+            n1:orientation="horizontal">
+
+            <Button
+                n1:id="@+id/btn_upload"
+                n1:layout_width="200.0dip"
+                n1:layout_height="wrap_content"
+                n1:layout_marginBottom="0.0dip"
+                n1:layout_marginRight="15.0dip"
+                n1:background="@drawable/button_select"
+                n1:padding="10.0dip"
+                n1:text="上传签名"
+                n1:textColor="@color/white"
+                n1:textSize="20.0sp" />
+
+            <TextView
+                n1:id="@+id/textview_picUploadResult"
+                n1:layout_width="wrap_content"
+                n1:layout_height="wrap_content"
+                n1:layout_marginLeft="10.0dip"
+                n1:text="上传结果"
+                n1:textColor="@color/popup_main_background"
+                n1:textSize="20.0sp" />
+        </LinearLayout>
+    </RelativeLayout>
+</ScrollView>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:descendantFocusability="blocksDescendants"
+    n1:orientation="horizontal">
+
+    <ImageView
+        n1:id="@+id/items_imageViewIsOK"
+        n1:layout_width="50.0dip"
+        n1:layout_height="70.0dip"
+        n1:layout_marginLeft="10.0dip"
+        n1:layout_marginTop="10.0dip"
+        n1:src="@drawable/warning" />
+
+    <TextView
+        n1:id="@+id/items_number"
+        n1:layout_width="150.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="60.0dip"
+        n1:layout_marginTop="10.0dip"
+        n1:hint="钢瓶编码"
+        n1:textColor="@color/textColorPrimary" />
+
+    <TextView
+        n1:id="@+id/items_chongweight"
+        n1:layout_width="110.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="260.0dip"
+        n1:layout_marginTop="10.0dip"
+        n1:hint="充装量"
+        n1:textColor="@color/textColorPrimary" />
+
+    <TextView
+        n1:id="@+id/items_kpweight"
+        n1:layout_width="100.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="60.0dip"
+        n1:layout_marginTop="30.0dip"
+        n1:hint="空瓶重"
+        n1:textColor="@color/textColorPrimary" />
+
+    <TextView
+        n1:id="@+id/items_tareweight"
+        n1:layout_width="120.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="160.0dip"
+        n1:layout_marginTop="30.0dip"
+        n1:hint="皮重"
+        n1:textColor="@color/textColorPrimary" />
+
+    <TextView
+        n1:id="@+id/items_canqiweight"
+        n1:layout_width="100.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="260.0dip"
+        n1:layout_marginTop="30.0dip"
+        n1:hint="残气重"
+        n1:textColor="@color/textColorPrimary" />
+
+    <TextView
+        n1:id="@+id/items_originalPrice"
+        n1:layout_width="100.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="60.0dip"
+        n1:layout_marginTop="50.0dip"
+        n1:hint="购买价"
+        n1:textColor="@color/textColorPrimary" />
+
+    <TextView
+        n1:id="@+id/items_gasPrice"
+        n1:layout_width="100.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="160.0dip"
+        n1:layout_marginTop="50.0dip"
+        n1:hint="气价"
+        n1:textColor="@color/textColorPrimary" />
+
+    <TextView
+        n1:id="@+id/items_canqiPrice"
+        n1:layout_width="100.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="260.0dip"
+        n1:layout_marginTop="50.0dip"
+        n1:hint="退残金额"
+        n1:textColor="@color/textColorPrimary" />
+
+    <TextView
+        n1:id="@+id/items_note"
+        n1:layout_width="260.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="60.0dip"
+        n1:layout_marginTop="70.0dip"
+        n1:hint="备注"
+        n1:textColor="@color/textColorPrimary" />
+</RelativeLayout>

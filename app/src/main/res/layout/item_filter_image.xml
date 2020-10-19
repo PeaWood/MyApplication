@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="wrap_content"
+    n1:layout_height="wrap_content">
+
+    <RelativeLayout
+        n1:layout_width="90.0dip"
+        n1:layout_height="90.0dip"
+        n1:layout_centerInParent="true">
+
+        <ImageView
+            n1:id="@+id/fiv"
+            n1:layout_width="80.0dip"
+            n1:layout_height="80.0dip"
+            n1:layout_marginTop="10.0dip"
+            n1:contentDescription="@null"
+            n1:scaleType="centerCrop"
+            n1:src="@color/color_f6" />
+
+        <LinearLayout
+            n1:id="@+id/ll_del"
+            n1:layout_width="30.0dip"
+            n1:layout_height="30.0dip"
+            n1:layout_alignParentRight="true"
+            n1:gravity="end"
+            n1:orientation="vertical">
+
+            <ImageView
+                n1:id="@+id/iv_del"
+                n1:layout_width="25.0dip"
+                n1:layout_height="25.0dip"
+                n1:contentDescription="@null"
+                n1:scaleType="fitXY"
+                n1:src="@drawable/delete" />
+        </LinearLayout>
+
+        <TextView
+            n1:id="@+id/tv_duration"
+            n1:layout_width="80.0dip"
+            n1:layout_height="30.0dip"
+            n1:layout_alignParentBottom="true"
+            n1:layout_marginBottom="5.0dip"
+            n1:background="@drawable/buybuybuy"
+            n1:drawableLeft="@drawable/video_icon"
+            n1:drawablePadding="5.0dip"
+            n1:gravity="center_vertical"
+            n1:paddingLeft="5.0dip"
+            n1:paddingTop="8.0dip"
+            n1:text="00:00"
+            n1:textColor="@color/white"
+            n1:textSize="12.0sp"
+            n1:visibility="gone" />
+    </RelativeLayout>
+</RelativeLayout>

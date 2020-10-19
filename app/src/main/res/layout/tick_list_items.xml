@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:descendantFocusability="blocksDescendants"
+    n1:orientation="horizontal">
+
+    <ImageView
+        n1:id="@+id/items_imageView1"
+        n1:layout_width="45.0dip"
+        n1:layout_height="45.0dip"
+        n1:layout_marginLeft="10.0dip"
+        n1:layout_marginTop="0.0dip"
+        n1:src="@drawable/icon_ticket" />
+
+    <TextView
+        n1:id="@+id/items_baseInfo"
+        n1:layout_width="300.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_marginTop="5.0dip"
+        n1:layout_toRightOf="@id/items_imageView1"
+        n1:textColor="@color/transparent_background" />
+
+    <TextView
+        n1:id="@+id/items_validTime"
+        n1:layout_width="300.0dip"
+        n1:layout_height="wrap_content"
+        n1:layout_below="@id/items_baseInfo"
+        n1:layout_toRightOf="@id/items_imageView1"
+        n1:textColor="@color/transparent_background" />
+</RelativeLayout>

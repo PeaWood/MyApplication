@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="wrap_content"
+    n1:orientation="vertical">
+
+    <LinearLayout
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:layout_marginBottom="20.0dip"
+        n1:layout_marginLeft="20.0dip"
+        n1:layout_marginRight="20.0dip"
+        n1:layout_marginTop="20.0dip"
+        n1:background="@drawable/radius_drawable_bg"
+        n1:orientation="vertical"
+        n1:padding="10.0dip">
+
+        <LinearLayout
+            n1:id="@+id/input_layout_head"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:gravity="center_vertical"
+            n1:orientation="horizontal">
+
+            <ImageView
+                n1:layout_width="60.0dip"
+                n1:layout_height="60.0dip"
+                n1:src="@drawable/icon_bottle" />
+
+            <TextView
+                n1:id="@+id/textView_bottleCode"
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginLeft="10.0dip"
+                n1:background="#00000000"
+                n1:hint="瓶号"
+                n1:padding="5.0dip"
+                n1:textSize="16.0sp" />
+        </LinearLayout>
+
+        <View
+            n1:layout_width="fill_parent"
+            n1:layout_height="1.0px"
+            n1:layout_marginBottom="5.0dip"
+            n1:layout_marginTop="5.0dip"
+            n1:background="#ffeeeeee" />
+
+        <LinearLayout
+            n1:id="@+id/input_layout_check"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:gravity="center_vertical"
+            n1:orientation="horizontal">
+
+            <ImageView
+                n1:layout_width="60.0dip"
+                n1:layout_height="60.0dip"
+                n1:src="@drawable/icon_bottle" />
+
+            <TextView
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginLeft="10.0dip"
+                n1:layout_weight="3.0"
+                n1:background="#00000000"
+                n1:hint="报废日期"
+                n1:padding="5.0dip"
+                n1:textSize="16.0sp" />
+
+            <TextView
+                n1:id="@+id/textView_scrapDate"
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginLeft="10.0dip"
+                n1:layout_weight="2.0"
+                n1:background="#00000000"
+                n1:hint="报废日期"
+                n1:padding="5.0dip"
+                n1:textSize="15.0sp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

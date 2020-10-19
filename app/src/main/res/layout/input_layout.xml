@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="wrap_content"
+    n1:orientation="vertical">
+
+    <LinearLayout
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:layout_marginLeft="20.0dip"
+        n1:layout_marginTop="20.0dip"
+        n1:layout_marginRight="20.0dip"
+        n1:layout_marginBottom="20.0dip"
+        n1:background="@drawable/radius_drawable_bg"
+        n1:orientation="vertical"
+        n1:padding="10.0dip">
+
+        <LinearLayout
+            n1:id="@+id/input_layout_name"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:gravity="center_vertical"
+            n1:orientation="horizontal">
+
+            <ImageView
+                n1:layout_width="40.0dip"
+                n1:layout_height="40.0dip"
+                n1:src="@drawable/icon_userlogo" />
+
+            <EditText
+                n1:id="@+id/input_userId"
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginLeft="10.0dip"
+                n1:background="#00000000"
+                n1:hint="用户名"
+                n1:padding="5.0dip"
+                n1:textSize="16.0sp" />
+        </LinearLayout>
+
+        <View
+            n1:layout_width="fill_parent"
+            n1:layout_height="1.0px"
+            n1:layout_marginTop="5.0dip"
+            n1:layout_marginBottom="5.0dip"
+            n1:background="#ffeeeeee" />
+
+        <LinearLayout
+            n1:id="@+id/input_layout_psw"
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:gravity="center_vertical"
+            n1:orientation="horizontal">
+
+            <ImageView
+                n1:layout_width="40.0dip"
+                n1:layout_height="40.0dip"
+                n1:src="@drawable/icon_password" />
+
+            <EditText
+                n1:id="@+id/input_password"
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_marginLeft="10.0dip"
+                n1:background="#00000000"
+                n1:hint="密码"
+                n1:inputType="textPassword"
+                n1:padding="5.0dip"
+                n1:textSize="16.0sp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

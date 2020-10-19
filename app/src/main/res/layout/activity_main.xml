@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:id="@android:id/tabhost"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:background="@color/backgroundcolor">
+
+    <LinearLayout
+        n1:layout_width="fill_parent"
+        n1:layout_height="fill_parent"
+        n1:orientation="vertical">
+
+        <FrameLayout
+            n1:id="@android:id/tabcontent"
+            n1:layout_width="fill_parent"
+            n1:layout_height="fill_parent"
+            n1:layout_weight="1.0" />
+
+        <ImageView
+            n1:layout_width="fill_parent"
+            n1:layout_height="1.0dip"
+            n1:layout_marginBottom="5.0dip"
+            n1:background="@color/shallowgray" />
+
+        <LinearLayout
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_weight="0.0"
+            n1:orientation="horizontal"
+            n1:paddingBottom="2.0dip">
+
+            <LinearLayout
+                n1:id="@+id/linearlayout_vaildorders"
+                n1:layout_width="wrap_content"
+                n1:layout_height="wrap_content"
+                n1:layout_weight="1.0"
+                n1:gravity="center_horizontal"
+                n1:orientation="vertical">
+
+                <ImageView
+                    n1:id="@+id/img_vaildorders"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:src="@mipmap/ic_menu_deal_off"
+                    n1:scaleType="matrix" />
+
+                <TextView
+                    n1:id="@+id/text_vaildorders"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:text="待抢订单"
+                    n1:textColor="@color/textgray"
+                    n1:textSize="12.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:id="@+id/linearlayout_myorders"
+                n1:layout_width="wrap_content"
+                n1:layout_height="wrap_content"
+                n1:layout_weight="1.0"
+                n1:gravity="center_horizontal"
+                n1:orientation="vertical">
+
+                <ImageView
+                    n1:id="@+id/img_myorders"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:src="@mipmap/ic_menu_poi_off"
+                    n1:scaleType="centerCrop" />
+
+                <TextView
+                    n1:id="@+id/text_myorders"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:text="我的订单"
+                    n1:textColor="@color/textgray"
+                    n1:textSize="12.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:id="@+id/linearlayout_mycheck"
+                n1:layout_width="wrap_content"
+                n1:layout_height="wrap_content"
+                n1:layout_weight="1.0"
+                n1:gravity="center_horizontal"
+                n1:orientation="vertical">
+
+                <ImageView
+                    n1:id="@+id/img_mycheck"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:src="@mipmap/ic_menu_more_off"
+                    n1:scaleType="matrix" />
+
+                <TextView
+                    n1:id="@+id/text_mycheck"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:text="我的巡检"
+                    n1:textColor="@color/textgray"
+                    n1:textSize="12.0sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:id="@+id/linearlayout_mine"
+                n1:layout_width="wrap_content"
+                n1:layout_height="wrap_content"
+                n1:layout_weight="1.0"
+                n1:gravity="center_horizontal"
+                n1:orientation="vertical">
+
+                <ImageView
+                    n1:id="@+id/img_mine"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:src="@mipmap/ic_menu_user_on"
+                    n1:scaleType="matrix" />
+
+                <TextView
+                    n1:id="@+id/text_mine"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:text="我的信息"
+                    n1:textColor="@color/textgray"
+                    n1:textSize="12.0sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TabWidget
+            n1:id="@android:id/tabs"
+            n1:layout_width="fill_parent"
+            n1:layout_height="50.0dip"
+            n1:visibility="gone" />
+    </LinearLayout>
+</TabHost>
