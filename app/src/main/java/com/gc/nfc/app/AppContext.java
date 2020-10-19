@@ -15,6 +15,7 @@ import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 
 public class AppContext extends Application {
+  //
   private String groupCode;
   
   private String groupName;
