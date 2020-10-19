@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -36,24 +37,26 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
     public static JSONArray m_checkOrderListJson;
 
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ListView listView;
 
     private void switchActivity(int paramInt) {
         try {
             Intent intent = new Intent();
             Bundle bundle = new Bundle();
             bundle.putString("check", m_checkOrderListJson.getJSONObject(paramInt).toString());
-            intent.setClass((Context) this, MendDetailActivity.class);
+            intent.setClass(this, MendDetailActivity.class);
             intent.putExtras(bundle);
             startActivity(intent);
         } catch (JSONException jSONException) {
-            Toast.makeText((Context) this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
     void init() {
         requestWindowFeature(1);
         setContentView(R.layout.activity_my_mend);
-        ((ListView) findViewById(R.id.listview)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView = findViewById(R.id.listview);
+        (listView).setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
                 MyMendActivity.this.switchActivity(param1Int);
             }
@@ -146,9 +149,12 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
                     hashMap.put("userIcon", R.mipmap.ic_menu_user_on);
                     list.add(hashMap);
                 }
-                //SimpleAdapter simpleAdapter = new SimpleAdapter();
-                //this((List)param1Object, 2131361883, new String[] { "orderSn", "createTime", "userId", "userPhone", "userIcon", "address", "orderStatus", "urgent" }, new int[] { 2131230871, 2131230858, 2131230889, 2131230890, 2131230863, 2131230852, 2131230872, 2131230887 });
-                //((ListView)MyMendActivity.this.findViewById(2131230927)).setAdapter((ListAdapter)simpleAdapter);
+                SimpleAdapter simpleAdapter = new SimpleAdapter(MyMendActivity.this,
+                        list,
+                        R.layout.order_list_items,
+                        new String[]{"orderSn", "createTime", "userId", "userPhone", "userIcon", "address", "orderStatus", "urgent"},
+                        new int[]{R.id.items_orderSn, R.id.items_creatTime, R.id.items_userId, R.id.items_userPhone, R.id.items_imageUserIcon, R.id.items_address, R.id.items_orderStatus, R.id.items_urgent});
+                listView.setAdapter(simpleAdapter);
             }
         });
     }
