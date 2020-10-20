@@ -139,6 +139,7 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
                 startActivity(new Intent(this, HistoryCheckActivity.class));
                 break;
             case R.id.lL_myBottle:
+                //我的气瓶
                 Intent intent = new Intent(this, MybottlesActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("userId", this.user.getUsername());
@@ -146,9 +147,11 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.lL_myMend:
+                //我的保修
                 startActivity(new Intent(this, MyMendActivity.class));
                 break;
             case R.id.lL_mySecurity:
+                //我的安检
                 startActivity(new Intent(this, MySecurityActivity.class));
                 break;
             case R.id.lL_mySetting:

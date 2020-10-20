@@ -129,6 +129,13 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
             }
 
             private void setData(Data_Mend data_mend) {
+                Gson gson  = new Gson();
+                try {
+                    JSONArray array = new JSONArray(gson.toJson(data_mend.getItems()));
+                    m_checkOrderListJson = array;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 ArrayList list = new ArrayList();
                 int size = data_mend.getItems().size();
                 for (byte b = 0; b < size; b++) {

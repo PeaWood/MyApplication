@@ -32,22 +32,9 @@ import org.json.JSONObject;
 public class HistoryOrdersActivity extends BaseActivity implements View.OnClickListener, AbsListView.OnScrollListener {
   public static JSONArray m_taskOrderListJson;
   
-  private Handler handler = new Handler() {
-      public void handleMessage(Message param1Message) {
-        super.handleMessage(param1Message);
-        switch (param1Message.what) {
-          default:
-            return;
-          case 257:
-            break;
-        } 
-        if (HistoryOrdersActivity.this.swipeRefreshLayout.isRefreshing())
-          HistoryOrdersActivity.this.swipeRefreshLayout.setRefreshing(false); 
-      }
-    };
-  
   private SwipeRefreshLayout swipeRefreshLayout;
-  
+  private ListView listView;
+
   private void switchActivity(int paramInt) {
     try {
 //      Intent intent = new Intent();
@@ -65,16 +52,17 @@ public class HistoryOrdersActivity extends BaseActivity implements View.OnClickL
   void init() {
     requestWindowFeature(1);
     setContentView(R.layout.activity_history_orders);
-    ((ListView)findViewById(R.id.listview)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    listView = (ListView) findViewById(R.id.listview);
+    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
           public void onItemClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
-            HistoryOrdersActivity.this.switchActivity(param1Int);
+            switchActivity(param1Int);
           }
         });
-    this.swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.main_srl);
-    this.swipeRefreshLayout.setColorSchemeResources(new int[]{R.color.colorAccent, R.color.colorAccent, R.color.colorAccent, R.color.colorAccent});
-    this.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+    swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.main_srl);
+    swipeRefreshLayout.setColorSchemeResources(new int[]{R.color.colorAccent, R.color.colorAccent, R.color.colorAccent, R.color.colorAccent});
+    swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
           public void onRefresh() {
-            HistoryOrdersActivity.this.refleshVaildOrders();
+            refleshVaildOrders();
           }
         });
     refleshVaildOrders();
@@ -181,7 +169,7 @@ public class HistoryOrdersActivity extends BaseActivity implements View.OnClickL
 //                }
 //                SimpleAdapter simpleAdapter = new SimpleAdapter();
 //                this((List)jSONException, 2131361883, new String[] { "orderSn", "createTime", "userId", "userPhone", "userIcon", "address", "orderStatus", "urgent" }, new int[] { 2131230871, 2131230858, 2131230889, 2131230890, 2131230863, 2131230852, 2131230872, 2131230887 });
-//                ((ListView)HistoryOrdersActivity.this.findViewById(2131230927)).setAdapter((ListAdapter)simpleAdapter);
+//                ((ListView)findViewById(2131230927)).setAdapter((ListAdapter)simpleAdapter);
 //                return;
 //              }
 //              Toast.makeText((Context)HistoryOrdersActivity.this, "请求超时，请检查网络", 1).show();
