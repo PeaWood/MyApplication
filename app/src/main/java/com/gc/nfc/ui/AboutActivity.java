@@ -28,5 +28,7 @@ public class AboutActivity extends Activity {
     setContentView(R.layout.activity_about);
   }
   
-  public void update(View paramView) {}
+  public void update(View paramView) {
+
+  }
 }

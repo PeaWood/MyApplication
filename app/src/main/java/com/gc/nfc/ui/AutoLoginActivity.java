@@ -95,6 +95,7 @@ public class AutoLoginActivity extends BaseActivity {
         if (user.getGroupCode().equals("00003")) {
           Intent starter = new Intent(AutoLoginActivity.this, MainlyActivity.class);
           startActivity(starter);
+          AutoLoginActivity.this.finish();
           return;
         }
         if (user.getGroupCode().equals("00007")) {

@@ -102,6 +102,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     //配送员
                     Intent starter = new Intent(LoginActivity.this, MainlyActivity.class);
                     startActivity(starter);
+                    LoginActivity.this.finish();
                     return;
                 }
                 if (user.getGroupCode().equals("00007")) {

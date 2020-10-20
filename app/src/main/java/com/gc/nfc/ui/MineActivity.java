@@ -48,7 +48,7 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
     private User user;
 
     private void loginOut() {
-        AppContext appContext = (AppContext) MineActivity.this.getApplicationContext();
+        AppContext appContext = (AppContext) getApplicationContext();
         appContext.logout();
         OkHttpUtil util = OkHttpUtil.getInstance(this);
         util.GET(OkHttpUtil.URL + "/sysusers/logout/" + user.getUsername(), null, new OkHttpUtil.ResultCallback() {
@@ -130,12 +130,12 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
 
     public void onClick(View paramView) {
         switch (paramView.getId()) {
-            default:
-                return;
             case R.id.lL_myHistoryOrders:
+                //历史订单
                 startActivity(new Intent(this, HistoryOrdersActivity.class));
                 break;
             case R.id.lL_myHistoryChecks:
+                //历史巡检
                 startActivity(new Intent(this, HistoryCheckActivity.class));
                 break;
             case R.id.lL_myBottle:
@@ -155,21 +155,24 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
                 startActivity(new Intent(this, MySecurityActivity.class));
                 break;
             case R.id.lL_mySetting:
+                //系统版本
                 startActivity(new Intent(this, AboutActivity.class));
                 break;
             case R.id.lL_myLogout:
+                //退出登录
                 loginOut();
                 break;
             case R.id.imageView_userQRcode:
+                //二维码
                 showIdentification();
                 break;
             case R.id.lL_recycle:
-                //钢瓶回收
-                //startActivity(new Intent(this, BottleRecycleActivity.class));
+                //退换货
+//                startActivity(new Intent(this, BottleRecycleActivity.class));
                 break;
             case R.id.lL_mapView:
                 //查看地图
-                //startActivity(new Intent((Context)this, MapViewActivity.class));
+                startActivity(new Intent(this, MapViewActivity.class));
                 break;
         }
     }
@@ -209,7 +212,7 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
      */
     public void refleshVaildMends() {
         Logger.e("refleshVaildMends");
-        AppContext appContext = (AppContext) MineActivity.this.getApplicationContext();
+        AppContext appContext = (AppContext) getApplicationContext();
         user = appContext.getUser();
         if (user == null) {
             Toast.makeText(this, "登陆会话失效", Toast.LENGTH_LONG).show();
@@ -237,8 +240,8 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
                 Gson gson = new Gson();
                 Data_Mend dataMend = gson.fromJson(string, Data_Mend.class);
                 int size = dataMend.getItems().size();
-                MineActivity.this.badgeMends.setBadgeNumber(size);
-                MineActivity.this.badgeMends.setBadgeGravity(Gravity.END | Gravity.TOP);
+                badgeMends.setBadgeNumber(size);
+                badgeMends.setBadgeGravity(Gravity.END | Gravity.TOP);
             }
         });
     }
@@ -274,8 +277,8 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
                 Gson gson = new Gson();
                 Data_Mend mendData = gson.fromJson(string, Data_Mend.class);
                 int size = mendData.getItems().size();
-                MineActivity.this.badgeSecurity.setBadgeNumber(size);
-                MineActivity.this.badgeSecurity.setBadgeGravity(Gravity.END | Gravity.TOP);
+                badgeSecurity.setBadgeNumber(size);
+                badgeSecurity.setBadgeGravity(Gravity.END | Gravity.TOP);
             }
         });
     }
