@@ -475,8 +475,8 @@ public class PicSignActivity extends AppCompatActivity {
 //      this.m_BottlesSpecMap = (Map<String, String>)JSON.parseObject(str3, typeReference1, new com.alibaba.fastjson.parser.Feature[0]);
       setOrderDetailsInfo();
       setOrderHeadInfo();
-      refleshBottlesListKP();
-      refleshBottlesListZP();
+//      refleshBottlesListKP();
+//      refleshBottlesListZP();
       refleshBottlesListYJ();
     } catch (JSONException jSONException) {
       Toast.makeText((Context)this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();

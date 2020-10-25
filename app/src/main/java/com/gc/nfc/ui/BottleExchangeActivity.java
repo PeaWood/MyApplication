@@ -1,5 +1,6 @@
 package com.gc.nfc.ui;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -10,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,10 +21,12 @@ import android.os.Message;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -50,7 +54,6 @@ import com.dk.bleNfc.card.Ntag21x;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
-import com.gc.nfc.domain.Data_TaskOrders;
 import com.gc.nfc.domain.Data_UserBottles;
 import com.gc.nfc.domain.Data_UserCard;
 import com.gc.nfc.domain.User;
@@ -61,6 +64,7 @@ import com.gc.nfc.utils.Tools;
 import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -84,7 +88,6 @@ import okhttp3.Response;
 
 public class BottleExchangeActivity extends BaseActivity implements View.OnClickListener, TextToSpeech.OnInitListener {
     private AppContext appContext;
-
     private BleNfcDevice bleNfcDevice;
 
     private DeviceManagerCallback deviceManagerCallback = new DeviceManagerCallback() {
@@ -162,73 +165,79 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                             deviceNoResponseException.printStackTrace();
                             return;
                         }
-                        //bleNfcDevice.openBeep(100, 100, 2);
+                        try {
+                            bleNfcDevice.openBeep(100, 100, 2);
+                        } catch (DeviceNoResponseException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }).start();
             }
         }
     };
 
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         public void handleMessage(Message param1Message) {
-            //        msgText.setText(msgBuffer);
-            //        if (bleNfcDevice.isConnection() == 2 || bleNfcDevice.isConnection() == 1);
-            //        switch (param1Message.what) {
-            //          default:
-            //            return;
-            //          case 3:
-            //            (new Thread(new Runnable() {
-            //                  public void run() {
-            //                    try {
-            //                      bleNfcDevice.getDeviceVersions();
-            //                      handler.sendEmptyMessage(0);
-            //                      if (bleNfcDevice.getDeviceBatteryVoltage() < 3.61D) {
-            //                        msgBuffer.append("(电量低)");
-            //                      } else {
-            //                        msgBuffer.append("(电量充足)");
-            //                      }
-            //                      handler.sendEmptyMessage(0);
-            //                      if (bleNfcDevice.androidFastParams(true));
-            //                      handler.sendEmptyMessage(0);
-            //                      handler.sendEmptyMessage(0);
-            //                      startAutoSearchCard();
-            //                    } catch (DeviceNoResponseException deviceNoResponseException) {
-            //                      deviceNoResponseException.printStackTrace();
-            //                    }
-            //                  }
-            //                })).start();
-            //          case 136:
-            //            String  str1 = param1Message.obj.toString();
-            //            if (str1 == null)
-            //              showToast("空标签！");
-            //            if (m_selected_nfc_model == 0)
-            //              bottleTakeOverUnit(str1, m_curUserId, m_deliveryUser.getUsername(), "6", m_customerAddress + "|空瓶回收", false, true);
-            //            if (m_selected_nfc_model == 1)
-            //              bottleTakeOverUnit(str1, m_deliveryUser.getUsername(), m_curUserId, "5", m_customerAddress + "|重瓶落户", false, false);
-            //          case 137:
-            //            break;
-            //        }
-            //        String[] arrayOfString = ((Message)str1).obj.toString().split(":");
-            //        if (arrayOfString.length != 2)
-            //          showToast("无效卡格式！");
-            //        String str1 = arrayOfString[0];
-            //        String str2 = arrayOfString[1];
-            //        if (m_handedUserCard == null)
-            //          showToast("该用户未绑定用户卡");
-            //        if (!str2.equals(m_handedUserCard))
-            //          showToast("非本人卡号！");
-            //        if (str1.equals("Y")) {
-            //          showToast("满意！");
-            //          orderServiceQualityUpload(true);
-            //        }
-            //        if (str1.equals("N")) {
-            //          showToast("不满意！");
-            //          orderServiceQualityUpload(false);
-            //        }
-            //        showToast("无效卡格式！");
+            msgText.setText(msgBuffer);
+            if (bleNfcDevice.isConnection() == 2 || bleNfcDevice.isConnection() == 1) {
+                switch (param1Message.what) {
+                    case 3:
+                        (new Thread(new Runnable() {
+                            public void run() {
+                                try {
+                                    bleNfcDevice.getDeviceVersions();
+                                    handler.sendEmptyMessage(0);
+                                    if (bleNfcDevice.getDeviceBatteryVoltage() < 3.61D) {
+                                        msgBuffer.append("(电量低)");
+                                    } else {
+                                        msgBuffer.append("(电量充足)");
+                                    }
+                                    handler.sendEmptyMessage(0);
+                                    if (bleNfcDevice.androidFastParams(true))
+                                        ;
+                                    handler.sendEmptyMessage(0);
+                                    handler.sendEmptyMessage(0);
+                                    startAutoSearchCard();
+                                } catch (DeviceNoResponseException deviceNoResponseException) {
+                                    deviceNoResponseException.printStackTrace();
+                                }
+                            }
+                        })).start();
+                    case 136:
+                        String str1 = param1Message.obj.toString();
+                        if (str1 == null)
+                            showToast("空标签！");
+                        if (m_selected_nfc_model == 0)
+                            bottleTakeOverUnit(str1, m_curUserId, m_deliveryUser.getUsername(), "6", m_customerAddress + "空瓶回收", false, true);
+                        if (m_selected_nfc_model == 1)
+                            bottleTakeOverUnit(str1, m_deliveryUser.getUsername(), m_curUserId, "5", m_customerAddress + "重瓶落户", false, false);
+                    case 137:
+                        String[] arrayOfString = param1Message.obj.toString().split(":");
+                        if (arrayOfString.length != 2) {
+                            showToast("无效卡格式！");
+                        }
+                        str1 = arrayOfString[0];
+                        String str2 = arrayOfString[1];
+                        if (m_handedUserCard == null)
+                            showToast("该用户未绑定用户卡");
+                        if (!str2.equals(m_handedUserCard))
+                            showToast("非本人卡号！");
+                        if (str1.equals("Y")) {
+                            showToast("满意！");
+                            orderServiceQualityUpload(true);
+                        }
+                        if (str1.equals("N")) {
+                            showToast("不满意！");
+                            orderServiceQualityUpload(false);
+                        }
+                        break;
+                }
+            }
         }
     };
 
+    @SuppressLint("HandlerLeak")
     private Handler handler_old = new Handler() {
         public void handleMessage(Message param1Message) {
             super.handleMessage(param1Message);
@@ -237,43 +246,35 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     };
 
     private Handler handler_weightScale = new Handler();
-
     private boolean isSpecialOrder;
-
     private int lastRssi = -100;
-
     private View layout_inputWeight;
 
     private RadioGroup.OnCheckedChangeListener listen = new RadioGroup.OnCheckedChangeListener() {
         public void onCheckedChanged(RadioGroup param1RadioGroup, int param1Int) {
             param1RadioGroup.getCheckedRadioButtonId();
             switch (param1RadioGroup.getCheckedRadioButtonId()) {
-                //          case 2131230983:
-                //            BottleExchangeActivity.access$302(BottleExchangeActivity.this, 0);
-                //          case 2131230985:
-                //            break;
+                case R.id.radioButton_kp_id:
+                    m_selected_nfc_model = 0;
+                case R.id.radioButton_zp_id:
+                    m_selected_nfc_model = 1;
+                    break;
             }
-            //        BottleExchangeActivity.access$302(BottleExchangeActivity.this, 1);
         }
     };
 
     BleNfcDeviceService mBleNfcDeviceService;
-
     private BluetoothDevice mNearestBle = null;
-
     private Lock mNearestBleLock = new ReentrantLock();
-
     private NfcAdapter mNfcAdapter;
-
     private PendingIntent mPendingIntent;
-
     private Scanner mScanner;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName param1ComponentName, IBinder param1IBinder) {
             BleNfcDeviceService bleNfcDeviceService = ((BleNfcDeviceService.LocalBinder) param1IBinder).getService();
-            //        BottleExchangeActivity.access$1102(BottleExchangeActivity.this, bleNfcDeviceService.bleNfcDevice);
-            //        BottleExchangeActivity.access$1202(BottleExchangeActivity.this, bleNfcDeviceService.scanner);
+            bleNfcDevice = bleNfcDeviceService.bleNfcDevice;
+            mScanner = bleNfcDeviceService.scanner;
             bleNfcDeviceService.setDeviceManagerCallback(deviceManagerCallback);
             bleNfcDeviceService.setScannerCallback(scannerCallback);
             searchNearestBleDevice();
@@ -285,171 +286,93 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     };
 
     private Map<String, String> m_BottlesMapKP;
-
     private Map<String, String> m_BottlesMapZP;
-
     private Map<String, String> m_BottlesSpecMap;
-
     private JSONObject m_OrderJson;
-
     private int m_bfp_price_15kg;
-
     private int m_bfp_price_50kg;
-
     private int m_bfp_price_5kg;
-
     private int m_bfp_quantity_15kg;
-
     private int m_bfp_quantity_50kg;
-
     private int m_bfp_quantity_5kg;
-
     private EditText m_bottleIdKPEditText;
-
     private EditText m_bottleIdZPEditText;
-
     Bundle m_bundle;
-
     private Button m_buttonNext;
-
     private String m_curUserId;
-
     private JSONObject m_curUserSettlementType;
-
     private String m_customerAddress;
-
     private User m_deliveryUser;
-
     private int m_gjp_price_15kg;
-
     private int m_gjp_price_50kg;
-
     private int m_gjp_price_5kg;
-
     private int m_gjp_quantity_15kg;
-
     private int m_gjp_quantity_50kg;
-
     private int m_gjp_quantity_5kg;
-
-    private String m_gp_code_head_KP;
-
-    private String m_gp_code_head_ZP;
-
+    private String m_gp_code_head_KP = "";
+    private String m_gp_code_head_ZP = "";
     private String m_handedUserCard = null;
-
     private int m_hp_quantity_15kg;
-
     private int m_hp_quantity_50kg;
-
     private int m_hp_quantity_5kg;
-
     private ImageView m_imageAddKPManual;
-
     private ImageView m_imageAddZPManual;
-
     private ImageView m_imageViewKPEye;
-
     private ImageView m_imageViewSearchBlue = null;
-
     private ImageView m_imageViewZPEye;
-
     private ImageView m_imageView_search_weightDevice = null;
-
     private ListView m_listView_kp;
-
     private ListView m_listView_zp;
-
     private Map<String, JSONObject> m_myBottlesMap;
-
     private String m_orderId;
-
     private boolean m_orderServiceQualityShowFlag;
-
     private int m_ptp_quantity_15kg;
-
     private int m_ptp_quantity_50kg;
-
     private int m_ptp_quantity_5kg;
-
     private int m_qp_quantity_15kg;
-
     private int m_qp_quantity_50kg;
-
     private int m_qp_quantity_5kg;
-
     private int m_selected_nfc_model;
-
     private Spinner m_spinnerGPHeadKP;
-
     private Spinner m_spinnerGPHeadZP;
-
     private int m_takeOverCount = 0;
-
     private TextView m_textViewTotalCountKP;
-
     private TextView m_textViewTotalCountZP;
-
     private Map<String, JSONObject> m_userBottlesMap;
-
     private int m_yjp_price_15kg;
-
     private int m_yjp_price_50kg;
-
     private int m_yjp_price_5kg;
-
     private int m_yjp_quantity_15kg;
-
     private int m_yjp_quantity_50kg;
-
     private int m_yjp_quantity_5kg;
-
     private String m_yjp_ss_total;
-
     private String m_yjp_ys_total;
-
     private StringBuffer msgBuffer;
-
     private TextView msgText = null;
-
     private TextView msgText_weightDevice = null;
-
     private RadioButton radioButton_kp;
-
     private RadioButton radioButton_zp;
-
     private RadioGroup radioGroup_nfc = null;
-
     private ProgressDialog readWriteDialog = null;
-
     //  private scalerSDK scale;
 
     private ScannerCallback scannerCallback = new ScannerCallback() {
         public void onReceiveScanDevice(BluetoothDevice param1BluetoothDevice, int param1Int, byte[] param1ArrayOfbyte) {
             super.onReceiveScanDevice(param1BluetoothDevice, param1Int, param1ArrayOfbyte);
-            if (Build.VERSION.SDK_INT >= 21)
-                System.out.println("Activity搜到设备：" + param1BluetoothDevice.getName() + " 信号强度：" + param1Int + " scanRecord：" + StringTool.byteHexToSting(param1ArrayOfbyte));
+//                System.out.println("Activity搜到设备：" + param1BluetoothDevice.getName() + " 信号强度：" + param1Int + " scanRecord：" + StringTool.byteHexToSting(param1ArrayOfbyte));
             if (param1ArrayOfbyte != null && StringTool.byteHexToSting(param1ArrayOfbyte).contains("017f5450") && param1Int >= -55) {
                 handler.sendEmptyMessage(0);
                 if (mNearestBle != null) {
                     if (param1Int > lastRssi) {
                         mNearestBleLock.lock();
                         try {
-                            //                BottleExchangeActivity.access$1702(BottleExchangeActivity.this, param1BluetoothDevice);
+                            mNearestBle = param1BluetoothDevice;
                             return;
                         } finally {
                             mNearestBleLock.unlock();
                         }
                     }
                     return;
-                }
-                mNearestBleLock.lock();
-                try {
-                    //            BottleExchangeActivity.access$1702(BottleExchangeActivity.this, param1BluetoothDevice);
-                    mNearestBleLock.unlock();
-                    return;
-                } finally {
-                    mNearestBleLock.unlock();
                 }
             }
         }
@@ -463,23 +386,23 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
 
     private Runnable task = new Runnable() {
         public void run() {
-            //        handler_weightScale.postDelayed(this, 150L);
-            //        if (scale.bleIsEnabled()) {
-            //          scale.Scan(true);
-            //          scale.updatelist();
-            //          if (scale.getDevicelist().isEmpty() != true) {
-            //            if (scale.getDevicelist().size() != 1) {
-            //              msgText_weightDevice.setText("多台蓝牙秤冲突！");
-            //              return;
+            //            handler_weightScale.postDelayed(this, 150L);
+            //            if (scale.bleIsEnabled()) {
+            //              scale.Scan(true);
+            //              scale.updatelist();
+            //              if (scale.getDevicelist().isEmpty() != true) {
+            //                if (scale.getDevicelist().size() != 1) {
+            //                  msgText_weightDevice.setText("多台蓝牙秤冲突！");
+            //                  return;
+            //                }
+            //                msgText_weightDevice.setText("连接正常！");
+            //                float f = ((ScaleDevice)scale.getDevicelist().get(0)).scalevalue;
+            //                if (layout_inputWeight != null)
+            //                  ((EditText)layout_inputWeight.findViewById(2131230836)).setText(String.format("%4.1f", new Object[] { Float.valueOf(f) }));
+            //                return;
+            //              }
+            //              msgText_weightDevice.setText("未连接！");
             //            }
-            //            msgText_weightDevice.setText("连接正常！");
-            //            float f = ((ScaleDevice)scale.getDevicelist().get(0)).scalevalue;
-            //            if (layout_inputWeight != null)
-            //              ((EditText)layout_inputWeight.findViewById(2131230836)).setText(String.format("%4.1f", new Object[] { Float.valueOf(f) }));
-            //            return;
-            //          }
-            //          msgText_weightDevice.setText("未连接！");
-            //        }
         }
     };
 
@@ -525,44 +448,39 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     private void OrdersBindGasCynNumber() {
-        //    if (this.m_BottlesMapZP.size() != 0) {
-        //      NetRequestConstant netRequestConstant = new NetRequestConstant();
-        //      netRequestConstant.setType(HttpRequestType.PUT);
-        //      netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Orders/Bind/GasCynNumber";
-        //      netRequestConstant.context = (Context)this;
-        //      HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-        //      hashMap.put("orderSn", this.m_orderId);
-        //      String str = "";
-        //      boolean bool = true;
-        //      for (Map.Entry<String, String> entry : this.m_BottlesMapZP.entrySet()) {
-        //        if (bool) {
-        //          bool = false;
-        //        } else {
-        //          str = str + ",";
-        //        }
-        //        str = str + (String)entry.getKey();
-        //      }
-        //      hashMap.put("gasCynNumbers", str);
-        //      netRequestConstant.setParams(hashMap);
-        //      getServer(new Netcallback() {
-        //            public void preccess(Object param1Object, boolean param1Boolean) {
-        //              if (param1Boolean) {
-        //                param1Object = param1Object;
-        //                if (param1Object != null) {
-        //                  if (param1Object.getStatusLine().getStatusCode() == 200) {
-        //                    Toast.makeText((Context)BottleExchangeActivity.this, "重瓶绑定订单成功" + param1Object.getStatusLine().getStatusCode(), 1).show();
-        //                    return;
-        //                  }
-        //                  Toast.makeText((Context)BottleExchangeActivity.this, "重瓶绑定订单失败" + param1Object.getStatusLine().getStatusCode(), 1).show();
-        //                  return;
-        //                }
-        //                Toast.makeText((Context)BottleExchangeActivity.this, "请求超时，请检查网络", 1).show();
-        //                return;
-        //              }
-        //              Toast.makeText((Context)BottleExchangeActivity.this, "网络未连接！", 1).show();
-        //            }
-        //          }netRequestConstant);
-        //    }
+        if (this.m_BottlesMapZP.size() != 0) {
+            OkHttpUtil okHttpUtil = OkHttpUtil.getInstance(this);
+            Map hashMap = new HashMap();
+            hashMap.put("orderSn", this.m_orderId);
+            String str = "";
+            boolean bool = true;
+            for (Map.Entry<String, String> entry : this.m_BottlesMapZP.entrySet()) {
+                if (bool) {
+                    bool = false;
+                } else {
+                    str = str + ",";
+                }
+                str = str + entry.getKey();
+            }
+            hashMap.put("gasCynNumbers", str);
+            okHttpUtil.postForm(OkHttpUtil.URL + "Orders/Bind/GasCynNumber", new OkHttpUtil.ResultCallback() {
+                @Override
+                public void onError(Request request, Exception e) {
+                    Toast.makeText(BottleExchangeActivity.this, "无数据", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onResponse(Response response) throws IOException {
+                    if (response.code() != 200) {
+                        Toast.makeText(BottleExchangeActivity.this, "重瓶绑定订单失败" + response.code(), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    String string = response.body().string();
+                    Logger.e("refleshVaildBottles: " + string);
+                    Toast.makeText(BottleExchangeActivity.this, "重瓶绑定订单失败" + response.code(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     private void addEditViewChanged(EditText paramEditText, final View layout) {
@@ -652,39 +570,32 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     private void createElectDep() {
-        //    NetRequestConstant netRequestConstant = new NetRequestConstant();
-        //    netRequestConstant.setType(HttpRequestType.POST);
-        //    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/ElectDeposit";
-        //    netRequestConstant.context = (Context)this;
-        //    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-        //    hashMap.put("customerId", this.m_curUserId);
-        //    hashMap.put("operId", this.m_deliveryUser.getUsername());
-        //    hashMap.put("actualAmount", this.m_yjp_ss_total);
-        //    JSONArray jSONArray = createElectDepDetails();
-        //    if (jSONArray == null) {
-        //      jumpToOrderDeal();
-        //      return;
-        //    }
-        //    hashMap.put("electDepositDetails", jSONArray);
-        //    netRequestConstant.setBody(hashMap);
-        //    getServer(new Netcallback() {
-        //          public void preccess(Object param1Object, boolean param1Boolean) {
-        //            if (param1Boolean) {
-        //              param1Object = param1Object;
-        //              if (param1Object != null) {
-        //                if (param1Object.getStatusLine().getStatusCode() == 201) {
-        //                  jumpToOrderDeal();
-        //                  return;
-        //                }
-        //                Toast.makeText((Context)BottleExchangeActivity.this, "电子押金单上传失败，" + getResponseMessage((HttpResponse)param1Object) + param1Object.getStatusLine().getStatusCode(), 1).show();
-        //                return;
-        //              }
-        //              Toast.makeText((Context)BottleExchangeActivity.this, "请求超时，请检查网络", 1).show();
-        //              return;
-        //            }
-        //            Toast.makeText((Context)BottleExchangeActivity.this, "网络未连接！", 1).show();
-        //          }
-        //        }netRequestConstant);
+        Map map = new HashMap();
+        map.put("customerId", this.m_curUserId);
+        map.put("operId", this.m_deliveryUser.getUsername());
+        map.put("actualAmount", this.m_yjp_ss_total);
+        JSONArray jSONArray = createElectDepDetails();
+        if (jSONArray == null) {
+            jumpToOrderDeal();
+            return;
+        }
+        map.put("electDepositDetails", jSONArray);
+        OkHttpUtil util = OkHttpUtil.getInstance(this);
+        util.postForm(OkHttpUtil.URL + "/ElectDeposit/", map, new OkHttpUtil.ResultCallback() {
+            @Override
+            public void onError(Request request, Exception e) {
+                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                if (response.code() != 201) {
+                    Toast.makeText(BottleExchangeActivity.this, "电子押金单上传失败，" + response.code(), Toast.LENGTH_LONG).show();
+                    return;
+                }
+                jumpToOrderDeal();
+            }
+        });
     }
 
     private JSONArray createElectDepDetails() {
@@ -823,25 +734,25 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 jSONArray.put(jSONObject2);
             }
             int i = jSONArray.length();
-            if (i == 0)
+            if (i == 0) {
                 jSONArray = null;
+            }
+            return jSONArray;
         } catch (JSONException jSONException) {
-            Toast.makeText((Context) this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
-            jSONException = null;
+            Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
+            return null;
         }
-        //    return (JSONArray)jSONException;
-        JSONArray jSONArray = new JSONArray();//我自己给加上的  防止报错
-        return jSONArray;
+        //        JSONArray jSONArray = new JSONArray();//我自己给加上的  防止报错
     }
 
     private void getBottleWeight(final String bottleCodeTemp, final boolean isZP) {
         final View layout = getLayoutInflater().inflate(R.layout.input_layout, null);//先随便用一个
         this.layout_inputWeight = layout;//这里原来是view  我先改为layout
-        AlertDialog.Builder builder = (new AlertDialog.Builder((Context) this)).setTitle("请输入").setIcon(R.drawable.icon_bottle).setView(layout).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        AlertDialog.Builder builder = (new AlertDialog.Builder(this)).setTitle("请输入").setIcon(R.drawable.icon_bottle).setView(layout).setPositiveButton("确定", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface param1DialogInterface, int param1Int) {
                 String str = ((EditText) layout.findViewById(R.id.input_userId)).getText().toString();
                 if (str.length() == 0) {
-                    Toast.makeText((Context) BottleExchangeActivity.this, "重量输入有误，请重新输入！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BottleExchangeActivity.this, "重量输入有误，请重新输入！", Toast.LENGTH_SHORT).show();
                 } else if (isZP) {
                     m_BottlesMapZP.put(bottleCodeTemp, str);
                     refleshBottlesListZP();
@@ -849,7 +760,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                     m_BottlesMapKP.put(bottleCodeTemp, str);
                     refleshBottlesListKP();
                 }
-                //            BottleExchangeActivity.access$3602(BottleExchangeActivity.this, (View)null);
+                //BottleExchangeActivity.access$3602(BottleExchangeActivity.this, (View)null);
             }
         });
         builder.setCancelable(false);
@@ -872,17 +783,17 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         HashMap<String, Object> hashMap;
         try {
             JSONArray jSONArray = this.m_OrderJson.getJSONArray("orderDetailList");
-            hashMap = new HashMap<String, Object>();
+            hashMap = new HashMap();
             for (byte b = 0; b < jSONArray.length(); b++) {
                 JSONObject jSONObject = jSONArray.getJSONObject(b);
                 String str = jSONObject.getJSONObject("goods").getJSONObject("gasCylinderSpec").get("code").toString();
                 int j = Integer.parseInt(jSONObject.get("quantity").toString());
                 if (hashMap.containsKey(str)) {
-                    int k = ((Integer) hashMap.get(str)).intValue();
+                    int k = (int) hashMap.get(str);
                     hashMap.remove(str);
-                    hashMap.put(str, Integer.valueOf(k + j));
+                    hashMap.put(str, k + j);
                 } else {
-                    hashMap.put(str, Integer.valueOf(j));
+                    hashMap.put(str, j);
                 }
             }
         } catch (JSONException jSONException) {
@@ -891,7 +802,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         }
         for (String str : hashMap.keySet()) {
             Integer integer2 = (Integer) hashMap.get(str);
-            Integer integer1 = Integer.valueOf(0);
+            Integer integer1 = 0;
             for (String str1 : this.m_BottlesMapZP.keySet()) {
                 StringBuilder stringBuilder = new StringBuilder();
                 ;
@@ -902,7 +813,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                     return false;
                 }
                 if (str2.equals(str))
-                    integer1 = Integer.valueOf(Integer.parseInt(stringBuilder.toString()) + 1);
+                    integer1 = Integer.parseInt(stringBuilder.toString()) + 1;
             }
             if (!integer1.equals(integer2)) {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -913,7 +824,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         int i = 0;
         Iterator<String> iterator = hashMap.keySet().iterator();
         while (iterator.hasNext())
-            i += ((Integer) hashMap.get(iterator.next())).intValue();
+            i += (Integer) hashMap.get(iterator.next());
         if (i != this.m_BottlesMapZP.size()) {
             Toast.makeText(this, "重瓶交接数量与订单不符！", Toast.LENGTH_LONG).show();
             return false;
@@ -922,17 +833,17 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     private void jumpToOrderDeal() {
-        //    Intent intent = new Intent();
-        //    if (this.isSpecialOrder) {
-        //      intent.setClass((Context)this, TrayOrderDealActivity.class);
-        //    } else {
-        //      intent.setClass((Context)this, OrderDealActivity.class);
-        //    }
+        Intent intent = new Intent();
+        if (this.isSpecialOrder) {
+            intent.setClass(this, TrayOrderDealActivity.class);
+        } else {
+            intent.setClass(this, OrderDealActivity.class);
+        }
         JSONArray jSONArray = createElectDepDetails();
         this.m_bundle.putString("YJD_YS", this.m_yjp_ys_total);
         this.m_bundle.putString("YJD_SS", this.m_yjp_ss_total);
-        //    this.m_bundle.putString("KPCode", JSON.toJSONString(this.m_BottlesMapKP));
-        //    this.m_bundle.putString("ZPCode", JSON.toJSONString(this.m_BottlesMapZP));
+        this.m_bundle.putString("KPCode", new JSONObject(this.m_BottlesMapKP).toString());
+        this.m_bundle.putString("ZPCode", new JSONObject(this.m_BottlesMapZP).toString());
         String str = "";
         if (jSONArray != null)
             str = String.valueOf(jSONArray);
@@ -1001,30 +912,30 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             hashMap.put("price", String.valueOf(this.m_bfp_price_50kg));
             arrayList.add(hashMap);
         }
-        //    this.m_bundle.putSerializable("MapList", arrayList);
-        //    this.m_bundle.putString("SpecMap", JSON.toJSONString(this.m_BottlesSpecMap));
-        //    intent.putExtras(this.m_bundle);
-        //    startActivity(intent);
+        this.m_bundle.putSerializable("MapList", arrayList);
+        this.m_bundle.putString("SpecMap", new JSONObject(this.m_BottlesSpecMap).toString());
+        intent.putExtras(this.m_bundle);
+        startActivity(intent);
     }
 
     private void orderServiceQualityShow() {
         GetUserCard();
-        //    AlertDialog.Builder builder = new AlertDialog.Builder((Context)this);
-        //    View view = View.inflate((Context)this, 2131361920, null);
-        //    builder.setIcon(2131165405);
-        //    builder.setTitle("用户卡评价(" + this.m_handedUserCard + ")");
-        //    AlertDialog alertDialog = builder.create();
-        //    alertDialog.setView(view);
-        //    alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-        //          public void onDismiss(DialogInterface param1DialogInterface) {
-        //            BottleExchangeActivity.access$3702(BottleExchangeActivity.this, false);
-        //          }
-        //        });
-        //    alertDialog.show();
-        //    Window window = alertDialog.getWindow();
-        //    window.setGravity(17);
-        //    window.setLayout(-1, -2);
-        //    this.m_orderServiceQualityShowFlag = true;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = View.inflate(this, R.layout.user_evaluate, null);
+        builder.setIcon(R.mipmap.icon_ticket_user);
+        builder.setTitle("用户卡评价(" + this.m_handedUserCard + ")");
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setView(view);
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            public void onDismiss(DialogInterface param1DialogInterface) {
+                m_orderServiceQualityShowFlag = false;
+            }
+        });
+        alertDialog.show();
+        Window window = alertDialog.getWindow();
+        window.setGravity(17);
+        window.setLayout(-1, -2);
+        this.m_orderServiceQualityShowFlag = true;
     }
 
     private void orderServiceQualityUpload(boolean paramBoolean) {
@@ -1035,7 +946,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             map.put("orderServiceQuality", "OSQPositive");
         }
         OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/Orders/" + this.m_orderId, map, new OkHttpUtil.ResultCallback() {
+        util.PUT(OkHttpUtil.URL + "/Orders/" + this.m_orderId, map, new OkHttpUtil.ResultCallback() {
             @Override
             public void onError(Request request, Exception e) {
                 Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
@@ -1056,8 +967,9 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                     Toast.makeText(BottleExchangeActivity.this, "鉴权失败，请重新登录" + response.code(), Toast.LENGTH_LONG).show();
                     return;
                 }
+                //测试
+                jumpToOrderDeal();
                 Toast.makeText(BottleExchangeActivity.this, "支付失败" + response.code(), Toast.LENGTH_LONG).show();
-                return;
             }
         });
     }
@@ -1067,32 +979,30 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             default:
                 return true;
             case 6:
-                break;
-        }
-        Ntag21x ntag21x = (Ntag21x) this.bleNfcDevice.getCard();
-        if (ntag21x != null) {
-            boolean bool;
-            try {
-                String str = ntag21x.NdefTextRead();
-                Message message = new Message();
-                message.obj = str;
-                if (this.m_orderServiceQualityShowFlag) {
-                    message.what = 137;
-                } else {
-                    message.what = 136;
+                boolean bool = true;
+                Ntag21x ntag21x = (Ntag21x) this.bleNfcDevice.getCard();
+                if (ntag21x != null) {
+                    try {
+                        String str = ntag21x.NdefTextRead();
+                        Message message = new Message();
+                        message.obj = str;
+                        if (this.m_orderServiceQualityShowFlag) {
+                            message.what = 137;
+                        } else {
+                            message.what = 136;
+                        }
+                        this.handler.sendMessage(message);
+                    } catch (CardNoResponseException cardNoResponseException) {
+                        cardNoResponseException.printStackTrace();
+                        bool = false;
+                    }
                 }
-                this.handler.sendMessage(message);
-            } catch (CardNoResponseException cardNoResponseException) {
-                cardNoResponseException.printStackTrace();
-                bool = false;
-            }
-
+                return bool;
         }
-        return true;
     }
 
     private void refleshBottlesListKP() {
-        this.m_textViewTotalCountKP.setText(Integer.toString(this.m_BottlesMapKP.size()));
+        this.m_textViewTotalCountKP.setText(this.m_BottlesMapKP.size() + "");
         ArrayList arrayList = new ArrayList();
         for (Map.Entry<String, String> entry : this.m_BottlesMapKP.entrySet()) {
             HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
@@ -1102,27 +1012,27 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             arrayList.add(hashMap);
         } //下面这个暂定这个布局  不太确定
         SimpleAdapter simpleAdapter = new SimpleAdapter(this, arrayList, R.layout.bottle_list_simple_items, new String[]{"bottleCode", "bottleWeight", "bottleSpec"}, new int[]{R.id.items_number, R.id.items_weight, R.id.items_spec});
-        this.m_listView_kp.setAdapter((ListAdapter) simpleAdapter);
+        this.m_listView_kp.setAdapter(simpleAdapter);
         setListViewHeightBasedOnChildren(this.m_listView_kp);
     }
 
     private void refleshBottlesListZP() {
-        this.m_textViewTotalCountZP.setText(Integer.toString(this.m_BottlesMapZP.size()));
-        ArrayList<HashMap<Object, Object>> arrayList = new ArrayList();
+        this.m_textViewTotalCountZP.setText(this.m_BottlesMapZP.size() + "");
+        ArrayList arrayList = new ArrayList();
         for (Map.Entry<String, String> entry : this.m_BottlesMapZP.entrySet()) {
-            HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-            if (getBottleSpec((String) entry.getKey()) == null) {
+            HashMap<Object, Object> hashMap = new HashMap();
+            if (getBottleSpec(entry.getKey()) == null) {
                 hashMap.put("bottleSpec", "未知");
             } else {
-                hashMap.put("bottleSpec", getSpecName(getBottleSpec((String) entry.getKey())));
+                hashMap.put("bottleSpec", getSpecName(getBottleSpec(entry.getKey())));
             }
             hashMap.put("bottleCode", entry.getKey());
-            hashMap.put("bottleWeight", (String) entry.getValue() + "公斤");
+            hashMap.put("bottleWeight", entry.getValue() + "公斤");
             arrayList.add(hashMap);
         }
-        //    SimpleAdapter simpleAdapter = new SimpleAdapter((Context)this, arrayList, 2131361859, new String[] { "bottleCode", "bottleWeight", "bottleSpec" }, new int[] { 2131230870, 2131230892, 2131230877 });
-        //    this.m_listView_zp.setAdapter((ListAdapter)simpleAdapter);
-        //    setListViewHeightBasedOnChildren(this.m_listView_zp);
+        SimpleAdapter simpleAdapter = new SimpleAdapter(this, arrayList, R.layout.bottle_list_simple_items, new String[]{"bottleCode", "bottleWeight", "bottleSpec"}, new int[]{R.id.items_number, R.id.items_weight, R.id.items_spec});
+        this.m_listView_zp.setAdapter(simpleAdapter);
+        setListViewHeightBasedOnChildren(this.m_listView_zp);
     }
 
     private void searchNearestBleDevice() {
@@ -1222,34 +1132,35 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         addEditViewChanged(editText9, view);
         AlertDialog.Builder builder = (new AlertDialog.Builder(this)).setTitle("电子押金单").setIcon(R.drawable.icon_logo).setView(view).setPositiveButton("确定", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface param1DialogInterface, int param1Int) {
-                getEditTextToInt(view.findViewById(R.id.textView_ptp_5kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_ptp_15kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_ptp_50kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_qp_5kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_qp_15kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_qp_50kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_hp_5kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_hp_15kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_hp_50kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_yjp_5kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_yjp_15kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_yjp_50kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_yjp_5kg_ys));
-                getEditTextToInt(view.findViewById(R.id.textView_yjp_15kg_ys));
-                getEditTextToInt(view.findViewById(R.id.textView_yjp_50kg_ys));
-                getEditTextToInt(view.findViewById(R.id.textView_gjp_5kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_gjp_15kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_gjp_50kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_gjp_5kg_ys));
-                getEditTextToInt(view.findViewById(R.id.textView_gjp_15kg_ys));
-                getEditTextToInt(view.findViewById(R.id.textView_gjp_50kg_ys));
-                getEditTextToInt(view.findViewById(R.id.textView_bfp_5kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_bfp_15kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_bfp_50kg_quantity));
-                getEditTextToInt(view.findViewById(R.id.textView_bfp_5kg_ys));
-                getEditTextToInt(view.findViewById(R.id.textView_bfp_15kg_ys));
-                getEditTextToInt(view.findViewById(R.id.textView_bfp_50kg_ys));
-                getTextViewToString(view.findViewById(R.id.textView_ys));
+                m_ptp_quantity_5kg = getEditTextToInt(view.findViewById(R.id.textView_ptp_5kg_quantity));
+                m_ptp_quantity_15kg = getEditTextToInt(view.findViewById(R.id.textView_ptp_15kg_quantity));
+                m_ptp_quantity_50kg = getEditTextToInt(view.findViewById(R.id.textView_ptp_50kg_quantity));
+                m_qp_quantity_5kg = getEditTextToInt(view.findViewById(R.id.textView_qp_5kg_quantity));
+                m_qp_quantity_15kg = getEditTextToInt(view.findViewById(R.id.textView_qp_15kg_quantity));
+                m_qp_quantity_50kg = getEditTextToInt(view.findViewById(R.id.textView_qp_50kg_quantity));
+                m_hp_quantity_5kg = getEditTextToInt(view.findViewById(R.id.textView_hp_5kg_quantity));
+                m_hp_quantity_15kg = getEditTextToInt(view.findViewById(R.id.textView_hp_15kg_quantity));
+                m_hp_quantity_50kg = getEditTextToInt(view.findViewById(R.id.textView_hp_50kg_quantity));
+                m_yjp_quantity_5kg = getEditTextToInt(view.findViewById(R.id.textView_yjp_5kg_quantity));
+                m_yjp_quantity_15kg = getEditTextToInt(view.findViewById(R.id.textView_yjp_15kg_quantity));
+                m_yjp_quantity_50kg = getEditTextToInt(view.findViewById(R.id.textView_yjp_50kg_quantity));
+                m_gjp_quantity_5kg = getEditTextToInt(view.findViewById(R.id.textView_gjp_5kg_quantity));
+                m_gjp_quantity_15kg = getEditTextToInt(view.findViewById(R.id.textView_gjp_15kg_quantity));
+                m_gjp_quantity_50kg = getEditTextToInt(view.findViewById(R.id.textView_gjp_50kg_quantity));
+                m_bfp_quantity_5kg = getEditTextToInt(view.findViewById(R.id.textView_bfp_5kg_quantity));
+                m_bfp_quantity_15kg = getEditTextToInt(view.findViewById(R.id.textView_bfp_15kg_quantity));
+                m_bfp_quantity_50kg = getEditTextToInt(view.findViewById(R.id.textView_bfp_50kg_quantity));
+                m_yjp_price_5kg = getEditTextToInt(view.findViewById(R.id.textView_yjp_5kg_ys));
+                m_yjp_price_15kg = getEditTextToInt(view.findViewById(R.id.textView_yjp_15kg_ys));
+                m_yjp_price_50kg = getEditTextToInt(view.findViewById(R.id.textView_yjp_50kg_ys));
+                m_gjp_price_5kg = getEditTextToInt(view.findViewById(R.id.textView_gjp_5kg_ys));
+                m_gjp_price_15kg = getEditTextToInt(view.findViewById(R.id.textView_gjp_15kg_ys));
+                m_gjp_price_50kg = getEditTextToInt(view.findViewById(R.id.textView_gjp_50kg_ys));
+                m_bfp_price_5kg = getEditTextToInt(view.findViewById(R.id.textView_bfp_5kg_ys));
+                m_bfp_price_15kg = getEditTextToInt(view.findViewById(R.id.textView_bfp_15kg_ys));
+                m_bfp_price_50kg = getEditTextToInt(view.findViewById(R.id.textView_bfp_50kg_ys));
+                m_yjp_ys_total = getTextViewToString(view.findViewById(R.id.textView_ys));
+                m_yjp_ss_total = getTextViewToString(view.findViewById(R.id.textView_ys));
                 if (m_deliveryUser.getScanType() == 2 || m_deliveryUser.getScanType() == 3) {
                     orderServiceQualityUpload(true);
                     return;
@@ -1313,40 +1224,39 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     private boolean upLoadGasCylinder() {
-        //    NetRequestConstant netRequestConstant = new NetRequestConstant();
-        //    netRequestConstant.setType(HttpRequestType.PUT);
-        //    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Orders/" + this.m_orderId;
-        //    netRequestConstant.context = (Context)this;
-        //    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-        //    hashMap.put("recycleGasCylinder", this.m_BottlesMapKP.toString());
-        //    hashMap.put("deliveryGasCylinder", this.m_BottlesMapZP.toString());
-        //    if (this.m_BottlesMapKP.size() == 0 && this.m_BottlesMapZP.size() == 0)
-        //      return false;
-        //    netRequestConstant.setBody(hashMap);
-        //    getServer(new Netcallback() {
-        //          public void preccess(Object param1Object, boolean param1Boolean) {
-        //            if (param1Boolean) {
-        //              param1Object = param1Object;
-        //              if (param1Object != null) {
-        //                if (param1Object.getStatusLine().getStatusCode() != 200) {
-        //                  if (param1Object.getStatusLine().getStatusCode() == 404) {
-        //                    Toast.makeText((Context)BottleExchangeActivity.this, "订单不存在", 1).show();
-        //                    return;
-        //                  }
-        //                  Toast.makeText((Context)BottleExchangeActivity.this, "瓶号上传失败" + param1Object.getStatusLine().getStatusCode(), 1).show();
-        //                }
-        //                return;
-        //              }
-        //              Toast.makeText((Context)BottleExchangeActivity.this, "请求超时，请检查网络", 1).show();
-        //              return;
-        //            }
-        //            Toast.makeText((Context)BottleExchangeActivity.this, "网络未连接！", 1).show();
-        //          }
-        //        }netRequestConstant);
+        Map map = new HashMap();
+        map.put("recycleGasCylinder", this.m_BottlesMapKP.toString());
+        map.put("deliveryGasCylinder", this.m_BottlesMapZP.toString());
+        if (this.m_BottlesMapKP.size() == 0 && this.m_BottlesMapZP.size() == 0)
+            return false;
+        OkHttpUtil util = OkHttpUtil.getInstance(this);
+        util.postForm(OkHttpUtil.URL + "/Orders/" + this.m_orderId, map, new OkHttpUtil.ResultCallback() {
+            @Override
+            public void onError(Request request, Exception e) {
+                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                if (response.code() != 200) {
+                    if (response.code() == 404) {
+                        Toast.makeText(BottleExchangeActivity.this, "订单不存在", Toast.LENGTH_LONG).show();
+                    }
+                    Toast.makeText(BottleExchangeActivity.this, "瓶号上传失败，" + response.code(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
         return true;
     }
 
     public void bottleTakeOverUnit(final String bottleCode, String paramString2, String paramString3, String paramString4, String paramString5, boolean paramBoolean1, final boolean isKP) {
+        //测试
+//        if (isKP) {
+//            addKP(bottleCode);
+//        }
+//        if (!isKP) {
+//            addZP(bottleCode);
+//        }
         boolean bool = false;
         if (this.m_BottlesMapKP.containsKey(bottleCode))
             bool = true;
@@ -1356,65 +1266,62 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             Toast.makeText(this, "钢瓶号：" + bottleCode + "    请勿重复提交！", Toast.LENGTH_SHORT).show();
             return;
         }
-        NetRequestConstant netRequestConstant = new NetRequestConstant();
-        netRequestConstant.setType(HttpRequestType.PUT);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/GasCylinder/check/" + bottleCode;
-        netRequestConstant.context = (Context) this;
-        HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-        hashMap.put("srcUserId", paramString2);
-        hashMap.put("targetUserId", paramString3);
-        hashMap.put("serviceStatus", paramString4);
-        hashMap.put("enableForce", Boolean.valueOf(paramBoolean1));
-        hashMap.put("note", paramString5);
-        //    netRequestConstant.setParams(hashMap);
-        //    getServer(new Netcallback() {
-        //          public void preccess(Object param1Object, boolean param1Boolean) {
-        //            if (param1Boolean) {
-        //              param1Object = param1Object;
-        //              if (param1Object != null) {
-        //                if (param1Object.getStatusLine().getStatusCode() == 200) {
-        //                  if (isKP) {
-        //                    addKP(bottleCode);
-        //                    return;
-        //                  }
-        //                  addZP(bottleCode);
-        //                  return;
-        //                }
-        //                MediaPlayer.create((Context)BottleExchangeActivity.this, 2131558400).start();
-        //                if (param1Object.getStatusLine().getStatusCode() == 409) {
-        //                  (new AlertDialog.Builder((Context)BottleExchangeActivity.this)).setTitle("钢瓶异常流转！").setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + getResponseMessage((HttpResponse)param1Object) + "\r\n确认强制交接吗？").setIcon(2131165405).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-        //                        public void onClick(DialogInterface param2DialogInterface, int param2Int) {
-        //                          if (Tools.isFastClick()) {
-        //                            MediaPlayer.create((Context)BottleExchangeActivity.this, 2131558407).start();
-        //                            if (isKP) {
-        //                              addKP(bottleCode);
-        //                              return;
-        //                            }
-        //                          } else {
-        //                            return;
-        //                          }
-        //                          addZP(bottleCode);
-        //                        }
-        //                      }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-        //                        public void onClick(DialogInterface param2DialogInterface, int param2Int) {}
-        //                      }).show();
-        //                  return;
-        //                }
-        //                (new AlertDialog.Builder((Context)BottleExchangeActivity.this)).setTitle("钢瓶异常流转！").setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + getResponseMessage((HttpResponse)param1Object)).setIcon(2131165405).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-        //                      public void onClick(DialogInterface param2DialogInterface, int param2Int) {}
-        //                    }).show();
-        //                return;
-        //              }
-        //              Toast.makeText((Context)BottleExchangeActivity.this, "请求超时，请检查网络", 1).show();
-        //              return;
-        //            }
-        //            Toast.makeText((Context)BottleExchangeActivity.this, "网络未连接！", 1).show();
-        //          }
-        //        }netRequestConstant);
+        Map map = new HashMap();
+        map.put("srcUserId", paramString2);
+        map.put("targetUserId", paramString3);
+        map.put("serviceStatus", paramString4);
+        map.put("enableForce", String.valueOf(paramBoolean1));
+        map.put("note", paramString5);
+        OkHttpUtil util = OkHttpUtil.getInstance(this);
+        util.PUT(OkHttpUtil.URL + "/GasCylinder/check/" + bottleCode, map, new OkHttpUtil.ResultCallback() {
+            @Override
+            public void onError(Request request, Exception e) {
+                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                Logger.e("orderServiceQualityUpload: " + response.code());
+                if (response.code() == 200) {
+                    if (isKP) {
+                        addKP(bottleCode);
+                        return;
+                    }
+                    addZP(bottleCode);
+                    return;
+                }
+                MediaPlayer.create(BottleExchangeActivity.this, R.raw.alarm).start();
+                if (response.code() == 409) {
+                    (new AlertDialog.Builder(BottleExchangeActivity.this)).setTitle("钢瓶异常流转！").
+                            setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + response.message() + "\r\n确认强制交接吗？").setIcon(R.mipmap.icon_common_user).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface param2DialogInterface, int param2Int) {
+                            if (Tools.isFastClick()) {
+                                MediaPlayer.create((Context) BottleExchangeActivity.this, 2131558407).start();
+                                if (isKP) {
+                                    addKP(bottleCode);
+                                    return;
+                                }
+                            } else {
+                                addZP(bottleCode);
+                                return;
+                            }
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface param2DialogInterface, int param2Int) {
+                        }
+                    }).show();
+                    return;
+                }
+                (new AlertDialog.Builder(BottleExchangeActivity.this)).setTitle("钢瓶异常流转！").setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + response.message()).setIcon(R.mipmap.icon_common_user).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface param2DialogInterface, int param2Int) {
+                    }
+                }).show();
+            }
+        });
     }
 
     public void deleteKP(final int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder((Context) this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("删除钢瓶");
         builder.setMessage("您确定要删除这只钢瓶吗?");
         builder.setIcon(R.drawable.icon_bottle);
@@ -1434,7 +1341,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     public void deleteZP(final int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder((Context) this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("删除钢瓶");
         builder.setMessage("您确定要删除这只钢瓶吗?");
         builder.setIcon(R.drawable.icon_bottle);
@@ -1505,7 +1412,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             return "15公斤";
         if (paramString.equals("0003"))
             return "50公斤";
-        Toast.makeText((Context) this, "未知钢瓶规格" + paramString, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "未知钢瓶规格" + paramString, Toast.LENGTH_SHORT).show();
         return null;
     }
 
@@ -1635,17 +1542,19 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             };
             listView1.setOnItemLongClickListener(onItemLongClickListener2);
             Spinner spinner2 = this.m_spinnerGPHeadKP;
+            String[] strs = new String[8];
+            strs[0] = "KMA2B";
+            strs[1] = "KMA2BA";
+            strs[2] = "KMA2BB";
+            strs[3] = "KMA2BC";
+            strs[4] = "KMA2BD";
+            strs[5] = "KMA2BE";
+            strs[6] = "KMA2BF";
+            strs[7] = "";
             AdapterView.OnItemSelectedListener onItemSelectedListener1 = new AdapterView.OnItemSelectedListener() {
                 public void onItemSelected(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
-                    (new String[8])[0] = "KMA2B";
-                    (new String[8])[1] = "KMA2BA";
-                    (new String[8])[2] = "KMA2BB";
-                    (new String[8])[3] = "KMA2BC";
-                    (new String[8])[4] = "KMA2BD";
-                    (new String[8])[5] = "KMA2BE";
-                    (new String[8])[6] = "KMA2BF";
-                    (new String[8])[7] = "";
-                    //            BottleExchangeActivity.access$102(BottleExchangeActivity.this, (new String[8])[param1Int]);
+                    m_gp_code_head_KP = strs[param1Int];
+                    Logger.e(""+m_gp_code_head_KP);
                     SharedPreferencesHelper.initial(BottleExchangeActivity.this);
                     SharedPreferencesHelper.put("codeHeadIndex", param1Int);
                 }
@@ -1655,17 +1564,10 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             };
             spinner2.setOnItemSelectedListener(onItemSelectedListener1);
             Spinner spinner1 = this.m_spinnerGPHeadZP;
+            m_gp_code_head_ZP = "KMA2B";
             AdapterView.OnItemSelectedListener onItemSelectedListener2 = new AdapterView.OnItemSelectedListener() {
                 public void onItemSelected(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
-                    (new String[8])[0] = "KMA2B";
-                    (new String[8])[1] = "KMA2BA";
-                    (new String[8])[2] = "KMA2BB";
-                    (new String[8])[3] = "KMA2BC";
-                    (new String[8])[4] = "KMA2BD";
-                    (new String[8])[5] = "KMA2BE";
-                    (new String[8])[6] = "KMA2BF";
-                    (new String[8])[7] = "";
-                    //            BottleExchangeActivity.access$202(BottleExchangeActivity.this, (new String[8])[param1Int]);
+                    m_gp_code_head_ZP = strs[param1Int];
                     SharedPreferencesHelper.put("codeHeadIndex", Integer.valueOf(param1Int));
                 }
 
@@ -1673,9 +1575,9 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 }
             };
             spinner1.setOnItemSelectedListener(onItemSelectedListener2);
-            //                  scalerSDK scalerSDK1 = new scalerSDK();
-            //                  this((Context)this);
-            //                  this.scale = scalerSDK1;
+            // scalerSDK scalerSDK1 = new scalerSDK();
+            // this((Context)this);
+            // this.scale = scalerSDK1;
             this.handler_weightScale.post(this.task);
             this.layout_inputWeight = null;
             this.m_orderServiceQualityShowFlag = false;
@@ -1711,6 +1613,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                         String str = (String) ((Map.Entry) iterator.next()).getValue();
                         if (str.length() == 0 || Double.parseDouble(str) < 4.0D) {
                             Toast.makeText(this, "所有空瓶必须称重，重量错误!", Toast.LENGTH_LONG).show();
+                            return;
                         }
                     }
                     iterator = this.m_BottlesMapZP.entrySet().iterator();
@@ -1718,14 +1621,17 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                         String str = (String) ((Map.Entry) iterator.next()).getValue();
                         if (str.length() == 0 || Double.parseDouble(str) < 4.0D) {
                             Toast.makeText(this, "所有重瓶必须称重，重量错误!", Toast.LENGTH_LONG).show();
+                            return;
                         }
                     }
                 }
                 if (m_deliveryUser.getScanType() == 0 || m_deliveryUser.getScanType() == 3) {
+                    Logger.e(isBottlesQuantityOK());
                     if (!isBottlesQuantityOK()) {
-                        show_deposit_slip();
+                        return;
                     }
                 }
+                show_deposit_slip();
                 break;
             case R.id.imageView_addKPManual:
                 intent = new Intent();
@@ -1743,18 +1649,28 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 intent.putExtras(bundle);
                 startActivity(intent);
                 break;
-            //      case 2131230810:
-//                    if (Tools.isFastClick()) {
-            //          bottleTakeOverUnit(this.m_gp_code_head_KP + this.m_bottleIdKPEditText.getText().toString(), this.m_curUserId, this.m_deliveryUser.getUsername(), "6", this.m_customerAddress + "|空瓶回收", false, true);
-            //          this.m_bottleIdKPEditText.setText("");
-            //        }
-            //      case 2131230811:
-            //        break;
+            case R.id.imageView_KPEYE:
+                if (Tools.isFastClick()) {
+                    if (TextUtils.isEmpty(this.m_gp_code_head_KP)) {
+                        this.m_gp_code_head_KP = "";
+                    }
+                    String s = this.m_gp_code_head_KP + this.m_bottleIdKPEditText.getText().toString();
+                    Logger.e(s);
+                    bottleTakeOverUnit(s, this.m_curUserId, this.m_deliveryUser.getUsername(), "6", this.m_customerAddress + "空瓶回收", false, true);
+                    this.m_bottleIdKPEditText.setText("");
+                }
+                break;
+            case R.id.imageView_ZPEYE:
+                if (Tools.isFastClick()) {
+                    String s = this.m_gp_code_head_ZP + this.m_bottleIdZPEditText.getText().toString();
+                    if (TextUtils.isEmpty(s)) {
+                        s = "";
+                    }
+                    bottleTakeOverUnit(s, this.m_deliveryUser.getUsername(), this.m_curUserId, "5", this.m_customerAddress + "重瓶落户", false, false);
+                    this.m_bottleIdZPEditText.setText("");
+                }
+                break;
         }
-        //    if (Tools.isFastClick()) {
-        //      bottleTakeOverUnit(this.m_gp_code_head_ZP + this.m_bottleIdZPEditText.getText().toString(), this.m_deliveryUser.getUsername(), this.m_curUserId, "5", this.m_customerAddress + "|重瓶落户", false, false);
-        //      this.m_bottleIdZPEditText.setText("");
-        //    }
     }
 
     protected void onCreate(Bundle paramBundle) {
@@ -1785,51 +1701,44 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     public void updateBottleSpec(final String bottleCode) {
-        //    NetRequestConstant netRequestConstant = new NetRequestConstant();
-        //    netRequestConstant.setType(HttpRequestType.GET);
-        //    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/GasCylinder";
-        //    netRequestConstant.context = (Context)this;
-        //    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-        //    hashMap.put("number", bottleCode);
-        //    netRequestConstant.setParams(hashMap);
-        //    getServer(new Netcallback() {
-        //          public void preccess(Object param1Object, boolean param1Boolean) {
-        //            if (param1Boolean) {
-        //              HttpResponse httpResponse = (HttpResponse)param1Object;
-        //              if (httpResponse != null) {
-        //                if (httpResponse.getStatusLine().getStatusCode() == 200)
-        //                  try {
-        //                    param1Object = new JSONObject();
-        //                    super(EntityUtils.toString(httpResponse.getEntity(), "UTF-8"));
-        //                    JSONArray jSONArray = param1Object.getJSONArray("items");
-        //                    for (byte b = 0;; b++) {
-        //                      if (b < jSONArray.length()) {
-        //                        JSONObject jSONObject = jSONArray.getJSONObject(b);
-        //                        param1Object = jSONObject.getJSONObject("spec");
-        //                        if (jSONObject.get("number").toString().equals(bottleCode)) {
-        //                          param1Object = param1Object.get("code").toString();
-        //                          m_BottlesSpecMap.put(bottleCode, param1Object);
-        //                          refleshBottlesListZP();
-        //                          refleshBottlesListKP();
-        //                          return;
-        //                        }
-        //                      } else {
-        //                        return;
-        //                      }
-        //                    }
-        //                  } catch (IOException iOException) {
-        //                    Toast.makeText((Context)BottleExchangeActivity.this, "异常" + iOException.toString(), 1).show();
-        //                  } catch (JSONException jSONException) {
-        //                    Toast.makeText((Context)BottleExchangeActivity.this, "异常" + jSONException.toString(), 1).show();
-        //                  }
-        //                return;
-        //              }
-        //              Toast.makeText((Context)BottleExchangeActivity.this, "请求超时，请检查网络", 1).show();
-        //              return;
-        //            }
-        //            Toast.makeText((Context)BottleExchangeActivity.this, "网络未连接！", 1).show();
-        //          }
-        //        }netRequestConstant);
+        Map map = new HashMap();
+        map.put("number", bottleCode);
+        OkHttpUtil util = OkHttpUtil.getInstance(this);
+        util.GET(OkHttpUtil.URL + "/GasCylinder/", map, new OkHttpUtil.ResultCallback() {
+            @Override
+            public void onError(Request request, Exception e) {
+                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                if (response.code() != 200) {
+                    Toast.makeText(BottleExchangeActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+                }
+                Logger.e(response.body());
+                JSONObject param1Object = null;
+                try {
+                    param1Object = new JSONObject(response.body().toString());
+                    JSONArray jSONArray = param1Object.getJSONArray("items");
+                    for (byte b = 0; ; b++) {
+                        if (b < jSONArray.length()) {
+                            JSONObject jSONObject = jSONArray.getJSONObject(b);
+                            param1Object = jSONObject.getJSONObject("spec");
+                            if (jSONObject.get("number").toString().equals(bottleCode)) {
+                                m_BottlesSpecMap.put(bottleCode, param1Object.get("code").toString());
+                                refleshBottlesListZP();
+                                refleshBottlesListKP();
+                                return;
+                            }
+                        } else {
+                            return;
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private class StartSearchButtonListener implements View.OnClickListener {

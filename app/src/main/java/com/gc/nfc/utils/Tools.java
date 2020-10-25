@@ -8,7 +8,7 @@ public class Tools {
   public static boolean isFastClick() {
     boolean bool = false;
     long l = System.currentTimeMillis();
-    if (l - lastClickTime >= 1000L)
+    if (l - lastClickTime >= MIN_CLICK_DELAY_TIME)
       bool = true; 
     lastClickTime = l;
     return bool;

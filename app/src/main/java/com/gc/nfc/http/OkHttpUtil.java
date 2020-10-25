@@ -146,7 +146,7 @@ public class OkHttpUtil {
         SharedPreferences share = thiscontext.getSharedPreferences("Session",Context.MODE_PRIVATE);
         String sessionid= share.getString("sessionid","null");
         Logger.e("HTTP GET : " + url);
-        Request request = new Request.Builder().get().url(url).addHeader("cookie",sessionid).build();//采用post提交数据
+        Request request = new Request.Builder().get().url(url).addHeader("cookie",sessionid).build();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -156,9 +156,7 @@ public class OkHttpUtil {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 saveSession(response);
-                if (response != null) {
-                    sendSuccessCallback(response, callback, isshowprogress);
-                }
+                sendSuccessCallback(response, callback, isshowprogress);
             }
         });
     }
@@ -215,9 +213,7 @@ public class OkHttpUtil {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful() && response != null) {
-                    sendSuccessCallback(response, callback, false);
-                }
+                sendSuccessCallback(response, callback, false);
             }
         });
     }
@@ -254,9 +250,7 @@ public class OkHttpUtil {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful() && response != null) {
-                    sendSuccessCallback(response, callback, isshowprogress);
-                }
+                sendSuccessCallback(response, callback, isshowprogress);
             }
         });
     }
@@ -292,9 +286,7 @@ public class OkHttpUtil {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful() && response != null) {
-                    sendSuccessCallback(response, callback, isshowprogress);
-                }
+                sendSuccessCallback(response, callback, isshowprogress);
             }
         });
     }
@@ -348,6 +340,34 @@ public class OkHttpUtil {
         });
     }
 
+    public void PUT(String url, Map<String, String> map, ResultCallback callback) {
+        FormBody.Builder form = new FormBody.Builder();//表单对象，包含以input开始的对象,以html表单为主
+        if (map != null && !map.isEmpty()) {
+            Log.e("PUT", map.toString());
+            //遍历Map集合
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                form.add(entry.getKey(), entry.getValue());
+            }
+        }
+        Log.e("PUT", url);
+        FormBody body = form.build();
+        SharedPreferences share = thiscontext.getSharedPreferences("Session",Context.MODE_PRIVATE);
+        String sessionid= share.getString("sessionid","null");
+        Request request = new Request.Builder().url(url).put(body).addHeader("cookie",sessionid).build();//采用put提交数据
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                sendFailedCallback(call, e, callback, false);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                saveSession(response);
+                sendSuccessCallback(response, callback, false);
+            }
+        });
+    }
+
     /**
      * 创建接口，回调给调用者
      */
@@ -367,9 +387,7 @@ public class OkHttpUtil {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful() && response != null) {
-                    sendSuccessCallback(response, callback, false);
-                }
+                sendSuccessCallback(response, callback, false);
             }
         });
 

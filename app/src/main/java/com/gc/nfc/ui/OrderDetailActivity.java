@@ -20,6 +20,14 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Poi;
+import com.amap.api.navi.AMapNavi;
+import com.amap.api.navi.AmapNaviPage;
+import com.amap.api.navi.AmapNaviParams;
+import com.amap.api.navi.AmapNaviType;
+import com.amap.api.navi.INaviInfoCallback;
+import com.amap.api.navi.model.AMapNaviLocation;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.domain.Data_CustomerBottle;
@@ -47,17 +55,7 @@ import java.util.Timer;
 import okhttp3.Request;
 import okhttp3.Response;
 
-//import com.amap.api.maps.model.LatLng;
-//import com.amap.api.maps.model.Poi;
-//import com.amap.api.navi.AMapNavi;
-//import com.amap.api.navi.AmapNaviPage;
-//import com.amap.api.navi.AmapNaviParams;
-//import com.amap.api.navi.AmapNaviType;
-//import com.amap.api.navi.INaviInfoCallback;
-//import com.amap.api.navi.model.AMapNaviLocation;
-
-//, INaviInfoCallback
-public class OrderDetailActivity extends BaseActivity implements View.OnClickListener {
+public class OrderDetailActivity extends BaseActivity implements View.OnClickListener, INaviInfoCallback {
     private AppContext appContext;
 
     @SuppressLint("HandlerLeak")
@@ -70,71 +68,38 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
     };
 
     private JSONObject m_OrderJson;
-
     private String m_businessKey;
-
     private Button m_buttonNext;
-
     private String m_currentCustomerId;
-
     private String m_customerPhone;
-
     private ImageView m_imageViewCall;
-
     private ImageView m_imageViewNav;
-
     private ImageView m_imageViewUserIcon;
-
     private boolean m_isTicketUser;
-
     private ListView m_listView;
-
     private String m_orderCreateTime;
-
     private int m_orderStatus;
-
     private String m_recvAddr;
-
-    //  private LatLng m_recvLocation;
-
+    private LatLng m_recvLocation;
     private String m_taskId;
-
     private TextView m_textViewAddress;
-
     private TextView m_textViewCallNumber;
-
     private TextView m_textViewCreateTime;
-
     private TextView m_textViewOrderSn;
-
     private TextView m_textViewOrderStatus;
-
     private TextView m_textViewPassedTime;
-
     private TextView m_textViewPayStatus;
-
     private TextView m_textViewPayTypeInfo;
-
     private TextView m_textViewPs;
-
     private TextView m_textViewReserveTime;
-
     private TextView m_textViewTotalMountDeal;
-
     private TextView m_textViewTotalMountOrignal;
-
     private TextView m_textViewTotalQuantity;
-
     private TextView m_textViewUserId;
-
     private TextView m_textViewUserPhone;
-
     private TextView m_textview_qp;
-
     private User m_user;
-
     private String strOrderType;
-
     private Timer timer;
 
     private void calculatePassedTime() {
@@ -280,14 +245,13 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void getRecvLocation() {
-        //    try {
-        //      JSONObject jSONObject = this.m_OrderJson;
-        //      LatLng latLng = new LatLng();
-        //      this(jSONObject.getDouble("recvLatitude"), jSONObject.getDouble("recvLongitude"));
-        //      this.m_recvLocation = latLng;
-        //    } catch (JSONException jSONException) {
-        //      Toast.makeText((Context)this, "异常" + jSONException.toString(), 1).show();
-        //    }
+        try {
+            JSONObject jSONObject = this.m_OrderJson;
+            LatLng latLng = new LatLng(jSONObject.getDouble("recvLatitude"), jSONObject.getDouble("recvLongitude"));
+            this.m_recvLocation = latLng;
+        } catch (JSONException jSONException) {
+            Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
+        }
     }
 
     private String getResponseMessage(HttpResponse paramHttpResponse) {
@@ -435,10 +399,10 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
 
     private void switchNavBar() {
         Logger.e("switchNavBar");
-        //    LatLng latLng1 = ((AppContext)getApplicationContext()).getLocation();
-        //    LatLng latLng2 = this.m_recvLocation;
-        //    AmapNaviPage.getInstance().showRouteActivity(getApplicationContext(), new AmapNaviParams(new Poi("当前位置", latLng1, ""), null, new Poi(this.m_recvAddr, latLng2, ""), AmapNaviType.DRIVER), this);
-        //    AMapNavi.getInstance((Context)this).setUseInnerVoice(true);
+        LatLng latLng1 = ((AppContext) getApplicationContext()).getLocation();
+        LatLng latLng2 = this.m_recvLocation;
+        AmapNaviPage.getInstance().showRouteActivity(getApplicationContext(), new AmapNaviParams(new Poi("当前位置", latLng1, ""), null, new Poi(this.m_recvAddr, latLng2, ""), AmapNaviType.DRIVER), this);
+        AMapNavi.getInstance( this).setUseInnerVoice(true);
     }
 
     public void callPhone(String paramString) {
@@ -560,13 +524,64 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
     public void onExitPage(int paramInt) {
     }
 
+    @Override
+    public void onStrategyChanged(int i) {
+
+    }
+
+    @Override
+    public View getCustomNaviBottomView() {
+        return null;
+    }
+
+    @Override
+    public View getCustomNaviView() {
+        return null;
+    }
+
+    @Override
+    public void onArrivedWayPoint(int i) {
+
+    }
+
+    @Override
+    public void onMapTypeChanged(int i) {
+
+    }
+
+    @Override
+    public View getCustomMiddleView() {
+        return null;
+    }
+
+    @Override
+    public void onNaviDirectionChanged(int i) {
+
+    }
+
+    @Override
+    public void onDayAndNightModeChanged(int i) {
+
+    }
+
+    @Override
+    public void onBroadcastModeChanged(int i) {
+
+    }
+
+    @Override
+    public void onScaleAutoChanged(boolean b) {
+
+    }
+
     public void onGetNavigationText(String paramString) {
     }
 
     public void onInitNaviFailure() {
     }
 
-    //  public void onLocationChange(AMapNaviLocation paramAMapNaviLocation) {}
+    public void onLocationChange(AMapNaviLocation paramAMapNaviLocation) {
+    }
 
     public void onReCalculateRoute(int paramInt) {
     }

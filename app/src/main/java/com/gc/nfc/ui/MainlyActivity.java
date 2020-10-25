@@ -32,7 +32,6 @@ import com.gc.nfc.domain.Data_TaskOrders;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
-import com.gc.nfc.service.MyJobService;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -432,24 +431,24 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
 
     @RequiresApi(21)
     public void startJobScheduler(String paramString) {
-        this.mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        this.mJobScheduler.cancel(55);
-        JobInfo.Builder builder = new JobInfo.Builder(55, new ComponentName((Context) this, MyJobService.class));
-        if (Build.VERSION.SDK_INT >= 21) {
-            builder.setMinimumLatency(5000L);
-            builder.setOverrideDeadline(6000L);
-            builder.setBackoffCriteria(30000L, JobInfo.BACKOFF_POLICY_LINEAR);
-        } else {
-            builder.setPeriodic(30000L);
-        }
-        builder.setPersisted(true);
-        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-        builder.setRequiresCharging(true);
-        PersistableBundle persistableBundle = new PersistableBundle();
+//        this.mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+//        this.mJobScheduler.cancel(55);
+//        JobInfo.Builder builder = new JobInfo.Builder(55, new ComponentName((Context) this, MyJobService.class));
+//        if (Build.VERSION.SDK_INT >= 21) {
+//            builder.setMinimumLatency(5000L);
+//            builder.setOverrideDeadline(6000L);
+//            builder.setBackoffCriteria(30000L, JobInfo.BACKOFF_POLICY_LINEAR);
+//        } else {
+//            builder.setPeriodic(30000L);
+//        }
+//        builder.setPersisted(true);
+//        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+//        builder.setRequiresCharging(true);
+//        PersistableBundle persistableBundle = new PersistableBundle();
 //            persistableBundle.putString("servicename", AmapLocationService.class.getName());
-        persistableBundle.putString("userId", paramString);
-        builder.setExtras(persistableBundle);
-        JobInfo jobInfo = builder.build();
-        this.mJobScheduler.schedule(jobInfo);
+//        persistableBundle.putString("userId", paramString);
+//        builder.setExtras(persistableBundle);
+//        JobInfo jobInfo = builder.build();
+//        this.mJobScheduler.schedule(jobInfo);
     }
 }

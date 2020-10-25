@@ -69,10 +69,10 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
           default:
             return;
           case 257:
-            break;
+              if (TrayOrderDealActivity.this.swipeRefreshLayout.isRefreshing())
+                  TrayOrderDealActivity.this.swipeRefreshLayout.setRefreshing(false);
+              break;
         } 
-        if (TrayOrderDealActivity.this.swipeRefreshLayout.isRefreshing())
-          TrayOrderDealActivity.this.swipeRefreshLayout.setRefreshing(false); 
       }
     };
   
@@ -139,6 +139,8 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
   private String m_depLeader;
   
   private ImageView m_imageViewPic;
+
+  private ImageView m_imageViewSign;
   
   private boolean m_isMonthDealUser;
   
@@ -628,8 +630,9 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
       this.m_textViewOrginalFee = (TextView)findViewById(R.id.textview_orginalFee);//原本价格
       this.m_textViewCouponAmount = (TextView)findViewById(R.id.textview_couponAmount);//优惠金额
       this.m_imageViewPic = (ImageView)findViewById(R.id.imageView_pic);//拍照上传
-      this.m_imageViewPic = (ImageView)findViewById(R.id.imageSign_pic);//电子签名  这个有问题 原来没有定义这个图片
+      this.m_imageViewSign = (ImageView)findViewById(R.id.imageSign_pic);//电子签名  这个有问题 原来没有定义这个图片
       this.m_imageViewPic.setOnClickListener(this);
+      this.m_imageViewSign.setOnClickListener(this);
       this.m_textViewResidualGasFee = (TextView)findViewById(R.id.textview_residualGasFee);//残气抵扣
       this.m_listView_kp = (ListView)findViewById(R.id.listview_kp);//抵扣详情
       JSONObject jSONObject1 = this.m_OrderJson.getJSONObject("customer");
@@ -724,18 +727,17 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
     Bundle bundle;
     Intent intent;
     switch (paramView.getId()) {
-      default:
-        return;
-      case 2131230817:
+      case R.id.imageView_pic:
         intent = new Intent();
         bundle = new Bundle();
         bundle.putString("fileFolder", "order");
         bundle.putString("fileNameHeader", this.m_orderId);
         bundle.putInt("MaxPicCount", 4);
-        intent.setClass((Context)this, PicSelActivity.class);
+        intent.setClass(this, PicSelActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
-      case 2131230806:
+        break;
+      case R.id.imageSign_pic:
         intent = new Intent();
         bundle = new Bundle();
         bundle.putString("order", this.m_OrderJson.toString());
@@ -745,22 +747,23 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         bundle.putSerializable("MapList", (Serializable)this.list_map);
 //        bundle.putString("KPCode", JSON.toJSONString(this.m_BottlesMapKPL));
 //        bundle.putString("ZPCode", JSON.toJSONString(this.m_BottlesMapZPL));
-//        bundle.putString("SpecMap", this.SpecMap);
-//        intent.setClass((Context)this, PicSignActivity.class);
+        bundle.putString("SpecMap", this.SpecMap);
+        intent.setClass(this, PicSignActivity.class);
         intent.putExtras(bundle);
         startActivityForResult(intent, 1);
-      case 2131230765:
+        break;
+      case R.id.button_next:
+        if (this.m_depLeader == null) {
+          Toast.makeText((Context)this, "所属店长查询失败！请再次提交！", Toast.LENGTH_SHORT).show();
+          GetDepLeader();
+        }
+        Toast.makeText((Context)this, "正在提交，请稍等。。。", Toast.LENGTH_SHORT).show();
+        this.m_buttonNext.setText("正在提交...");
+        this.m_buttonNext.setBackgroundColor(getResources().getColor(R.color.textgray));
+        this.m_buttonNext.setEnabled(false);
+        this.handlerDelayCommit.sendEmptyMessageDelayed(0, 1000L);
         break;
     } 
-    if (this.m_depLeader == null) {
-      Toast.makeText((Context)this, "所属店长查询失败！请再次提交！", Toast.LENGTH_SHORT).show();
-      GetDepLeader();
-    } 
-    Toast.makeText((Context)this, "正在提交，请稍等。。。", Toast.LENGTH_SHORT).show();
-    this.m_buttonNext.setText("正在提交...");
-    this.m_buttonNext.setBackgroundColor(getResources().getColor(R.color.textgray));
-    this.m_buttonNext.setEnabled(false);
-    this.handlerDelayCommit.sendEmptyMessageDelayed(0, 1000L);
   }
   
   protected void onCreate(Bundle paramBundle) {

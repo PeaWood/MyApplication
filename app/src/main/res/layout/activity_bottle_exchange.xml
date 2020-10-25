@@ -233,7 +233,7 @@
                     n1:layout_height="wrap_content"
                     n1:layout_alignParentRight="true"
                     n1:layout_marginRight="10.0dip"
-                    n1:text=""
+                    n1:text="0"
                     n1:textColor="@color/colorAccent"
                     n1:textSize="20.0dip" />
             </RelativeLayout>
@@ -336,7 +336,7 @@
                     n1:layout_height="wrap_content"
                     n1:layout_alignParentRight="true"
                     n1:layout_marginRight="10.0dip"
-                    n1:text=""
+                    n1:text="0"
                     n1:textColor="@color/colorAccent"
                     n1:textSize="20.0dip" />
             </RelativeLayout>
