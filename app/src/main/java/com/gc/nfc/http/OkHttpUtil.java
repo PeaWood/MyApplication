@@ -353,7 +353,13 @@ public class OkHttpUtil {
         FormBody body = form.build();
         SharedPreferences share = thiscontext.getSharedPreferences("Session",Context.MODE_PRIVATE);
         String sessionid= share.getString("sessionid","null");
-        Request request = new Request.Builder().url(url).put(body).addHeader("cookie",sessionid).build();//采用put提交数据
+        Request request = new Request.Builder()
+                .url(url)
+                .put(body)
+                .addHeader("cookie",sessionid)
+                .addHeader("Content-Type", "application/json; charset=utf-8")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .build();//采用put提交数据
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

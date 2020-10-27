@@ -42,6 +42,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.dk.bleNfc.BleManager.Scanner;
 import com.dk.bleNfc.BleManager.ScannerCallback;
 import com.dk.bleNfc.BleNfcDeviceService;
@@ -746,11 +747,11 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     private void getBottleWeight(final String bottleCodeTemp, final boolean isZP) {
-        final View layout = getLayoutInflater().inflate(R.layout.input_layout, null);//先随便用一个
+        final View layout = getLayoutInflater().inflate(R.layout.upload_weight, null);//先随便用一个
         this.layout_inputWeight = layout;//这里原来是view  我先改为layout
         AlertDialog.Builder builder = (new AlertDialog.Builder(this)).setTitle("请输入").setIcon(R.drawable.icon_bottle).setView(layout).setPositiveButton("确定", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface param1DialogInterface, int param1Int) {
-                String str = ((EditText) layout.findViewById(R.id.input_userId)).getText().toString();
+                String str = ((EditText) layout.findViewById(R.id.input_bottleWeight2)).getText().toString();
                 if (str.length() == 0) {
                     Toast.makeText(BottleExchangeActivity.this, "重量输入有误，请重新输入！", Toast.LENGTH_SHORT).show();
                 } else if (isZP) {
@@ -760,7 +761,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                     m_BottlesMapKP.put(bottleCodeTemp, str);
                     refleshBottlesListKP();
                 }
-                //BottleExchangeActivity.access$3602(BottleExchangeActivity.this, (View)null);
             }
         });
         builder.setCancelable(false);
@@ -842,8 +842,8 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         JSONArray jSONArray = createElectDepDetails();
         this.m_bundle.putString("YJD_YS", this.m_yjp_ys_total);
         this.m_bundle.putString("YJD_SS", this.m_yjp_ss_total);
-        this.m_bundle.putString("KPCode", new JSONObject(this.m_BottlesMapKP).toString());
-        this.m_bundle.putString("ZPCode", new JSONObject(this.m_BottlesMapZP).toString());
+        this.m_bundle.putString("KPCode", JSON.toJSONString(this.m_BottlesMapKP));
+        this.m_bundle.putString("ZPCode", JSON.toJSONString(this.m_BottlesMapZP));
         String str = "";
         if (jSONArray != null)
             str = String.valueOf(jSONArray);
@@ -955,6 +955,8 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             @Override
             public void onResponse(Response response) throws IOException {
                 Logger.e("orderServiceQualityUpload: " + response.code());
+                Logger.e("orderServiceQualityUpload: "+response.message());
+                Logger.e("orderServiceQualityUpload: "+response.body().string());
                 if (response.code() == 200) {
                     handler_old.sendEmptyMessageDelayed(0, 500L);
                     return;
@@ -1251,12 +1253,12 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
 
     public void bottleTakeOverUnit(final String bottleCode, String paramString2, String paramString3, String paramString4, String paramString5, boolean paramBoolean1, final boolean isKP) {
         //测试
-//        if (isKP) {
-//            addKP(bottleCode);
-//        }
-//        if (!isKP) {
-//            addZP(bottleCode);
-//        }
+        if (isKP) {
+            addKP(bottleCode);
+        }
+        if (!isKP) {
+            addZP(bottleCode);
+        }
         boolean bool = false;
         if (this.m_BottlesMapKP.containsKey(bottleCode))
             bool = true;
@@ -1281,7 +1283,9 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
 
             @Override
             public void onResponse(Response response) throws IOException {
-                Logger.e("orderServiceQualityUpload: " + response.code());
+                Logger.e("bottleTakeOverUnit: " + response.code());
+                Logger.e("bottleTakeOverUnit: "+response.message());
+                Logger.e("bottleTakeOverUnit: "+response.body().string());
                 if (response.code() == 200) {
                     if (isKP) {
                         addKP(bottleCode);
@@ -1715,7 +1719,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 if (response.code() != 200) {
                     Toast.makeText(BottleExchangeActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
                 }
-                Logger.e(response.body());
+                Logger.e("updateBottleSpec: "+response.body().string());
                 JSONObject param1Object = null;
                 try {
                     param1Object = new JSONObject(response.body().toString());
