@@ -61,7 +61,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
   public void onBindViewHolder(final ViewHolder viewHolder, int paramInt) {
     String str;
     if (getItemViewType(paramInt) == 1) {
-      viewHolder.mImg.setImageResource(R.drawable.icon_add);
+      viewHolder.mImg.setImageResource(R.drawable.add_img);
       viewHolder.mImg.setOnClickListener(new View.OnClickListener() {
             public void onClick(View param1View) {
               GridImageAdapter.this.mOnAddPicClickListener.onAddPicClick();
