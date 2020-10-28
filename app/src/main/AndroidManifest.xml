@@ -75,6 +75,10 @@
         android:appComponentFactory="111"
         android:networkSecurityConfig="@xml/network_security_config"
         tools:ignore="GoogleAppIndexingWarning">
+        <meta-data android:name="com.amap.api.v2.apikey" android:value="ffda4c68ede19c14999d37d75ab1d20a"/>
+        <service android:name="com.amap.api.location.APSService"/>
+        <!--<service android:name="com.dk.bleNfc.BleNfcDeviceService"/>-->
+        <!--<service android:enabled="true" android:exported="true" android:name="com.gc.nfc.utils.AmapLocationService"/>-->
         <activity
             android:name="com.gc.nfc.ui.WelcomeActivity"
             android:launchMode="singleTop"
