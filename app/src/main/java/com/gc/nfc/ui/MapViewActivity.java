@@ -145,7 +145,7 @@ public class MapViewActivity extends BaseActivity {
         markerOptions.position(new LatLng(paramDouble2.doubleValue(), paramDouble1.doubleValue()));
         markerOptions.title(paramString1).snippet(paramString2);
         markerOptions.draggable(false);
-        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), 2131165515)));
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.worker)));
         aMap.addMarker(markerOptions).setVisible(true);
     }
 }
