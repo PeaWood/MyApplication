@@ -37,14 +37,19 @@ import android.widget.Toast;
 //import com.amap.api.navi.AmapNaviType;
 //import com.amap.api.navi.INaviInfoCallback;
 //import com.amap.api.navi.model.AMapNaviLocation;
+
+import com.dk.bleNfc.BleManager.BleManager;
 import com.dk.bleNfc.BleManager.Scanner;
 import com.dk.bleNfc.BleManager.ScannerCallback;
 import com.dk.bleNfc.BleNfcDeviceService;
 import com.dk.bleNfc.DeviceManager.BleNfcDevice;
+import com.dk.bleNfc.DeviceManager.ComByteManager;
+import com.dk.bleNfc.DeviceManager.DeviceManager;
 import com.dk.bleNfc.DeviceManager.DeviceManagerCallback;
 import com.dk.bleNfc.Exception.CardNoResponseException;
 import com.dk.bleNfc.Exception.DeviceNoResponseException;
 import com.dk.bleNfc.Tool.StringTool;
+import com.dk.bleNfc.card.Mifare;
 import com.dk.bleNfc.card.Ntag21x;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
@@ -61,98 +66,123 @@ import org.json.JSONException;
 import org.json.JSONObject;
 //INaviInfoCallback
 public class MendDetailActivity extends BaseActivity implements View.OnClickListener{
-  private AppContext appContext;
+    private AppContext appContext;
   
-  private BleNfcDevice bleNfcDevice;
-  
-  private DeviceManagerCallback deviceManagerCallback = new DeviceManagerCallback() {
-      public void onReceiveButtonEnter(byte param1Byte) {}
-      
-      public void onReceiveConnectBtDevice(boolean param1Boolean) {
-        super.onReceiveConnectBtDevice(param1Boolean);
-        if (param1Boolean) {
-          System.out.println("Activity设备连接成功");
-          MendDetailActivity.this.msgBuffer.delete(0, MendDetailActivity.this.msgBuffer.length());
-          MendDetailActivity.this.msgBuffer.append("设备连接成功!");
-          if (MendDetailActivity.this.mNearestBle != null);
-          try {
-            Thread.sleep(500L);
-            MendDetailActivity.this.handlerBlue.sendEmptyMessage(3);
-          } catch (InterruptedException interruptedException) {
-            interruptedException.printStackTrace();
-          } 
-        } 
-      }
-      
-      public void onReceiveConnectionStatus(boolean param1Boolean) {
-        super.onReceiveConnectionStatus(param1Boolean);
-        System.out.println("Activity设备链接状态回调");
-      }
-      
-      public void onReceiveDeviceAuth(byte[] param1ArrayOfbyte) {
-        super.onReceiveDeviceAuth(param1ArrayOfbyte);
-      }
-      
-      public void onReceiveDisConnectDevice(boolean param1Boolean) {
-        super.onReceiveDisConnectDevice(param1Boolean);
-        System.out.println("Activity设备断开链接");
-        MendDetailActivity.this.msgBuffer.delete(0, MendDetailActivity.this.msgBuffer.length());
-        MendDetailActivity.this.msgBuffer.append("设备断开链接!");
-        MendDetailActivity.this.handlerBlue.sendEmptyMessage(0);
-      }
-      
-      public void onReceiveInitCiphy(boolean param1Boolean) {
-        super.onReceiveInitCiphy(param1Boolean);
-      }
-      
-      public void onReceiveRfmClose(boolean param1Boolean) {
-        super.onReceiveRfmClose(param1Boolean);
-      }
-      
-      public void onReceiveRfmSentApduCmd(byte[] param1ArrayOfbyte) {
-        super.onReceiveRfmSentApduCmd(param1ArrayOfbyte);
-        System.out.println("Activity接收到APDU回调：" + StringTool.byteHexToSting(param1ArrayOfbyte));
-      }
-      
-      public void onReceiveRfnSearchCard(boolean param1Boolean, final int cardTypeTemp, byte[] param1ArrayOfbyte1, byte[] param1ArrayOfbyte2) {
-        super.onReceiveRfnSearchCard(param1Boolean, cardTypeTemp, param1ArrayOfbyte1, param1ArrayOfbyte2);
-        if (param1Boolean && cardTypeTemp != 0) {
-          System.out.println("Activity接收到激活卡片回调：UID->" + StringTool.byteHexToSting(param1ArrayOfbyte1) + " ATS->" + StringTool.byteHexToSting(param1ArrayOfbyte2));
-          (new Thread(new Runnable() {
-                public void run() {
-                  try {
-                    boolean bool;
-                    if (MendDetailActivity.this.bleNfcDevice.isAutoSearchCard()) {
-                      MendDetailActivity.this.bleNfcDevice.stoptAutoSearchCard();
-                      bool = MendDetailActivity.this.readWriteCardDemo(cardTypeTemp);
-                      MendDetailActivity.this.startAutoSearchCard();
-                    } else {
-                      bool = MendDetailActivity.this.readWriteCardDemo(cardTypeTemp);
-                      MendDetailActivity.this.bleNfcDevice.closeRf();
-                    } 
-                    if (bool) {
-                      MendDetailActivity.this.bleNfcDevice.openBeep(50, 50, 3);
-                      return;
-                    } 
-                  } catch (DeviceNoResponseException deviceNoResponseException) {
-                    deviceNoResponseException.printStackTrace();
-                    return;
-                  }
-                  try {
-                    MendDetailActivity.this.bleNfcDevice.openBeep(100, 100, 2);
-                  } catch (DeviceNoResponseException e) {
-                    e.printStackTrace();
-                  }
+    private BleNfcDevice bleNfcDevice;
+
+    //设备操作类回调
+    private DeviceManagerCallback deviceManagerCallback = new DeviceManagerCallback() {
+        @Override
+        public void onReceiveConnectBtDevice(boolean blnIsConnectSuc) {
+            super.onReceiveConnectBtDevice(blnIsConnectSuc);
+            if (blnIsConnectSuc) {
+                System.out.println("Activity设备连接成功");
+                msgBuffer.delete(0, msgBuffer.length());
+                msgBuffer.append("设备连接成功!");
+                if (mNearestBle != null) {
+                    //msgBuffer.append("设备名称：").append(bleNfcDevice.getDeviceName()).append("\r\n");
                 }
-              })).start();
-        } 
-      }
+                //msgBuffer.append("信号强度：").append(lastRssi).append("dB\r\n");
+                //msgBuffer.append("SDK版本：" + BleNfcDevice.SDK_VERSIONS + "\r\n");
+
+                //连接上后延时500ms后再开始发指令
+                try {
+                    Thread.sleep(500L);
+                    handler.sendEmptyMessage(3);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void onReceiveDisConnectDevice(boolean blnIsDisConnectDevice) {
+            super.onReceiveDisConnectDevice(blnIsDisConnectDevice);
+            System.out.println("Activity设备断开链接");
+            msgBuffer.delete(0, msgBuffer.length());
+            msgBuffer.append("设备断开链接!");
+            handler.sendEmptyMessage(0);
+        }
+
+        @Override
+        public void onReceiveConnectionStatus(boolean blnIsConnection) {
+            super.onReceiveConnectionStatus(blnIsConnection);
+            System.out.println("Activity设备链接状态回调");
+        }
+
+        @Override
+        public void onReceiveInitCiphy(boolean blnIsInitSuc) {
+            super.onReceiveInitCiphy(blnIsInitSuc);
+        }
+
+        @Override
+        public void onReceiveDeviceAuth(byte[] authData) {
+            super.onReceiveDeviceAuth(authData);
+        }
+
+        @Override
+        //寻到卡片回调
+        public void onReceiveRfnSearchCard(boolean blnIsSus, int cardType, byte[] bytCardSn, byte[] bytCarATS) {
+            super.onReceiveRfnSearchCard(blnIsSus, cardType, bytCardSn, bytCarATS);
+            if (!blnIsSus || cardType == BleNfcDevice.CARD_TYPE_NO_DEFINE) {
+                return;
+            }
+            System.out.println("Activity接收到激活卡片回调：UID->" + StringTool.byteHexToSting(bytCardSn) + " ATS->" + StringTool.byteHexToSting(bytCarATS));
+
+            final int cardTypeTemp = cardType;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    boolean isReadWriteCardSuc;
+                    try {
+                        if (bleNfcDevice.isAutoSearchCard()) {
+                            //如果是自动寻卡的，寻到卡后，先关闭自动寻卡
+                            bleNfcDevice.stoptAutoSearchCard();
+                            isReadWriteCardSuc = readWriteCardDemo(cardTypeTemp);
+//                            isReadWriteCardSuc=true;
+                            //读卡结束，重新打开自动寻卡
+                            startAutoSearchCard();
+                        }
+                        else {
+                            isReadWriteCardSuc = readWriteCardDemo(cardTypeTemp);
+//                            isReadWriteCardSuc=true;
+                            //如果不是自动寻卡，读卡结束,关闭天线
+                            bleNfcDevice.closeRf();
+                        }
+
+                        //打开蜂鸣器提示读卡完成
+                        if (isReadWriteCardSuc) {
+                            bleNfcDevice.openBeep(50, 50, 3);  //读写卡成功快响3声
+                        }
+                        else {
+                            bleNfcDevice.openBeep(100, 100, 2); //读写卡失败慢响2声
+                        }
+                    } catch (DeviceNoResponseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+
+        @Override
+        public void onReceiveRfmSentApduCmd(byte[] bytApduRtnData) {
+            super.onReceiveRfmSentApduCmd(bytApduRtnData);
+            System.out.println("Activity接收到APDU回调：" + StringTool.byteHexToSting(bytApduRtnData));
+        }
+
+        @Override
+        public void onReceiveRfmClose(boolean blnIsCloseSuc) {
+            super.onReceiveRfmClose(blnIsCloseSuc);
+        }
+        @Override
+        //按键返回回调
+        public void onReceiveButtonEnter(byte keyValue) {}
     };
   
-  private Handler handlerBlue = new Handler() {
+    private Handler handler = new Handler() {
       public void handleMessage(Message param1Message) {
-        MendDetailActivity.this.msgText.setText(MendDetailActivity.this.msgBuffer);
-        if (MendDetailActivity.this.bleNfcDevice.isConnection() == 2 || MendDetailActivity.this.bleNfcDevice.isConnection() == 1);
+        msgText.setText(msgBuffer);
+        //if (MendDetailActivity.this.bleNfcDevice.isConnection() == 2 || MendDetailActivity.this.bleNfcDevice.isConnection() == 1);
         switch (param1Message.what) {
           default:
             return;
@@ -161,16 +191,16 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
                   public void run() {
                     try {
                       MendDetailActivity.this.bleNfcDevice.getDeviceVersions();
-                      MendDetailActivity.this.handlerBlue.sendEmptyMessage(0);
+                      MendDetailActivity.this.handler.sendEmptyMessage(0);
                       if (MendDetailActivity.this.bleNfcDevice.getDeviceBatteryVoltage() < 3.61D) {
                         MendDetailActivity.this.msgBuffer.append("(电量低)");
                       } else {
                         MendDetailActivity.this.msgBuffer.append("(电量充足)");
                       } 
-                      MendDetailActivity.this.handlerBlue.sendEmptyMessage(0);
+                      MendDetailActivity.this.handler.sendEmptyMessage(0);
                       if (MendDetailActivity.this.bleNfcDevice.androidFastParams(true));
-                      MendDetailActivity.this.handlerBlue.sendEmptyMessage(0);
-                      MendDetailActivity.this.handlerBlue.sendEmptyMessage(0);
+                      MendDetailActivity.this.handler.sendEmptyMessage(0);
+                      MendDetailActivity.this.handler.sendEmptyMessage(0);
                       MendDetailActivity.this.startAutoSearchCard();
                     } catch (DeviceNoResponseException deviceNoResponseException) {
                       deviceNoResponseException.printStackTrace();
@@ -179,21 +209,25 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
                 })).start();
           case 137:
             break;
-        } 
-        String[] arrayOfString = param1Message.obj.toString().split(":");
-        if (arrayOfString.length != 2)
-          MendDetailActivity.this.showToast("无效卡格式！"); 
-        String str1 = arrayOfString[0];
-        String str2 = arrayOfString[1];
-        if (MendDetailActivity.this.m_handedUserCard == null)
-          MendDetailActivity.this.showToast("该用户未绑定用户卡"); 
-        if (!str2.equals(MendDetailActivity.this.m_handedUserCard))
-          MendDetailActivity.this.showToast("非本人卡号！"); 
-        if (str1.equals("Y"))
-          MendDetailActivity.this.orderServiceQualityUpload(true); 
-        if (str1.equals("N"))
-          MendDetailActivity.this.orderServiceQualityUpload(false); 
-        MendDetailActivity.this.showToast("无效卡格式！");
+        }
+        try {
+            String[] arrayOfString = param1Message.obj.toString().split(":");
+            if (arrayOfString.length != 2)
+                MendDetailActivity.this.showToast("无效卡格式！");
+            String str1 = arrayOfString[0];
+            String str2 = arrayOfString[1];
+            if (MendDetailActivity.this.m_handedUserCard == null)
+                MendDetailActivity.this.showToast("该用户未绑定用户卡");
+            if (!str2.equals(MendDetailActivity.this.m_handedUserCard))
+                MendDetailActivity.this.showToast("非本人卡号！");
+            if (str1.equals("Y"))
+                MendDetailActivity.this.orderServiceQualityUpload(true);
+            if (str1.equals("N"))
+                MendDetailActivity.this.orderServiceQualityUpload(false);
+            MendDetailActivity.this.showToast("无效卡格式！");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
       }
     };
   
@@ -208,13 +242,14 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   private Scanner mScanner;
   
   private final ServiceConnection mServiceConnection = new ServiceConnection() {
-      public void onServiceConnected(ComponentName param1ComponentName, IBinder param1IBinder) {
-        BleNfcDeviceService bleNfcDeviceService = ((BleNfcDeviceService.LocalBinder)param1IBinder).getService();
+      public void onServiceConnected(ComponentName param1ComponentName, IBinder service) {
+        BleNfcDeviceService mBleNfcDeviceService = ((BleNfcDeviceService.LocalBinder) service).getService();
         bleNfcDevice = mBleNfcDeviceService.bleNfcDevice;
         mScanner = mBleNfcDeviceService.scanner;
-        bleNfcDeviceService.setDeviceManagerCallback(MendDetailActivity.this.deviceManagerCallback);
-        bleNfcDeviceService.setScannerCallback(MendDetailActivity.this.scannerCallback);
-        MendDetailActivity.this.searchNearestBleDevice();
+        mBleNfcDeviceService.setDeviceManagerCallback(deviceManagerCallback);
+        mBleNfcDeviceService.setScannerCallback(scannerCallback);
+        //开始搜索设备
+        searchNearestBleDevice();
       }
       
       public void onServiceDisconnected(ComponentName param1ComponentName) {
@@ -275,36 +310,48 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   private ProgressDialog readWriteDialog = null;
   
   private ScannerCallback scannerCallback = new ScannerCallback() {
-      public void onReceiveScanDevice(BluetoothDevice param1BluetoothDevice, int param1Int, byte[] param1ArrayOfbyte) {
-        super.onReceiveScanDevice(param1BluetoothDevice, param1Int, param1ArrayOfbyte);
-        if (Build.VERSION.SDK_INT >= 21)
-          System.out.println("Activity搜到设备：" + param1BluetoothDevice.getName() + " 信号强度：" + param1Int + " scanRecord：" + StringTool.byteHexToSting(param1ArrayOfbyte)); 
-        if (param1ArrayOfbyte != null && StringTool.byteHexToSting(param1ArrayOfbyte).contains("017f5450") && param1Int >= -55) {
-          MendDetailActivity.this.handlerBlue.sendEmptyMessage(0);
-          if (MendDetailActivity.this.mNearestBle != null) {
-            if (param1Int > MendDetailActivity.this.lastRssi) {
-              MendDetailActivity.this.mNearestBleLock.lock();
-              try {
-                mNearestBle = param1BluetoothDevice;
-              } finally {
-                MendDetailActivity.this.mNearestBleLock.unlock();
-              } 
-            } 
-            return;
-          } 
-          MendDetailActivity.this.mNearestBleLock.lock();
+    @Override
+    public void onReceiveScanDevice(BluetoothDevice device, int rssi, byte[] scanRecord) {
+      super.onReceiveScanDevice(device, rssi, scanRecord);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //StringTool.byteHexToSting(scanRecord.getBytes())
+        System.out.println("Activity搜到设备：" + device.getName()
+                + " 信号强度：" + rssi
+                + " scanRecord：" + StringTool.byteHexToSting(scanRecord));
+      }
+
+      //搜索蓝牙设备并记录信号强度最强的设备
+      if ( (scanRecord != null) && (StringTool.byteHexToSting(scanRecord).contains("017f5450"))) {  //从广播数据中过滤掉其它蓝牙设备
+        if (rssi < -55) {
+          return;
+        }
+        //msgBuffer.append("搜到设备：").append(device.getName()).append(" 信号强度：").append(rssi).append("\r\n");
+        handler.sendEmptyMessage(0);
+        if (mNearestBle != null) {
+          if (rssi > lastRssi) {
+            mNearestBleLock.lock();
+            try {
+              mNearestBle = device;
+            }finally {
+              mNearestBleLock.unlock();
+            }
+          }
+        }
+        else {
+          mNearestBleLock.lock();
           try {
-            mNearestBle = param1BluetoothDevice;
-            MendDetailActivity.this.mNearestBleLock.unlock();
-          } finally {
-            MendDetailActivity.this.mNearestBleLock.unlock();
-          } 
-        } 
+            mNearestBle = device;
+          }finally {
+            mNearestBleLock.unlock();
+          }
+          lastRssi = rssi;
+        }
       }
-      
-      public void onScanDeviceStopped() {
-        super.onScanDeviceStopped();
-      }
+    }
+
+    @Override
+    public void onScanDeviceStopped() {
+      super.onScanDeviceStopped();
+    }
     };
   
   private Toast toast = null;
@@ -359,11 +406,13 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   }
   
   private void blueDeviceInitial() {
-    this.msgText = (TextView)findViewById(R.id.msgText);
-    this.m_imageViewSearchBlue = (ImageView)findViewById(R.id.imageView_search);
-    this.m_imageViewSearchBlue.setOnClickListener(new StartSearchButtonListener());
-    this.msgBuffer = new StringBuffer();
-    bindService(new Intent((Context)this, BleNfcDeviceService.class), this.mServiceConnection, Context.BIND_AUTO_CREATE);
+    msgText = (TextView)findViewById(R.id.msgText);
+    m_imageViewSearchBlue= (ImageView) findViewById(R.id.imageView_search);
+    m_imageViewSearchBlue.setOnClickListener(new StartSearchButtonListener());
+    msgBuffer = new StringBuffer();
+    //ble_nfc服务初始化
+    Intent gattServiceIntent = new Intent(this, BleNfcDeviceService.class);
+    bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
   }
   
   private void getOrderOps() {
@@ -471,7 +520,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
         } else {
           message.what = 136;
         } 
-        this.handlerBlue.sendMessage(message);
+        this.handler.sendMessage(message);
       } catch (CardNoResponseException cardNoResponseException) {
         cardNoResponseException.printStackTrace();
         bool = false;
@@ -484,208 +533,64 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   private void searchNearestBleDevice() {
     this.msgBuffer.delete(0, this.msgBuffer.length());
     this.msgBuffer.append("正在搜索设备...");
-    this.handlerBlue.sendEmptyMessage(0);
-    if (!this.mScanner.isScanning() && this.bleNfcDevice.isConnection() == 0)
-      (new Thread(new Runnable() {
-            public void run() {
-              // Byte code:
-              //   0: aload_0
-              //   1: monitorenter
-              //   2: aload_0
-              //   3: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   6: invokestatic access$200 : (Lcom/gc/nfc/ui/MendDetailActivity;)Lcom/dk/bleNfc/BleManager/Scanner;
-              //   9: lconst_0
-              //   10: invokevirtual startScan : (J)V
-              //   13: aload_0
-              //   14: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   17: invokestatic access$900 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/util/concurrent/locks/Lock;
-              //   20: invokeinterface lock : ()V
-              //   25: aload_0
-              //   26: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   29: aconst_null
-              //   30: invokestatic access$702 : (Lcom/gc/nfc/ui/MendDetailActivity;Landroid/bluetooth/BluetoothDevice;)Landroid/bluetooth/BluetoothDevice;
-              //   33: pop
-              //   34: aload_0
-              //   35: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   38: invokestatic access$900 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/util/concurrent/locks/Lock;
-              //   41: invokeinterface unlock : ()V
-              //   46: aload_0
-              //   47: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   50: bipush #-100
-              //   52: invokestatic access$802 : (Lcom/gc/nfc/ui/MendDetailActivity;I)I
-              //   55: pop
-              //   56: iconst_0
-              //   57: istore_1
-              //   58: aload_0
-              //   59: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   62: invokestatic access$700 : (Lcom/gc/nfc/ui/MendDetailActivity;)Landroid/bluetooth/BluetoothDevice;
-              //   65: ifnonnull -> 141
-              //   68: iload_1
-              //   69: sipush #20000
-              //   72: if_icmpge -> 141
-              //   75: aload_0
-              //   76: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   79: invokestatic access$200 : (Lcom/gc/nfc/ui/MendDetailActivity;)Lcom/dk/bleNfc/BleManager/Scanner;
-              //   82: invokevirtual isScanning : ()Z
-              //   85: ifeq -> 141
-              //   88: aload_0
-              //   89: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   92: invokestatic access$100 : (Lcom/gc/nfc/ui/MendDetailActivity;)Lcom/dk/bleNfc/DeviceManager/BleNfcDevice;
-              //   95: invokevirtual isConnection : ()I
-              //   98: istore_2
-              //   99: iload_2
-              //   100: ifne -> 141
-              //   103: iinc #1, 1
-              //   106: lconst_1
-              //   107: invokestatic sleep : (J)V
-              //   110: goto -> 58
-              //   113: astore_3
-              //   114: aload_3
-              //   115: invokevirtual printStackTrace : ()V
-              //   118: goto -> 58
-              //   121: astore_3
-              //   122: aload_0
-              //   123: monitorexit
-              //   124: aload_3
-              //   125: athrow
-              //   126: astore_3
-              //   127: aload_0
-              //   128: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   131: invokestatic access$900 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/util/concurrent/locks/Lock;
-              //   134: invokeinterface unlock : ()V
-              //   139: aload_3
-              //   140: athrow
-              //   141: aload_0
-              //   142: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   145: invokestatic access$200 : (Lcom/gc/nfc/ui/MendDetailActivity;)Lcom/dk/bleNfc/BleManager/Scanner;
-              //   148: invokevirtual isScanning : ()Z
-              //   151: ifeq -> 372
-              //   154: aload_0
-              //   155: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   158: invokestatic access$100 : (Lcom/gc/nfc/ui/MendDetailActivity;)Lcom/dk/bleNfc/DeviceManager/BleNfcDevice;
-              //   161: invokevirtual isConnection : ()I
-              //   164: istore_1
-              //   165: iload_1
-              //   166: ifne -> 372
-              //   169: ldc2_w 500
-              //   172: invokestatic sleep : (J)V
-              //   175: aload_0
-              //   176: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   179: invokestatic access$200 : (Lcom/gc/nfc/ui/MendDetailActivity;)Lcom/dk/bleNfc/BleManager/Scanner;
-              //   182: invokevirtual stopScan : ()V
-              //   185: aload_0
-              //   186: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   189: invokestatic access$900 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/util/concurrent/locks/Lock;
-              //   192: invokeinterface lock : ()V
-              //   197: aload_0
-              //   198: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   201: invokestatic access$700 : (Lcom/gc/nfc/ui/MendDetailActivity;)Landroid/bluetooth/BluetoothDevice;
-              //   204: ifnull -> 307
-              //   207: aload_0
-              //   208: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   211: invokestatic access$200 : (Lcom/gc/nfc/ui/MendDetailActivity;)Lcom/dk/bleNfc/BleManager/Scanner;
-              //   214: invokevirtual stopScan : ()V
-              //   217: aload_0
-              //   218: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   221: invokestatic access$1000 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/lang/StringBuffer;
-              //   224: iconst_0
-              //   225: aload_0
-              //   226: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   229: invokestatic access$1000 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/lang/StringBuffer;
-              //   232: invokevirtual length : ()I
-              //   235: invokevirtual delete : (II)Ljava/lang/StringBuffer;
-              //   238: pop
-              //   239: aload_0
-              //   240: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   243: invokestatic access$1000 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/lang/StringBuffer;
-              //   246: ldc '正在连接设备...'
-              //   248: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuffer;
-              //   251: pop
-              //   252: aload_0
-              //   253: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   256: invokestatic access$600 : (Lcom/gc/nfc/ui/MendDetailActivity;)Landroid/os/Handler;
-              //   259: iconst_0
-              //   260: invokevirtual sendEmptyMessage : (I)Z
-              //   263: pop
-              //   264: aload_0
-              //   265: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   268: invokestatic access$100 : (Lcom/gc/nfc/ui/MendDetailActivity;)Lcom/dk/bleNfc/DeviceManager/BleNfcDevice;
-              //   271: aload_0
-              //   272: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   275: invokestatic access$700 : (Lcom/gc/nfc/ui/MendDetailActivity;)Landroid/bluetooth/BluetoothDevice;
-              //   278: invokevirtual getAddress : ()Ljava/lang/String;
-              //   281: invokevirtual requestConnectBleDevice : (Ljava/lang/String;)V
-              //   284: aload_0
-              //   285: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   288: invokestatic access$900 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/util/concurrent/locks/Lock;
-              //   291: invokeinterface unlock : ()V
-              //   296: aload_0
-              //   297: monitorexit
-              //   298: return
-              //   299: astore_3
-              //   300: aload_3
-              //   301: invokevirtual printStackTrace : ()V
-              //   304: goto -> 175
-              //   307: aload_0
-              //   308: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   311: invokestatic access$1000 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/lang/StringBuffer;
-              //   314: iconst_0
-              //   315: aload_0
-              //   316: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   319: invokestatic access$1000 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/lang/StringBuffer;
-              //   322: invokevirtual length : ()I
-              //   325: invokevirtual delete : (II)Ljava/lang/StringBuffer;
-              //   328: pop
-              //   329: aload_0
-              //   330: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   333: invokestatic access$1000 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/lang/StringBuffer;
-              //   336: ldc '未找到设备！'
-              //   338: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuffer;
-              //   341: pop
-              //   342: aload_0
-              //   343: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   346: invokestatic access$600 : (Lcom/gc/nfc/ui/MendDetailActivity;)Landroid/os/Handler;
-              //   349: iconst_0
-              //   350: invokevirtual sendEmptyMessage : (I)Z
-              //   353: pop
-              //   354: goto -> 284
-              //   357: astore_3
-              //   358: aload_0
-              //   359: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   362: invokestatic access$900 : (Lcom/gc/nfc/ui/MendDetailActivity;)Ljava/util/concurrent/locks/Lock;
-              //   365: invokeinterface unlock : ()V
-              //   370: aload_3
-              //   371: athrow
-              //   372: aload_0
-              //   373: getfield this$0 : Lcom/gc/nfc/ui/MendDetailActivity;
-              //   376: invokestatic access$200 : (Lcom/gc/nfc/ui/MendDetailActivity;)Lcom/dk/bleNfc/BleManager/Scanner;
-              //   379: invokevirtual stopScan : ()V
-              //   382: goto -> 296
-              // Exception table:
-              //   from	to	target	type
-              //   2	25	121	finally
-              //   25	34	126	finally
-              //   34	56	121	finally
-              //   58	68	121	finally
-              //   75	99	121	finally
-              //   106	110	113	java/lang/InterruptedException
-              //   106	110	121	finally
-              //   114	118	121	finally
-              //   122	124	121	finally
-              //   127	141	121	finally
-              //   141	165	121	finally
-              //   169	175	299	java/lang/InterruptedException
-              //   169	175	121	finally
-              //   175	197	121	finally
-              //   197	284	357	finally
-              //   284	296	121	finally
-              //   296	298	121	finally
-              //   300	304	121	finally
-              //   307	354	357	finally
-              //   358	372	121	finally
-              //   372	382	121	finally
+    this.handler.sendEmptyMessage(0);
+    if (!mScanner.isScanning() && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          synchronized (this) {
+            mScanner.startScan(0);
+            mNearestBleLock.lock();
+            try {
+              mNearestBle = null;
+            }finally {
+              mNearestBleLock.unlock();
             }
-          })).start(); 
+            lastRssi = -100;
+
+            int searchCnt = 0;
+            while ((mNearestBle == null)
+                    && (searchCnt < 20000)
+                    && (mScanner.isScanning())
+                    && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+              searchCnt++;
+              try {
+                Thread.sleep(1);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            }
+
+            if (mScanner.isScanning() && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+              try {
+                Thread.sleep(500);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+              mScanner.stopScan();
+              mNearestBleLock.lock();
+              try {
+                if (mNearestBle != null) {
+                  mScanner.stopScan();
+                  msgBuffer.delete(0, msgBuffer.length());
+                  msgBuffer.append("正在连接设备...");
+                  handler.sendEmptyMessage(0);
+                  bleNfcDevice.requestConnectBleDevice(mNearestBle.getAddress());
+                } else {
+                  msgBuffer.delete(0, msgBuffer.length());
+                  msgBuffer.append("未找到设备！");
+                  handler.sendEmptyMessage(0);
+                }
+              }finally {
+                mNearestBleLock.unlock();
+              }
+            } else {
+              mScanner.stopScan();
+            }
+          }
+        }
+      }).start();
+    }
   }
   
   private void setListViewHeightBasedOnChildren(ListView paramListView) {
@@ -749,7 +654,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
     message.what = 4;
     message.arg1 = paramInt;
     message.obj = paramString;
-    this.handlerBlue.sendMessage(message);
+    this.handler.sendMessage(message);
   }
   
   private void showToast(String paramString) {
@@ -781,7 +686,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
       if (bool || b >= 10) {
         if (!bool) {
           this.msgBuffer.append("不支持自动寻卡！\r\n");
-          this.handlerBlue.sendEmptyMessage(0);
+          this.handler.sendEmptyMessage(0);
         } 
         return bool;
       } 
@@ -843,10 +748,10 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
 //      this.m_editTextPs = (EditText)findViewById(2131230846);
 //      this.m_textViewCheckType = (TextView)findViewById(2131231096);
 //      this.m_textview_checkDetail = (TextView)findViewById(2131231095);
-      this.m_buttonNext.setOnClickListener(this);
-      this.m_imageViewNav.setOnClickListener(this);
-      this.m_imageViewCall.setOnClickListener(this);
-      this.m_imageViewPic.setOnClickListener(this);
+      //this.m_buttonNext.setOnClickListener(this);
+      //this.m_imageViewNav.setOnClickListener(this);
+      //this.m_imageViewCall.setOnClickListener(this);
+      //this.m_imageViewPic.setOnClickListener(this);
       setOrderHeadInfo();
       blueDeviceInitial();
       this.m_orderServiceQualityShowFlag = false;
@@ -921,14 +826,13 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   public void onStopSpeaking() {}
   
   private class StartSearchButtonListener implements View.OnClickListener {
-    private StartSearchButtonListener() {}
-    
-    public void onClick(View param1View) {
-      if (MendDetailActivity.this.bleNfcDevice.isConnection() == 2) {
-        MendDetailActivity.this.bleNfcDevice.requestDisConnectDevice();
+    @Override
+    public void onClick(View v) {
+      if ( (bleNfcDevice.isConnection() == BleManager.STATE_CONNECTED) ) {
+        bleNfcDevice.requestDisConnectDevice();
         return;
-      } 
-      MendDetailActivity.this.searchNearestBleDevice();
+      }
+      searchNearestBleDevice();
     }
   }
 }
