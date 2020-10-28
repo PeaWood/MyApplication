@@ -55,6 +55,7 @@ import com.dk.bleNfc.card.Ntag21x;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.domain.Data_UpdateBottleSpec;
 import com.gc.nfc.domain.Data_UserBottles;
 import com.gc.nfc.domain.Data_UserCard;
 import com.gc.nfc.domain.User;
@@ -74,6 +75,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -1008,9 +1010,9 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         ArrayList arrayList = new ArrayList();
         for (Map.Entry<String, String> entry : this.m_BottlesMapKP.entrySet()) {
             HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-            hashMap.put("bottleSpec", getSpecName(getBottleSpec((String) entry.getKey())));
+            hashMap.put("bottleSpec", getSpecName(getBottleSpec(entry.getKey())));
             hashMap.put("bottleCode", entry.getKey());
-            hashMap.put("bottleWeight", (String) entry.getValue() + "公斤");
+            hashMap.put("bottleWeight", entry.getValue() + "公斤");
             arrayList.add(hashMap);
         } //下面这个暂定这个布局  不太确定
         SimpleAdapter simpleAdapter = new SimpleAdapter(this, arrayList, R.layout.bottle_list_simple_items, new String[]{"bottleCode", "bottleWeight", "bottleSpec"}, new int[]{R.id.items_number, R.id.items_weight, R.id.items_spec});
@@ -1255,9 +1257,11 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         //测试
         if (isKP) {
             addKP(bottleCode);
+            return;
         }
         if (!isKP) {
             addZP(bottleCode);
+            return;
         }
         boolean bool = false;
         if (this.m_BottlesMapKP.containsKey(bottleCode))
@@ -1516,7 +1520,8 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             ListView listView4 = this.m_listView_kp;
             AdapterView.OnItemLongClickListener onItemLongClickListener1 = new AdapterView.OnItemLongClickListener() {
                 public boolean onItemLongClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
-                    String str = ((TextView) param1View.findViewById(R.id.items_weight)).getText().toString();//暂定这个
+                    String str = ((TextView) param1View.findViewById(R.id.items_number)).getText().toString();//暂定这个
+                    Logger.e("code : "+str);
                     getBottleWeight(str, false);
                     return true;
                 }
@@ -1539,7 +1544,8 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             ListView listView1 = this.m_listView_zp;
             AdapterView.OnItemLongClickListener onItemLongClickListener2 = new AdapterView.OnItemLongClickListener() {
                 public boolean onItemLongClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
-                    String str = ((TextView) param1View.findViewById(R.id.items_weight)).getText().toString();
+                    String str = ((TextView) param1View.findViewById(R.id.items_number)).getText().toString();
+
                     getBottleWeight(str, true);
                     return true;
                 }
@@ -1637,7 +1643,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 }
                 show_deposit_slip();
                 break;
-            case R.id.imageView_addKPManual:
+            case R.id.imageView_KPEYE:
                 intent = new Intent();
                 bundle = new Bundle();
                 bundle.putString("userId", this.m_curUserId);
@@ -1645,7 +1651,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 intent.putExtras(bundle);
                 startActivity(intent);
                 break;
-            case R.id.imageView_addZPManual:
+            case R.id.imageView_ZPEYE:
                 intent = new Intent();
                 bundle = new Bundle();
                 bundle.putString("userId", this.m_deliveryUser.getUsername());
@@ -1653,7 +1659,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 intent.putExtras(bundle);
                 startActivity(intent);
                 break;
-            case R.id.imageView_KPEYE:
+            case R.id.imageView_addKPManual:
                 if (Tools.isFastClick()) {
                     if (TextUtils.isEmpty(this.m_gp_code_head_KP)) {
                         this.m_gp_code_head_KP = "";
@@ -1664,7 +1670,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                     this.m_bottleIdKPEditText.setText("");
                 }
                 break;
-            case R.id.imageView_ZPEYE:
+            case R.id.imageView_addZPManual:
                 if (Tools.isFastClick()) {
                     String s = this.m_gp_code_head_ZP + this.m_bottleIdZPEditText.getText().toString();
                     if (TextUtils.isEmpty(s)) {
@@ -1719,30 +1725,35 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 if (response.code() != 200) {
                     Toast.makeText(BottleExchangeActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
                 }
-                Logger.e("updateBottleSpec: "+response.body().string());
-                JSONObject param1Object = null;
-                try {
-                    param1Object = new JSONObject(response.body().toString());
-                    JSONArray jSONArray = param1Object.getJSONArray("items");
-                    for (byte b = 0; ; b++) {
-                        if (b < jSONArray.length()) {
-                            JSONObject jSONObject = jSONArray.getJSONObject(b);
-                            param1Object = jSONObject.getJSONObject("spec");
-                            if (jSONObject.get("number").toString().equals(bottleCode)) {
-                                m_BottlesSpecMap.put(bottleCode, param1Object.get("code").toString());
-                                refleshBottlesListZP();
-                                refleshBottlesListKP();
-                                return;
-                            }
-                        } else {
+                String s = response.body().string();
+                Logger.e("updateBottleSpec: "+s);
+                Gson gson = new Gson();
+                Data_UpdateBottleSpec data_updateBottleSpec = gson.fromJson(JSONTokener(s), Data_UpdateBottleSpec.class);
+                List<Data_UpdateBottleSpec.ItemsBean> items = data_updateBottleSpec.getItems();
+                for (byte b = 0; b< items.size(); b++) {
+                    if (b < items.size()) {
+                        Data_UpdateBottleSpec.ItemsBean itemsBean = items.get(b);
+                        if (itemsBean.getNumber().equals(bottleCode)) {
+                            Logger.e("getSpec code : "+itemsBean.getSpec().getCode());
+                            m_BottlesSpecMap.put(bottleCode, itemsBean.getSpec().getCode());
+                            refleshBottlesListZP();
+                            refleshBottlesListKP();
                             return;
                         }
+                    } else {
+                        return;
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             }
         });
+    }
+
+    public String JSONTokener(String in) {
+        // consume an optional byte order mark (BOM) if it exists
+        if (in != null && in.startsWith("\ufeff")) {
+            in = in.substring(1);
+        }
+        return in;
     }
 
     private class StartSearchButtonListener implements View.OnClickListener {

@@ -357,8 +357,8 @@ public class OkHttpUtil {
                 .url(url)
                 .put(body)
                 .addHeader("cookie",sessionid)
-                .addHeader("Content-Type", "application/json; charset=utf-8")
-                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Content-Type", "application/json;charset=UTF-8")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
                 .build();//采用put提交数据
         client.newCall(request).enqueue(new Callback() {
             @Override
