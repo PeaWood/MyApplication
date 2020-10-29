@@ -131,15 +131,19 @@ public class PicSelActivity extends AppCompatActivity implements View.OnClickLis
     View.OnClickListener onClickListener = new View.OnClickListener() {
         public void onClick(View param1View) {
           switch (param1View.getId()) {
-            default:
-              PicSelActivity.this.closePopupWindow();
-              return;
-            case 2131231124:
+            case R.id.tv_album:
               PictureSelector.create((Activity)PicSelActivity.this).openGallery(PictureMimeType.ofImage()).maxSelectNum(PicSelActivity.this.maxSelectNum).minSelectNum(1).imageSpanCount(4).selectionMode(2).forResult(188);
-            case 2131231125:
+              PicSelActivity.this.closePopupWindow();
+              break;
+            case R.id.tv_camera:
+              PictureSelector.create((Activity)PicSelActivity.this).openCamera(PictureMimeType.ofImage()).forResult(188);
+              PicSelActivity.this.closePopupWindow();
+              break;
+            case R.id.tv_cancel:
+              PicSelActivity.this.closePopupWindow();
               break;
           } 
-          PictureSelector.create((Activity)PicSelActivity.this).openCamera(PictureMimeType.ofImage()).forResult(188);
+
         }
       };
     textView1.setOnClickListener(onClickListener);
