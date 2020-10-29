@@ -503,7 +503,7 @@ public class PicSignActivity extends AppCompatActivity {
     setContentView(this.binding.getRoot());
     this.binding.btn1.setOnClickListener(new View.OnClickListener() {
           public void onClick(View param1View) {
-//            PicSignActivity.this.startActivityForResult(new Intent((Context)PicSignActivity.this, QianZiActivity.class), 1);
+            PicSignActivity.this.startActivityForResult(new Intent((Context)PicSignActivity.this, QianZiActivity.class), 1);
           }
         });
     if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE") == PackageManager.PERMISSION_DENIED)
