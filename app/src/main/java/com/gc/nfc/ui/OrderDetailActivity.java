@@ -448,7 +448,7 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
             m_textViewUserId = (TextView) findViewById(R.id.items_userId);
             m_textViewUserPhone = (TextView) findViewById(R.id.items_userPhone);
             m_textViewCreateTime = (TextView) findViewById(R.id.items_creatTime);
-            m_textViewAddress = (TextView) findViewById(R.id.items_addressStatic);
+            m_textViewAddress = (TextView) findViewById(R.id.items_address);
             m_imageViewUserIcon = (ImageView) findViewById(R.id.items_imageUserIcon);
             m_textViewPayTypeInfo = (TextView) findViewById(R.id.items_userCredit);
             m_textview_qp = (TextView) findViewById(R.id.textview_qp);

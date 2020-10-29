@@ -119,12 +119,12 @@
                         n1:layout_marginLeft="16.0dip"
                         n1:layout_marginTop="10.0dip"
                         n1:hint="地 址："
-                        n1:textColor="#fff"
+                        n1:textColorHint="#fff"
                         n1:textSize="14.0sp" />
 
                     <TextView
                         n1:id="@+id/items_address"
-                        n1:layout_width="wrap_content"
+                        n1:layout_width="230dip"
                         n1:layout_height="wrap_content"
                         n1:layout_marginTop="10.0dip"
                         n1:layout_weight="1"
