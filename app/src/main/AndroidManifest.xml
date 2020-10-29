@@ -79,6 +79,16 @@
         <service android:name="com.amap.api.location.APSService"/>
         <!--<service android:name="com.dk.bleNfc.BleNfcDeviceService"/>-->
         <!--<service android:enabled="true" android:exported="true" android:name="com.gc.nfc.utils.AmapLocationService"/>-->
+        <provider android:authorities="com.gc.nfc.provider"
+                   android:exported="false"
+                   android:grantUriPermissions="true"
+                   android:name="com.luck.picture.lib.PictureFileProvider">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+                   android:resource="@xml/file_paths"/>
+        </provider>
+        <activity android:configChanges="keyboardHidden|orientation|screenSize"
+            android:name="com.amap.api.navi.AmapRouteActivity"
+            android:theme="@android:style/Theme.NoTitleBar"/>
         <activity
             android:name="com.gc.nfc.ui.WelcomeActivity"
             android:launchMode="singleTop"
