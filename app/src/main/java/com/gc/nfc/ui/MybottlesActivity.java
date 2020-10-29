@@ -9,6 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -40,7 +41,7 @@ public class MybottlesActivity extends BaseActivity implements View.OnClickListe
     private String m_userId;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
-
+    private ImageView imageView;
     private void switchActivity(int paramInt) {
     }
 
@@ -51,6 +52,13 @@ public class MybottlesActivity extends BaseActivity implements View.OnClickListe
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
                 switchActivity(param1Int);
+            }
+        });
+        imageView = (ImageView) findViewById(R.id.img_back);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
         m_totalCountTextView = (TextView) findViewById(R.id.textview_totalCount);

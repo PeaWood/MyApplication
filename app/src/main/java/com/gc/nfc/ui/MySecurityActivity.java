@@ -6,6 +6,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -36,6 +37,7 @@ public class MySecurityActivity extends BaseActivity implements View.OnClickList
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
+    private ImageView imageView;
 
     private void switchActivity(int paramInt) {
         //    try {
@@ -54,6 +56,13 @@ public class MySecurityActivity extends BaseActivity implements View.OnClickList
         requestWindowFeature(1);
         setContentView(R.layout.activity_my_security);
         listView = (ListView) findViewById(R.id.listview);
+        imageView = (ImageView) findViewById(R.id.img_back);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
                 switchActivity(param1Int);

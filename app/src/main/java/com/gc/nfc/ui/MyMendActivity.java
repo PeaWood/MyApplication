@@ -7,6 +7,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -38,6 +39,7 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
+    private ImageView image;
 
     private void switchActivity(int paramInt) {
         try {
@@ -56,6 +58,8 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
         requestWindowFeature(1);
         setContentView(R.layout.activity_my_mend);
         listView = findViewById(R.id.listview);
+        image = findViewById(R.id.img_back);
+        image.setOnClickListener(backOnClickListener);
         (listView).setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
                 MyMendActivity.this.switchActivity(param1Int);
@@ -165,4 +169,11 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
             }
         });
     }
+    private View.OnClickListener backOnClickListener = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            finish();
+        }
+    };
 }

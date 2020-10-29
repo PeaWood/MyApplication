@@ -7,6 +7,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -39,6 +40,7 @@ public class HistoryOrdersActivity extends BaseActivity implements View.OnClickL
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
     private Data_Order data_taskOrders;
+    private ImageView imageView;
 
     private void switchActivity(int paramInt) {
         try {
@@ -63,6 +65,13 @@ public class HistoryOrdersActivity extends BaseActivity implements View.OnClickL
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
                 switchActivity(param1Int);
+            }
+        });
+        imageView = (ImageView) findViewById(R.id.img_back);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.main_srl);
