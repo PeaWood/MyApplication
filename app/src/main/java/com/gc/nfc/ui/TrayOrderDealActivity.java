@@ -2,11 +2,9 @@ package com.gc.nfc.ui;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,7 +15,6 @@ import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -31,14 +28,19 @@ import com.alibaba.fastjson.TypeReference;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
-import com.gc.nfc.domain.Data_Caculate;
 import com.gc.nfc.domain.Data_Depleader;
+import com.gc.nfc.domain.Data_Order;
 import com.gc.nfc.domain.RefoundDetail;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
-import com.gc.nfc.interfaces.Netcallback;
 import com.google.gson.Gson;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -51,12 +53,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -197,7 +193,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
                     Toast.makeText(TrayOrderDealActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
                 }
                 String string = response.body().string();
-                Logger.e("GetDepLeader : "+string);
+                Logger.e("GetDepLeader : " + string);
                 Gson gson = new Gson();
                 Data_Depleader depleader = gson.fromJson(string, Data_Depleader.class);
                 try {
@@ -259,49 +255,49 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
 
             @Override
             public void onResponse(Response response) throws IOException {
-                Logger.e("OrderCalculate: "+response.code());
-                Logger.e("OrderCalculate: "+response.message());
-                Logger.e("OrderCalculate: "+response.body().string());
+                Logger.e("OrderCalculate: " + response.code());
+                Logger.e("OrderCalculate: " + response.message());
+                Logger.e("OrderCalculate: " + response.body().string());
                 if (response.code() != 200) {
-//                    refleshBottlesMapKP();
-//                    refleshPayStatus();
+                    //                    refleshBottlesMapKP();
+                    //                    refleshPayStatus();
                     Toast.makeText(TrayOrderDealActivity.this, response.message(), Toast.LENGTH_LONG).show();
-//                    return;
+                    //                    return;
                 }
-//                Logger.e("OrderCalculate: "+response.body().string());
-//                Gson gson = new Gson();
-//                Data_Caculate data_caculate = gson.fromJson(response.body().string(), Data_Caculate.class);
-//                for (byte b = 0; b < data_caculate.getItems().size(); b++) {
-//                    Data_Caculate.ItemsBean itemsBean = data_caculate.getItems().get(b);
-//                    param1Boolean = jSONObject1.getBoolean("success");
-//                    String str = jSONObject1.getString("gasCynNumber");
-//                    param1Object = m_BottlesMapKP.get(str);
-//                    if (((RefoundDetail)param1Object).note == null) {
-//                      String str1 = new String();
-//                      this();
-//                      ((RefoundDetail)param1Object).note = str1;
-//                    }
-//                    ((RefoundDetail)param1Object).note = jSONObject1.getString("note");
-//                    if (param1Boolean) {
-//                      JSONObject jSONObject2 = jSONObject1.getJSONObject("gasRefoundDetail");
-//                      jSONObject2.getString("orderSn");
-//                      DoubleCast(Double.valueOf(jSONObject2.getDouble("dealPrice")));
-//                      jSONObject2.getString("prevOrder");
-//                      jSONObject2.getString("prevGoodsCode");
-//                      ((RefoundDetail)param1Object).isOK = true;
-//                      ((RefoundDetail)param1Object).kp_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("refoundWeight")));
-//                      ((RefoundDetail)param1Object).tare_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("tareWeight")));
-//                      ((RefoundDetail)param1Object).canqi_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("remainGas")));
-//                      ((RefoundDetail)param1Object).chongzhuang_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("standWeight")));
-//                      ((RefoundDetail)param1Object).original_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("dealPrice")));
-//                      ((RefoundDetail)param1Object).gas_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("unitPrice")));
-//                      ((RefoundDetail)param1Object).canqi_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("refoundSum")));
-//                      ((RefoundDetail)param1Object).forceCaculate = jSONObject2.getBoolean("forceCaculate");
-//                    } else {
-//                      ((RefoundDetail)param1Object).isOK = false;
-//                    }
-//                    m_BottlesMapKP.put(str, param1Object);
-//                }
+                //                Logger.e("OrderCalculate: "+response.body().string());
+                //                Gson gson = new Gson();
+                //                Data_Caculate data_caculate = gson.fromJson(response.body().string(), Data_Caculate.class);
+                //                for (byte b = 0; b < data_caculate.getItems().size(); b++) {
+                //                    Data_Caculate.ItemsBean itemsBean = data_caculate.getItems().get(b);
+                //                    param1Boolean = jSONObject1.getBoolean("success");
+                //                    String str = jSONObject1.getString("gasCynNumber");
+                //                    param1Object = m_BottlesMapKP.get(str);
+                //                    if (((RefoundDetail)param1Object).note == null) {
+                //                      String str1 = new String();
+                //                      this();
+                //                      ((RefoundDetail)param1Object).note = str1;
+                //                    }
+                //                    ((RefoundDetail)param1Object).note = jSONObject1.getString("note");
+                //                    if (param1Boolean) {
+                //                      JSONObject jSONObject2 = jSONObject1.getJSONObject("gasRefoundDetail");
+                //                      jSONObject2.getString("orderSn");
+                //                      DoubleCast(Double.valueOf(jSONObject2.getDouble("dealPrice")));
+                //                      jSONObject2.getString("prevOrder");
+                //                      jSONObject2.getString("prevGoodsCode");
+                //                      ((RefoundDetail)param1Object).isOK = true;
+                //                      ((RefoundDetail)param1Object).kp_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("refoundWeight")));
+                //                      ((RefoundDetail)param1Object).tare_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("tareWeight")));
+                //                      ((RefoundDetail)param1Object).canqi_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("remainGas")));
+                //                      ((RefoundDetail)param1Object).chongzhuang_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("standWeight")));
+                //                      ((RefoundDetail)param1Object).original_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("dealPrice")));
+                //                      ((RefoundDetail)param1Object).gas_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("unitPrice")));
+                //                      ((RefoundDetail)param1Object).canqi_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("refoundSum")));
+                //                      ((RefoundDetail)param1Object).forceCaculate = jSONObject2.getBoolean("forceCaculate");
+                //                    } else {
+                //                      ((RefoundDetail)param1Object).isOK = false;
+                //                    }
+                //                    m_BottlesMapKP.put(str, param1Object);
+                //                }
                 //try {
                 //  JSONObject jSONObject = new JSONObject();
                 //  this(EntityUtils.toString(param1Object.getEntity(), "UTF-8"));
@@ -352,9 +348,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
             Window window = alertDialog.getWindow();
             window.setGravity(17);
             window.setLayout(-1, -2);
-        } catch (MalformedURLException malformedURLException) {
-
-        } catch (IOException iOException) {
+        } catch (Exception iOException) {
         }
     }
 
@@ -532,7 +526,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
             arrayList.add(hashMap);
         }
         SimpleAdapter simpleAdapter = new SimpleAdapter(this, arrayList, R.layout.bottle_list_tray_pay_items, new String[]{"note", "icon", "code", "kp_weight", "tare_weight", "canqi_weight", "chongzhuang_weight", "original_price", "gas_price", "canqi_price"}, new int[]{R.id.items_note, R.id.items_imageViewIsOK, R.id.items_number, R.id.items_kpweight, R.id.items_tareweight, R.id.items_canqiweight, R.id.items_chongweight, R.id.items_originalPrice, R.id.items_gasPrice, R.id.items_canqiPrice});
-        m_listView_kp.setAdapter((ListAdapter) simpleAdapter);
+        m_listView_kp.setAdapter(simpleAdapter);
         setListViewHeightBasedOnChildren(m_listView_kp);
     }
 
@@ -574,6 +568,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
             textView3.setText(stringBuilder1.append("￥").append(String.format("%.2f", new Object[]{double_1})).toString());
             TextView textView1 = m_textViewResidualGasFee;
             stringBuilder1 = new StringBuilder();
+            textView1.setText(stringBuilder1.append("￥").append(String.format("%.2f", new Object[] { double_2 })).toString());
             m_totalFee = String.format("%.2f", new Object[]{double_3});
         } catch (JSONException jSONException) {
             Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
@@ -584,7 +579,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         try {
             setContentView(R.layout.activity_tray_order_deal);
             HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-            this.m_BottlesMapKP = (Map)hashMap;
+            this.m_BottlesMapKP = (Map) hashMap;
             Bundle bundle = getIntent().getExtras();
             String str1 = bundle.getString("order");
             JSONObject jSONObject2 = new JSONObject(str1);
@@ -594,13 +589,14 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
             String str2 = bundle.getString("KPCode");
             str1 = bundle.getString("ZPCode");
             this.SpecMap = bundle.getString("SpecMap");
-            this.list_map = (List<Map<String, String>>)bundle.getSerializable("MapList");
+            this.list_map = (List<Map<String, String>>) bundle.getSerializable("MapList");
             this.m_yjys = bundle.getString("YJD_YS");
             this.m_yjss = bundle.getString("YJD_SS");
             TextView textView = (TextView) findViewById(R.id.textview_YJSSFee);//这个不太确定
             StringBuilder stringBuilder = new StringBuilder();
             textView.setText(stringBuilder.append(m_yjss).append("元 (现金或门店二维码收取)").toString());
-            TypeReference<HashMap<String,String>> typeReference1 = new TypeReference<HashMap<String,String>>(){};
+            TypeReference<HashMap<String, String>> typeReference1 = new TypeReference<HashMap<String, String>>() {
+            };
             m_BottlesMapKPL = JSON.parseObject(str2, typeReference1);
             TypeReference<HashMap<String, String>> typeReference2 = new TypeReference<HashMap<String, String>>() {
 
@@ -685,8 +681,8 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         appContext = (AppContext) getApplicationContext();
         m_deliveryUser = appContext.getUser();
         GetDepLeader();
-        Logger.e("size = "+m_BottlesMapKP.size());
-        if (m_BottlesMapKP.size() == 0) {//m_BottlesMapKP.size() != 0
+        Logger.e("size = " + m_BottlesMapKP.size());
+        if (m_BottlesMapKP.size() != 0) {
             OrderCalculate();
         } else {
             setOrderAppendInfo(m_OrderJson);
@@ -772,41 +768,32 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         if (swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(false);
         }
+        HashMap map = new HashMap<Object, Object>();
+        map.put("orderSn", m_orderId);
+        OkHttpUtil util = OkHttpUtil.getInstance(this);
+        util.GET(OkHttpUtil.URL + "/Orders", map, new OkHttpUtil.ResultCallback() {
+            @Override
+            public void onError(Request request, Exception e) {
+                Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+            }
 
-
-        NetRequestConstant netRequestConstant = new NetRequestConstant();
-        netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Orders";
-        netRequestConstant.context = this;
-        HashMap hashMap = new HashMap<Object, Object>();
-        hashMap.put("orderSn", m_orderId);
-        netRequestConstant.setParams(hashMap);
-        //    getServer(new Netcallback() {
-        //          public void preccess(Object param1Object, boolean param1Boolean) {
-        //            if (param1Boolean) {
-        //              HttpResponse httpResponse = (HttpResponse)param1Object;
-        //              if (httpResponse != null) {
-        //                if (httpResponse.getStatusLine().getStatusCode() == 200)
-        //                  try {
-        //                    param1Object = new JSONObject();
-        //                    super(EntityUtils.toString(httpResponse.getEntity(), "UTF-8"));
-        //                    param1Object = param1Object.getJSONArray("items");
-        //                    if (param1Object.length() == 1) {
-        //                      param1Object = param1Object.getJSONObject(0);
-        //                      setOrderAppendInfo((JSONObject)param1Object);
-        //                    }
-        //                  } catch (IOException iOException) {
-        //                    Toast.makeText(TrayOrderDealActivity.this, "异常" + iOException.toString(), 1).show();
-        //                  } catch (JSONException jSONException) {
-        //                    Toast.makeText(TrayOrderDealActivity.this, "异常" + jSONException.toString(), 1).show();
-        //                  }
-        //                return;
-        //              }
-        //              Toast.makeText(TrayOrderDealActivity.this, "请求超时，请检查网络", 1).show();
-        //              return;
-        //            }
-        //            Toast.makeText(TrayOrderDealActivity.this, "网络未连接！", 1).show();
-        //          }
-        //        }netRequestConstant);
+            @Override
+            public void onResponse(Response response) throws IOException {
+                if (response.code() != 200) {
+                    Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                }
+                String string = response.body().string();
+                Logger.e("refleshPayStatus: "+ string);
+                Gson gson = new Gson();
+                Data_Order data_order = gson.fromJson(string, Data_Order.class);
+                if (data_order.getItems().size() == 1) {
+                    try {
+                        setOrderAppendInfo(new JSONObject(gson.toJson( data_order.getItems().get(0))));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 }

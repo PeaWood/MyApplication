@@ -30,7 +30,7 @@
             n1:id="@+id/clear"
             n1:layout_width="wrap_content"
             n1:layout_height="wrap_content"
-            n1:layout_marginLeft="250.0dip"
+            n1:layout_marginLeft="210.0dip"
             n1:text="清除" />
     </LinearLayout>
 </RelativeLayout>
