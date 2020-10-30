@@ -1,35 +1,36 @@
 package com.gc.nfc.common;
 
-import android.content.Context;
-import com.gc.nfc.ui.BaseActivity;
 import java.util.Map;
 
+import com.gc.nfc.ui.BaseActivity.HttpRequestType;
+
+import android.content.Context;
+
 public class NetRequestConstant {
-    public Map<String, Object> body;
 
-    public Context context;
-
+	public  Context context;
+	public  String requestUrl;
+	public  Map<String, Object> body;
+	public  Map<String, Object> params;
     public boolean isBodyJsonArray = false;
+	private HttpRequestType type;
 
-    public Map<String, Object> params;
+	public HttpRequestType getType() {
+		return type;
+	}
 
-    public String requestUrl;
+	public void setType(HttpRequestType type) {
+		this.type = type;
+	}
+	
+	public  void setBody(Map body){
+		this.body = body;
+	}
 
-    private BaseActivity.HttpRequestType type;
+	public  void setParams(Map params){
+		this.params = params;
+	}
 
-    public BaseActivity.HttpRequestType getType() {
-        return this.type;
-    }
+	
 
-    public void setBody(Map<String, Object> paramMap) {
-        this.body = paramMap;
-    }
-
-    public void setParams(Map<String, Object> paramMap) {
-        this.params = paramMap;
-    }
-
-    public void setType(BaseActivity.HttpRequestType paramHttpRequestType) {
-        this.type = paramHttpRequestType;
-    }
 }

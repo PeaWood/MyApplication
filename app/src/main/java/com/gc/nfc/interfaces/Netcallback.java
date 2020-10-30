@@ -1,6 +1,7 @@
 package com.gc.nfc.interfaces;
 
 public interface Netcallback {
-    void preccess(Object paramObject, boolean paramBoolean);
+    //res为请求网络成功后的Json串，返回的请求网络
+    void preccess(Object res , boolean flag);
 }
 

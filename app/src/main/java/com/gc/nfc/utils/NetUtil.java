@@ -1,241 +1,220 @@
 package com.gc.nfc.utils;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.support.v4.content.ContextCompat;
-
-import com.gc.nfc.common.NetRequestConstant;
-import com.gc.nfc.http.Logger;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
+import org.apache.http.entity.StringEntity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import org.apache.http.client.CookieStore;
+
+import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.http.Logger;
+
 public class NetUtil {
-    public static String SESSIONID;
+	private static CookieStore m_tempCookies = null;//临时cookies
+	private static CookieStore m_loginCookies = null;//登陆会话的cookies
 
-    public static CookieStore m_loginCookies;
 
-    public static CookieStore m_tempCookies = null;
+	public static void setLoginCookies(){
+		m_loginCookies = m_tempCookies;
+	}
+	//用get方式请求网络，返回响应的结果
+	public static HttpResponse httpGet(NetRequestConstant nrc) {
+		try {
+			HttpParams httpParams=new BasicHttpParams();
+			HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
+			HttpConnectionParams.setSoTimeout(httpParams, 5000);
 
-    static {
-        m_loginCookies = null;
-        SESSIONID = null;
-    }
+			//创建一个HttpClient实例
+			DefaultHttpClient httpClient=new DefaultHttpClient(httpParams);
 
-    public static HttpResponse httpGet(NetRequestConstant paramNetRequestConstant) {
-        try {
-            BasicHttpParams basicHttpParams = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout((HttpParams) basicHttpParams, 20000);
-            HttpConnectionParams.setSoTimeout((HttpParams) basicHttpParams, 20000);
-            DefaultHttpClient defaultHttpClient = new DefaultHttpClient((HttpParams) basicHttpParams);
-            String str2 = paramNetRequestConstant.requestUrl;
-            String str1 = str2;
-            if (paramNetRequestConstant.params != null) {
-                str1 = str2;
-                if (!paramNetRequestConstant.params.isEmpty()) {
-                    ArrayList<BasicNameValuePair> arrayList = new ArrayList(paramNetRequestConstant.params.size());
-                    for (String str : paramNetRequestConstant.params.keySet()) {
-                        BasicNameValuePair basicNameValuePair = new BasicNameValuePair(str, paramNetRequestConstant.params.get(str).toString());
-                        arrayList.add(basicNameValuePair);
-                    }
-                    StringBuilder stringBuilder1 = new StringBuilder();
-                    StringBuilder stringBuilder2 = stringBuilder1.append(str2).append("?");
-                    UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(arrayList, "UTF-8");
-                    str1 = stringBuilder2.append(EntityUtils.toString((HttpEntity) urlEncodedFormEntity)).toString();
-                }
-            }
-            HttpGet httpGet = new HttpGet(str1);
-            if (m_loginCookies != null) {
-                StringBuilder stringBuilder = new StringBuilder();
-                httpGet.setHeader("Cookie", stringBuilder.append("JSESSIONID=").append(SESSIONID).toString());
-                defaultHttpClient.setCookieStore(m_loginCookies);
-            }
-            HttpResponse httpResponse = defaultHttpClient.execute((HttpUriRequest) httpGet);
-            m_tempCookies = defaultHttpClient.getCookieStore();
-            return (HttpResponse) httpResponse;
-        } catch (ClientProtocolException clientProtocolException) {
-            return (HttpResponse) clientProtocolException;
-        } catch (SocketTimeoutException e) {
-            return (HttpResponse) e;
-        } catch (ConnectTimeoutException e) {
-            return (HttpResponse) e;
-        } catch (IOException e) {
-            return (HttpResponse) e;
-        }
+			String requestUrl = nrc.requestUrl;
+			if (nrc.params != null && !nrc.params.isEmpty()) {
+				List<NameValuePair> pairs = new ArrayList<NameValuePair>(nrc.params.size());
+				for (String key : nrc.params.keySet()) {
+					pairs.add(new BasicNameValuePair(key, nrc.params.get(key).toString()));
+				}
+				requestUrl += "?" + EntityUtils.toString(new UrlEncodedFormEntity(pairs, "UTF-8"));
+			}
+			//建立HttpGet对象
+			HttpGet httpRequest=new HttpGet(requestUrl);
+			//添加cookies
+			if(m_loginCookies!=null){
+				httpClient.setCookieStore(m_loginCookies);
+			}
 
-    }
+			HttpResponse httpResponse = httpClient.execute(httpRequest);
 
-    public static HttpResponse httpPost(NetRequestConstant paramNetRequestConstant) {
-        try {
-            BasicHttpParams basicHttpParams = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout((HttpParams) basicHttpParams, 5000);
-            HttpConnectionParams.setSoTimeout((HttpParams) basicHttpParams, 5000);
-            DefaultHttpClient defaultHttpClient = new DefaultHttpClient((HttpParams) basicHttpParams);
-            String str2 = paramNetRequestConstant.requestUrl;
-            String str1 = str2;
-            if (paramNetRequestConstant.params != null) {
-                str1 = str2;
-                if (!paramNetRequestConstant.params.isEmpty()) {
-                    ArrayList<BasicNameValuePair> arrayList = new ArrayList(paramNetRequestConstant.params.size());
-                    for (String str : paramNetRequestConstant.params.keySet()) {
-                        BasicNameValuePair basicNameValuePair = new BasicNameValuePair(str, paramNetRequestConstant.params.get(str).toString());
-                        arrayList.add(basicNameValuePair);
-                    }
-                    StringBuilder stringBuilder2 = new StringBuilder();
-                    StringBuilder stringBuilder1 = stringBuilder2.append(str2).append("?");
-                    UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(arrayList, "UTF-8");
-                    str1 = stringBuilder1.append(EntityUtils.toString((HttpEntity) urlEncodedFormEntity)).toString();
-                }
-            }
-            HttpPost httpPost = new HttpPost(str1);
-            httpPost.setHeader("Content-Type", "application/json");
-            Map map = paramNetRequestConstant.body;
-            JSONObject jSONObject = new JSONObject();
-            for (Object o : map.entrySet()) {
-                Map.Entry entry = (Map.Entry) o;
-                jSONObject.put((String) entry.getKey(), entry.getValue());
-            }
-            StringEntity stringEntity = new StringEntity(jSONObject.toString(), "UTF-8");
-            httpPost.setEntity((HttpEntity) stringEntity);
-            if (m_loginCookies != null) {
-                StringBuilder stringBuilder1 = new StringBuilder();
-                httpPost.setHeader("Cookie", stringBuilder1.append("JSESSIONID=").append(SESSIONID).toString());
-                defaultHttpClient.setCookieStore(m_loginCookies);
-            }
-            HttpResponse httpResponse2 = defaultHttpClient.execute((HttpUriRequest) httpPost);
-            StringBuilder stringBuilder = new StringBuilder();
-            Logger.e(stringBuilder.append("NetUtil Code ：").append(paramNetRequestConstant.requestUrl).toString());
-            HttpResponse httpResponse1 = httpResponse2;
-            return httpResponse1;
-        } catch (ClientProtocolException clientProtocolException) {
-            return (HttpResponse) clientProtocolException;
-        } catch (SocketTimeoutException e) {
-            return (HttpResponse) e;
-        } catch (ConnectTimeoutException e) {
-            return (HttpResponse) e;
-        } catch (IOException e) {
-            return (HttpResponse) e;
-        } catch (JSONException e) {
-            return (HttpResponse) e;
-        }
-    }
+			m_tempCookies =httpClient.getCookieStore();
+			return  httpResponse;
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-    public static HttpResponse httpPut(NetRequestConstant paramNetRequestConstant) {
-        try {
-            BasicHttpParams basicHttpParams = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout((HttpParams) basicHttpParams, 5000);
-            HttpConnectionParams.setSoTimeout((HttpParams) basicHttpParams, 5000);
-            DefaultHttpClient defaultHttpClient = new DefaultHttpClient((HttpParams) basicHttpParams);
-            String str2 = paramNetRequestConstant.requestUrl;
-            String str1 = str2;
-            if (paramNetRequestConstant.params != null) {
-                str1 = str2;
-                if (!paramNetRequestConstant.params.isEmpty()) {
-                    ArrayList<BasicNameValuePair> arrayList = new ArrayList(paramNetRequestConstant.params.size());
-                    for (String str : paramNetRequestConstant.params.keySet()) {
-                        BasicNameValuePair basicNameValuePair = new BasicNameValuePair(str, paramNetRequestConstant.params.get(str).toString());
-                        arrayList.add(basicNameValuePair);
-                    }
-                    StringBuilder stringBuilder2 = new StringBuilder();
-                    StringBuilder stringBuilder1 = stringBuilder2.append(str2).append("?");
-                    UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(arrayList, "UTF-8");
-                    str1 = stringBuilder1.append(EntityUtils.toString((HttpEntity) urlEncodedFormEntity)).toString();
-                }
-            }
-            HttpPut httpPut = new HttpPut(str1);
-            httpPut.setHeader("Content-Type", "application/json; charset=utf-8");
-            if (paramNetRequestConstant.body != null) {
-                StringEntity stringEntity;
-                Map map = paramNetRequestConstant.body;
-                if (map.size() == 1 && paramNetRequestConstant.isBodyJsonArray) {
-                    JSONArray jSONArray = (JSONArray) map.get("jsonArray");
-                    stringEntity = new StringEntity(jSONArray.toString());
-                    stringEntity.setContentType("application/json");
-                    httpPut.setEntity((HttpEntity) stringEntity);
-                } else {
-                    JSONObject jSONObject = new JSONObject();
-                    for (Object o : map.entrySet()) {
-                        Map.Entry entry = (Map.Entry) o;
-                        jSONObject.put((String) entry.getKey(), entry.getValue());
-                    }
-                    stringEntity = new StringEntity(jSONObject.toString(), "UTF-8");
-                    httpPut.setEntity((HttpEntity) stringEntity);
-                }
-            }
-            if (m_loginCookies != null) {
-                StringBuilder stringBuilder1 = new StringBuilder();
-                httpPut.setHeader("Cookie", stringBuilder1.append("JSESSIONID=").append(SESSIONID).toString());
-                defaultHttpClient.setCookieStore(m_loginCookies);
-            }
-            HttpResponse httpResponse2 = defaultHttpClient.execute((HttpUriRequest) httpPut);
-            StringBuilder stringBuilder = new StringBuilder();
-            Logger.e(stringBuilder.append("NetUtil Code ：").append(paramNetRequestConstant.requestUrl).toString());
-            HttpResponse httpResponse1 = httpResponse2;
-            return httpResponse1;
-        } catch (ClientProtocolException e) {
-            return (HttpResponse) e;
-        } catch (SocketTimeoutException e) {
-            return (HttpResponse) e;
-        } catch (ConnectTimeoutException e) {
-            return (HttpResponse) e;
-        } catch (IOException e) {
-            return (HttpResponse) e;
-        } catch (JSONException e) {
-            return (HttpResponse) e;
-        }
-    }
+		return null;
+	}
 
-    public static boolean isCheckNet(Context paramContext) {
-        String[] deniedPermissions = new String[]{Manifest.permission.INTERNET};
-        if (ContextCompat.checkSelfPermission(paramContext, deniedPermissions[0]) != PackageManager.PERMISSION_GRANTED) {
-            return false;
-        } else {
-            return true;
-        }
-    }
+	//post请求方式
+	public static HttpResponse httpPost(NetRequestConstant nrc){
+		String result=null;
+		try {
+			HttpParams httpParams=new BasicHttpParams();
+			HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
+			HttpConnectionParams.setSoTimeout(httpParams, 5000);
 
-    public static void setLoginCookies() {
-        m_loginCookies = m_tempCookies;
-        List<Cookie> list = m_loginCookies.getCookies();
-        for (byte b = 0; ; b++) {
-            if (b < list.size()) {
-                if ("JSESSIONID".equals(((Cookie) list.get(b)).getName())) {
-                    SESSIONID = ((Cookie) list.get(b)).getValue();
-                    return;
-                }
-            } else {
-                return;
-            }
-        }
-    }
+			//创建一个HttpClient实例
+			DefaultHttpClient httpClient=new DefaultHttpClient(httpParams);
+			//添加cookies
+			if(m_loginCookies!=null){
+				httpClient.setCookieStore(m_loginCookies);
+			}
+			//建立HttpPost对象
+			String requestUrl = nrc.requestUrl;
+			if (nrc.params != null && !nrc.params.isEmpty()) {
+				List<NameValuePair> pairs = new ArrayList<NameValuePair>(nrc.params.size());
+				for (String key : nrc.params.keySet()) {
+					pairs.add(new BasicNameValuePair(key, nrc.params.get(key).toString()));
+				}
+				requestUrl += "?" + EntityUtils.toString(new UrlEncodedFormEntity(pairs, "UTF-8"));
+			}
+			HttpPost httpRequest=new HttpPost(requestUrl);
+			httpRequest.setHeader("Content-Type", "application/json");
+
+			//发送请求的参数
+			Map<String, Object> body = nrc.body;
+			JSONObject bodyJson = new JSONObject();  ;
+			for(Map.Entry<String, Object> entry : body.entrySet()){
+				bodyJson.put(entry.getKey(), entry.getValue());
+			}
+
+			StringEntity stringEntity = new StringEntity(bodyJson.toString());
+			//stringEntity.setContentEncoding("UTF-8");
+			stringEntity.setContentType("application/json");
+
+			httpRequest.setEntity(stringEntity);
+
+			//发送请求并等待响应
+			HttpResponse httpResponse=httpClient.execute(httpRequest);
+
+			Logger.e( "NetUtil Code ：" + nrc.requestUrl);
+			return httpResponse;
+
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	//put请求方式
+	public static HttpResponse httpPut(NetRequestConstant nrc){
+		String result=null;
+		try {
+
+			HttpParams httpParams=new BasicHttpParams();
+			HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
+			HttpConnectionParams.setSoTimeout(httpParams, 5000);
+
+			//创建一个HttpClient实例
+			DefaultHttpClient httpClient=new DefaultHttpClient(httpParams);
+			//添加cookies
+			if(m_loginCookies!=null){
+				httpClient.setCookieStore(m_loginCookies);
+			}
+
+			//建立HttpPost对象
+			String requestUrl = nrc.requestUrl;
+			if (nrc.params != null && !nrc.params.isEmpty()) {
+				List<NameValuePair> pairs = new ArrayList<NameValuePair>(nrc.params.size());
+				for (String key : nrc.params.keySet()) {
+					pairs.add(new BasicNameValuePair(key, nrc.params.get(key).toString()));
+				}
+				requestUrl += "?" + EntityUtils.toString(new UrlEncodedFormEntity(pairs, "UTF-8"));
+			}
+			HttpPut httpRequest=new HttpPut(requestUrl);
+			httpRequest.setHeader("Content-Type", "application/json");
+
+			//发送请求的参数
+			if(nrc.body!=null){
+				Map<String, Object> body = nrc.body;
+				JSONObject bodyJson = new JSONObject();  ;
+				for(Map.Entry<String, Object> entry : body.entrySet()){
+					bodyJson.put(entry.getKey(), (String) entry.getValue());
+				}
+
+				StringEntity stringEntity = new StringEntity(bodyJson.toString());
+				stringEntity.setContentType("application/json");
+				httpRequest.setEntity(stringEntity);
+			}
+
+			//stringEntity.setContentEncoding("UTF-8");
+
+			//发送请求并等待响应
+			HttpResponse httpResponse=httpClient.execute(httpRequest);
+
+			Logger.e( "NetUtil Code ：" + nrc.requestUrl);
+			return httpResponse;
+
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static boolean isCheckNet(Context context){
+		ConnectivityManager cm=(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo info=cm.getActiveNetworkInfo();
+		if(info==null){
+			//没有联网
+			return false;
+		}else{
+			//联网类型
+			//String type=info.getTypeName();
+			return true;
+		}
+	}
+
 }

@@ -31,12 +31,20 @@ import java.io.InputStreamReader;
  * Created by lenovo on 2020/9/23
  */
 public abstract class BaseActivity extends Activity {
+    private NetRequestConstant nrc;
+    private Handler handler;
+    public static final int SUCCESS = 10001;
+    public static final int FAIL = 10002;
+    public static final int ERROR = 10003;
     private int PERMISSION_REQUEST_CODE = 10000;
 
     abstract void init();
-
-    protected void onCreate(Bundle paramBundle) {
-        super.onCreate(paramBundle);
+    public enum HttpRequestType{
+        GET,POST,PUT,
+    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         requestPermissions();
@@ -56,107 +64,76 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
-    public enum HttpRequestType {
-        GET, POST, PUT;
 
-        static {
 
-        }
-    }
-
-    private String getResponseMessage(HttpResponse paramHttpResponse) {
-        IOException iOException1;
-        IOException iOException2 = null;
-        try {
-            InputStreamReader inputStreamReader = new InputStreamReader(paramHttpResponse.getEntity().getContent());
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuffer stringBuffer = new StringBuffer();
-            String str = System.getProperty("line.separator");
-            while (true) {
-                String str2 = bufferedReader.readLine();
-                if (str2 != null) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuffer.append(stringBuilder.append(str2).append(str).toString());
-                    continue;
-                }
-                bufferedReader.close();
-                String str1 = stringBuffer.toString();
-                if (str1.equals(""))
-                    str1 = "{\"message\":\"no value\"}";
-                JSONObject jSONObject = new JSONObject();
-                return jSONObject.get("message").toString();
-            }
-        } catch (IOException e) {
-            return e.toString();
-        } catch (JSONException e) {
-            return e.toString();
-        }
-    }
-
-    class BaseHandler extends Handler {
-        private Netcallback callBack;
-
-        public BaseHandler(Netcallback param1Netcallback) {
-            this.callBack = param1Netcallback;
-        }
-
-        public void handleMessage(Message param1Message) {
-            HttpResponse httpResponse = (HttpResponse)param1Message.obj;
-            if (httpResponse != null && httpResponse.getStatusLine().getStatusCode() >= 400) {
-                String str = BaseActivity.this.getResponseMessage(httpResponse);
-                if (str == null) {
-                    Toast.makeText((Context)BaseActivity.this, String.valueOf(httpResponse.getStatusLine().getStatusCode()), Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText((Context)BaseActivity.this, String.valueOf(httpResponse.getStatusLine().getStatusCode()) + str, Toast.LENGTH_LONG).show();
-                }
-            }
-            switch (param1Message.what) {
-                default:
-                    super.handleMessage(param1Message);
-                    return;
-                case 10001:
-                    this.callBack.preccess(param1Message.obj, true);
-                case 10002:
-                case 10003:
-                    break;
-            }
-            this.callBack.preccess(param1Message.obj, false);
-        }
-    }
-
-    protected void getServer(Netcallback paramNetcallback, NetRequestConstant paramNetRequestConstant) {
-        RunnableTask runnableTask = new RunnableTask(paramNetRequestConstant, new BaseHandler(paramNetcallback));
-        ThreadPool.getInstance().addTask(runnableTask);
-    }
-    class RunnableTask implements Runnable {
-        private Handler handler;
+    class RunnableTask implements Runnable{
 
         private NetRequestConstant nrc;
+        private Handler handler;
 
-        public RunnableTask(NetRequestConstant param1NetRequestConstant, Handler param1Handler) {
-            this.nrc = param1NetRequestConstant;
-            this.handler = param1Handler;
+        public RunnableTask(NetRequestConstant nrc , Handler handler) {
+            this.nrc = nrc;
+            this.handler = handler;
         }
+
 
         public void run() {
-            HttpResponse httpResponse = null;
-            if (NetUtil.isCheckNet(BaseActivity.this.getApplicationContext())) {
-                if (this.nrc.getType() == BaseActivity.HttpRequestType.POST) {
-                    httpResponse = NetUtil.httpPost(this.nrc);
-                } else if (this.nrc.getType() == BaseActivity.HttpRequestType.GET) {
-                    httpResponse = NetUtil.httpGet(this.nrc);
-                } else if (this.nrc.getType() == BaseActivity.HttpRequestType.PUT) {
-                    httpResponse = NetUtil.httpPut(this.nrc);
+            HttpResponse res = null;
+            if(NetUtil.isCheckNet(getApplicationContext())){
+                if(nrc.getType()==HttpRequestType.POST){//Post请求
+                    res = NetUtil.httpPost(nrc);
+                }else if(nrc.getType()==HttpRequestType.GET){//get请求
+                    res = NetUtil.httpGet(nrc);
+                }else if(nrc.getType()==HttpRequestType.PUT){//put请求
+                    res = NetUtil.httpPut(nrc);
                 }
-                Message message1 = Message.obtain();
-                message1.obj = httpResponse;
-                message1.what = 10001;
-                this.handler.sendMessage(message1);
-                return;
+                Message message = Message.obtain();
+                message.obj = res;
+                message.what = SUCCESS;
+                handler.sendMessage(message);
+
+            }else{
+                Message message = Message.obtain();
+                message.what = ERROR;
+                handler.sendMessage(message);
             }
-            Message message = Message.obtain();
-            message.what = 10003;
-            this.handler.sendMessage(message);
         }
+    }
+
+    class BaseHandler extends Handler{
+
+        private Netcallback callBack;
+
+
+        public BaseHandler(Netcallback callBack) {
+            this.callBack = callBack;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO Auto-generated method stub
+
+            switch (msg.what) {
+                case SUCCESS:// 网络请求成功后回调
+                    callBack.preccess(msg.obj, true);
+                    break;
+
+                case FAIL:// 网络请求失败后回调
+                case ERROR:
+                    callBack.preccess(msg.obj, false);
+                    break;
+
+                default:
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+
+    }
+
+    protected void getServer(Netcallback callBack ,NetRequestConstant nrc){
+        Handler handler = new BaseHandler(callBack);
+        RunnableTask task = new RunnableTask(nrc, handler);
+        ThreadPool.getInstance().addTask(task);
     }
 }

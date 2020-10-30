@@ -63,6 +63,7 @@ import com.gc.nfc.domain.Data_UserCard;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
+import com.gc.nfc.interfaces.Netcallback;
 import com.gc.nfc.utils.SharedPreferencesHelper;
 import com.gc.nfc.utils.Tools;
 import com.google.gson.Gson;
@@ -970,6 +971,46 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     private void orderServiceQualityUpload(boolean paramBoolean) {
+        NetRequestConstant netRequestConstant = new NetRequestConstant();
+        netRequestConstant.setType(BaseActivity.HttpRequestType.PUT);
+        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Orders/" + this.m_orderId;
+        netRequestConstant.context = (Context)this;
+        HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
+        if (paramBoolean) {
+            hashMap.put("orderServiceQuality", "OSQNegative");
+        } else {
+            hashMap.put("orderServiceQuality", "OSQPositive");
+        }
+        netRequestConstant.setBody(hashMap);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                if (flag) {
+                    HttpResponse response=(HttpResponse)res;
+                    if (response != null) {
+                        if (response.getStatusLine().getStatusCode() == 200) {
+                            BottleExchangeActivity.this.handler_old.sendEmptyMessageDelayed(0, 500L);
+                            return;
+                        }
+                        if (response.getStatusLine().getStatusCode() == 404) {
+                            Toast.makeText((Context)BottleExchangeActivity.this,"订单不存在", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        if (response.getStatusLine().getStatusCode() == 401) {
+                            Toast.makeText((Context)BottleExchangeActivity.this, "鉴权失败，请重新登录"+ response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        Toast.makeText((Context)BottleExchangeActivity.this, "支付失败"+ response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    Toast.makeText((Context)BottleExchangeActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Toast.makeText((Context)BottleExchangeActivity.this, "网络未连接", Toast.LENGTH_LONG).show();
+            }
+        },netRequestConstant);
+    }
+
+    private void orderServiceQualityUpload2(boolean paramBoolean) {
         Map<String, String> map = new HashMap();
         if (paramBoolean) {
             map.put("orderServiceQuality", "OSQNegative");
@@ -1719,6 +1760,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             //    if (this.scale != null && this.scale.getDevicelist().size() == 1)
             //        this.scale.bleSend(this.scale.getDevicelist().get(0), (byte) 1);
             case R.id.button_next:
+                orderServiceQualityUpload(true);//测试
                 if (isSpecialOrder) {
                     Iterator<Map.Entry<String, String>> iterator = this.m_BottlesMapKP.entrySet().iterator();
                     while (iterator.hasNext()) {
