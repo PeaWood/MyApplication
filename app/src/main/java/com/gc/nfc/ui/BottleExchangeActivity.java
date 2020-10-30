@@ -1356,6 +1356,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
 
     public void bottleTakeOverUnit(final String bottleCode, String paramString2, String paramString3, String paramString4, String paramString5, boolean paramBoolean1, final boolean isKP) {
         //测试
+        /*
         if (isKP) {
             addKP(bottleCode);
             return;
@@ -1364,6 +1365,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             addZP(bottleCode);
             return;
         }
+        */
         boolean bool = false;
         if (this.m_BottlesMapKP.containsKey(bottleCode))
             bool = true;
@@ -1373,14 +1375,13 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             Toast.makeText(this, "钢瓶号：" + bottleCode + "    请勿重复提交！", Toast.LENGTH_SHORT).show();
             return;
         }
+
         Map map = new HashMap();
-        map.put("srcUserId", paramString2);
-        map.put("targetUserId", paramString3);
-        map.put("serviceStatus", paramString4);
-        map.put("enableForce", String.valueOf(paramBoolean1));
-        map.put("note", paramString5);
+
+        String url=OkHttpUtil.URL + "/GasCylinder/check/" + bottleCode+"?srcUserId="+paramString2+"&targetUserId="+paramString3+"&serviceStatus="+paramString4+"&enableForce="+String.valueOf(paramBoolean1)+"&note="+paramString5;
+        Logger.e("URL: " + url);
         OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.PUT(OkHttpUtil.URL + "/GasCylinder/check/" + bottleCode, map, new OkHttpUtil.ResultCallback() {
+        util.PUT(url, map, new OkHttpUtil.ResultCallback() {
             @Override
             public void onError(Request request, Exception e) {
                 Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
