@@ -43,6 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.dk.bleNfc.BleManager.BleManager;
 import com.dk.bleNfc.BleManager.Scanner;
 import com.dk.bleNfc.BleManager.ScannerCallback;
 import com.dk.bleNfc.BleNfcDeviceService;
@@ -52,6 +53,7 @@ import com.dk.bleNfc.Exception.CardNoResponseException;
 import com.dk.bleNfc.Exception.DeviceNoResponseException;
 import com.dk.bleNfc.Tool.StringTool;
 import com.dk.bleNfc.card.Ntag21x;
+
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
@@ -185,6 +187,8 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             msgText.setText(msgBuffer);
             if (bleNfcDevice.isConnection() == 2 || bleNfcDevice.isConnection() == 1) {
                 switch (param1Message.what) {
+                    default:
+                        return;
                     case 3:
                         (new Thread(new Runnable() {
                             public void run() {
@@ -207,16 +211,18 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                                 }
                             }
                         })).start();
+                        break;
                     case 136:
-                        String str1 = param1Message.obj.toString();
+                        String str1 = param1Message.obj!=null?param1Message.obj.toString():null;
                         if (str1 == null)
                             showToast("空标签！");
                         if (m_selected_nfc_model == 0)
                             bottleTakeOverUnit(str1, m_curUserId, m_deliveryUser.getUsername(), "6", m_customerAddress + "空瓶回收", false, true);
                         if (m_selected_nfc_model == 1)
                             bottleTakeOverUnit(str1, m_deliveryUser.getUsername(), m_curUserId, "5", m_customerAddress + "重瓶落户", false, false);
+                        break;
                     case 137:
-                        String[] arrayOfString = param1Message.obj.toString().split(":");
+                        String[] arrayOfString = param1Message.obj!=null?param1Message.obj.toString().split(":"):null;
                         if (arrayOfString.length != 2) {
                             showToast("无效卡格式！");
                         }
@@ -259,6 +265,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             switch (param1RadioGroup.getCheckedRadioButtonId()) {
                 case R.id.radioButton_kp_id:
                     m_selected_nfc_model = 0;
+                    break;
                 case R.id.radioButton_zp_id:
                     m_selected_nfc_model = 1;
                     break;
@@ -274,12 +281,13 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     private Scanner mScanner;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName param1ComponentName, IBinder param1IBinder) {
-            BleNfcDeviceService bleNfcDeviceService = ((BleNfcDeviceService.LocalBinder) param1IBinder).getService();
-            bleNfcDevice = bleNfcDeviceService.bleNfcDevice;
-            mScanner = bleNfcDeviceService.scanner;
-            bleNfcDeviceService.setDeviceManagerCallback(deviceManagerCallback);
-            bleNfcDeviceService.setScannerCallback(scannerCallback);
+        public void onServiceConnected(ComponentName param1ComponentName, IBinder service) {
+            BleNfcDeviceService mBleNfcDeviceService = ((BleNfcDeviceService.LocalBinder) service).getService();
+            bleNfcDevice = mBleNfcDeviceService.bleNfcDevice;
+            mScanner = mBleNfcDeviceService.scanner;
+            mBleNfcDeviceService.setDeviceManagerCallback(deviceManagerCallback);
+            mBleNfcDeviceService.setScannerCallback(scannerCallback);
+            //开始搜索设备
             searchNearestBleDevice();
         }
 
@@ -360,26 +368,45 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     //  private scalerSDK scale;
 
     private ScannerCallback scannerCallback = new ScannerCallback() {
-        public void onReceiveScanDevice(BluetoothDevice param1BluetoothDevice, int param1Int, byte[] param1ArrayOfbyte) {
-            super.onReceiveScanDevice(param1BluetoothDevice, param1Int, param1ArrayOfbyte);
-//                System.out.println("Activity搜到设备：" + param1BluetoothDevice.getName() + " 信号强度：" + param1Int + " scanRecord：" + StringTool.byteHexToSting(param1ArrayOfbyte));
-            if (param1ArrayOfbyte != null && StringTool.byteHexToSting(param1ArrayOfbyte).contains("017f5450") && param1Int >= -55) {
+        @Override
+        public void onReceiveScanDevice(BluetoothDevice device, int rssi, byte[] scanRecord) {
+            super.onReceiveScanDevice(device, rssi, scanRecord);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //StringTool.byteHexToSting(scanRecord.getBytes())
+                System.out.println("Activity搜到设备：" + device.getName()
+                        + " 信号强度：" + rssi
+                        + " scanRecord：" + StringTool.byteHexToSting(scanRecord));
+            }
+
+            //搜索蓝牙设备并记录信号强度最强的设备
+            if ( (scanRecord != null) && (StringTool.byteHexToSting(scanRecord).contains("017f5450"))) {  //从广播数据中过滤掉其它蓝牙设备
+                if (rssi < -55) {
+                    return;
+                }
+                //msgBuffer.append("搜到设备：").append(device.getName()).append(" 信号强度：").append(rssi).append("\r\n");
                 handler.sendEmptyMessage(0);
                 if (mNearestBle != null) {
-                    if (param1Int > lastRssi) {
+                    if (rssi > lastRssi) {
                         mNearestBleLock.lock();
                         try {
-                            mNearestBle = param1BluetoothDevice;
-                            return;
-                        } finally {
+                            mNearestBle = device;
+                        }finally {
                             mNearestBleLock.unlock();
                         }
                     }
-                    return;
+                }
+                else {
+                    mNearestBleLock.lock();
+                    try {
+                        mNearestBle = device;
+                    }finally {
+                        mNearestBleLock.unlock();
+                    }
+                    lastRssi = rssi;
                 }
             }
         }
 
+        @Override
         public void onScanDeviceStopped() {
             super.onScanDeviceStopped();
         }
@@ -565,11 +592,13 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     private void blueDeviceInitial() {
-        this.msgText = (TextView) findViewById(R.id.msgText);//这一块是蓝牙的显示状态(读卡器状态)
-        this.m_imageViewSearchBlue = (ImageView) findViewById(R.id.imageView_search);
-        this.m_imageViewSearchBlue.setOnClickListener(new StartSearchButtonListener());
-        this.msgBuffer = new StringBuffer();
-        //    bindService(new Intent((Context)this, BleNfcDeviceService.class), this.mServiceConnection, 1);
+        msgText = (TextView)findViewById(R.id.msgText);
+        m_imageViewSearchBlue= (ImageView) findViewById(R.id.imageView_search);
+        m_imageViewSearchBlue.setOnClickListener(new StartSearchButtonListener());
+        msgBuffer = new StringBuffer();
+        //ble_nfc服务初始化
+        Intent gattServiceIntent = new Intent(this, BleNfcDeviceService.class);
+        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
     private void createElectDep() {
@@ -984,10 +1013,32 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 return true;
             case 6:
                 boolean bool = true;
+                boolean hasSecondField=false;
+                boolean hasFirstField=false;
                 Ntag21x ntag21x = (Ntag21x) this.bleNfcDevice.getCard();
                 if (ntag21x != null) {
                     try {
-                        String str = ntag21x.NdefTextRead();
+                        hasFirstField = ntag21x.HasFirstField();
+                        hasSecondField = ntag21x.HasSecondField();
+                    } catch (CardNoResponseException cardNoResponseException) {
+                        cardNoResponseException.printStackTrace();
+                        bool = false;
+                    }
+                    String str=null;
+                    if(hasSecondField) {
+                        try {
+                            str = ntag21x.NdefTextReadSec();
+                        } catch (CardNoResponseException cardNoResponseException) {
+                            cardNoResponseException.printStackTrace();
+                        }
+                    }else{
+                        try {
+                            str = ntag21x.NdefTextRead();
+                        } catch (CardNoResponseException cardNoResponseException) {
+                            cardNoResponseException.printStackTrace();
+                        }
+                    }
+                    if(str!=null) {
                         Message message = new Message();
                         message.obj = str;
                         if (this.m_orderServiceQualityShowFlag) {
@@ -996,10 +1047,8 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                             message.what = 136;
                         }
                         this.handler.sendMessage(message);
-                    } catch (CardNoResponseException cardNoResponseException) {
-                        cardNoResponseException.printStackTrace();
-                        bool = false;
                     }
+
                 }
                 return bool;
         }
@@ -1043,11 +1092,63 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         this.msgBuffer.delete(0, this.msgBuffer.length());
         this.msgBuffer.append("正在搜索设备...");
         this.handler.sendEmptyMessage(0);
-        if (!this.mScanner.isScanning() && this.bleNfcDevice.isConnection() == 0)
-            (new Thread(new Runnable() {
+        if (!mScanner.isScanning() && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+            new Thread(new Runnable() {
+                @Override
                 public void run() {
+                    synchronized (this) {
+                        mScanner.startScan(0);
+                        mNearestBleLock.lock();
+                        try {
+                            mNearestBle = null;
+                        }finally {
+                            mNearestBleLock.unlock();
+                        }
+                        lastRssi = -100;
+
+                        int searchCnt = 0;
+                        while ((mNearestBle == null)
+                                && (searchCnt < 20000)
+                                && (mScanner.isScanning())
+                                && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+                            searchCnt++;
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (mScanner.isScanning() && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            mScanner.stopScan();
+                            mNearestBleLock.lock();
+                            try {
+                                if (mNearestBle != null) {
+                                    mScanner.stopScan();
+                                    msgBuffer.delete(0, msgBuffer.length());
+                                    msgBuffer.append("正在连接设备...");
+                                    handler.sendEmptyMessage(0);
+                                    bleNfcDevice.requestConnectBleDevice(mNearestBle.getAddress());
+                                } else {
+                                    msgBuffer.delete(0, msgBuffer.length());
+                                    msgBuffer.append("未找到设备！");
+                                    handler.sendEmptyMessage(0);
+                                }
+                            }finally {
+                                mNearestBleLock.unlock();
+                            }
+                        } else {
+                            mScanner.stopScan();
+                        }
+                    }
                 }
-            })).start();
+            }).start();
+        }
     }
 
     private void setListViewHeightBasedOnChildren(ListView paramListView) {
@@ -1757,11 +1858,9 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     private class StartSearchButtonListener implements View.OnClickListener {
-        private StartSearchButtonListener() {
-        }
-
-        public void onClick(View param1View) {
-            if (bleNfcDevice.isConnection() == 2) {
+        @Override
+        public void onClick(View v) {
+            if ( (bleNfcDevice.isConnection() == BleManager.STATE_CONNECTED) ) {
                 bleNfcDevice.requestDisConnectDevice();
                 return;
             }

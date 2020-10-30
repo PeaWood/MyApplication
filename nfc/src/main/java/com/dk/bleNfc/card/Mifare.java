@@ -202,24 +202,19 @@ public class Mifare extends Card {
         dataExchange(aCommand, new onReceiveDataExchangeListener() {
             @Override
             public void onReceiveDataExchange(boolean isSuc, byte[] returnBytes) {
-                if ( isSuc && (returnBytes != null) && (returnBytes.length == 1) && (returnBytes[0] == (byte)0xA0) ){
+                if (isSuc){
                     dataExchange(blockDataTemp, new onReceiveDataExchangeListener() {
                         @Override
                         public void onReceiveDataExchange(boolean isSuc, byte[] returnBytes) {
                             if (mOnReceiveWriteListener != null) {
-                                if ( isSuc && (returnBytes != null) && (returnBytes.length == 1) && (returnBytes[0] == (byte)0xA0) ) {
-                                    mOnReceiveWriteListener.onReceiveWrite(true);
-                                }
-                                else {
-                                    mOnReceiveWriteListener.onReceiveWrite(false);
-                                }
+                                mOnReceiveWriteListener.onReceiveWrite(isSuc);
                             }
                         }
                     });
                 }
                 else {
                     if (mOnReceiveWriteListener != null) {
-                        mOnReceiveWriteListener.onReceiveWrite(false);
+                        mOnReceiveWriteListener.onReceiveWrite(isSuc);
                     }
                 }
             }

@@ -253,7 +253,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
       }
       
       public void onServiceDisconnected(ComponentName param1ComponentName) {
-        MendDetailActivity.this.mBleNfcDeviceService = null;
+        mBleNfcDeviceService = null;
       }
     };
   

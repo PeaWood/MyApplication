@@ -62,7 +62,7 @@ public class Iso15693Card extends Card{
         deviceManager.requestRfmIso15693ReadSingleBlock(uid, addr, new DeviceManager.onReceiveRfIso15693ReadSingleBlockListener() {
             @Override
             public void onReceiveRfIso15693ReadSingleBlock(boolean isSuc, byte[] returnData) {
-                if (returnData.length < 4) {
+                if (returnData.length < 5) {
                     if (mOnReceiveReadListener != null) {
                         mOnReceiveReadListener.onReceiveRead(false, returnData);
                     }
@@ -70,12 +70,7 @@ public class Iso15693Card extends Card{
                 else {
                     if (mOnReceiveReadListener != null) {
                         byte[] readData = new byte[4];
-                        if (returnData.length == 5) {
-                            System.arraycopy(returnData, 1, readData, 0, 4);
-                        }
-                        else {
-                            System.arraycopy(returnData, 0, readData, 0, 4);
-                        }
+                        System.arraycopy(returnData, 1, readData, 0, 4);
                         mOnReceiveReadListener.onReceiveRead(isSuc, readData);
                     }
                 }
@@ -91,20 +86,15 @@ public class Iso15693Card extends Card{
         deviceManager.requestRfmIso15693ReadMultipleBlock(uid, addr, number, new DeviceManager.onRecevieRfIso15693ReadMultipleBlockListener() {
             @Override
             public void onRecevieRfIso15693ReadMultipleBlock(boolean isSuc, byte[] returnData) {
-                if ((returnData == null) || (returnData.length < 4)) {
+                if ((returnData == null) || (returnData.length < 5)) {
                     if (mOnReceiveReadMultipleListener != null) {
                         mOnReceiveReadMultipleListener.onReceiveReadMultiple(false, returnData);
                     }
                 }
                 else {
                     if (mOnReceiveReadMultipleListener != null) {
-                        byte[] readData = new byte[returnData.length - returnData.length % 4];
-                        if (returnData.length % 4 == 1) {
-                            System.arraycopy(returnData, 1, readData, 0, readData.length);
-                        }
-                        else {
-                            System.arraycopy(returnData, 0, readData, 0, readData.length);
-                        }
+                        byte[] readData = new byte[returnData.length - 1];
+                        System.arraycopy(returnData, 1, readData, 0, readData.length);
                         mOnReceiveReadMultipleListener.onReceiveReadMultiple(isSuc, readData);
                     }
                 }

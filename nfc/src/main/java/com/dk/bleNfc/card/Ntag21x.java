@@ -1,20 +1,14 @@
 package com.dk.bleNfc.card;
 
-import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 
-import com.dk.bleNfc.DeviceManager.*;
+import com.dk.bleNfc.DeviceManager.DeviceManager;
 import com.dk.bleNfc.Exception.CardNoResponseException;
-import com.dk.bleNfc.Exception.DeviceNoResponseException;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
 
 /**
  * Created by Administrator on 2016/9/19.
@@ -121,7 +115,53 @@ public class Ntag21x extends Ultralight {
      *                  卡片无响应时会抛出异常
      */
     public boolean longWrite(byte startAddress, byte[] writeBytes) throws CardNoResponseException {
-        return longWriteWithScheduleCallback(startAddress, writeBytes, null);
+        final byte startAddressTemp;
+        startAddressTemp = startAddress;
+
+        byte[] returnBytes;
+        returnBytes = read((byte) 0);
+        switch (returnBytes[14]) {
+            case 0x12:
+                size = SIZE_NTAG213;
+                break;
+            case 0x3e:
+                size = SIZE_NTAG215;
+                break;
+            case 0x6d:
+            case 0x6f:
+                size = SIZE_NTAG216;
+                break;
+            default:
+                size = SIZE_NTAG213;
+                break;
+        }
+
+        //写入数据长度超过卡片容量
+        if (writeBytes.length + (startAddressTemp & 0x00ff) * 4 > (size + 16)) {
+            throw new CardNoResponseException(ERR_MEMORY_OUT);
+        }
+
+        int currentWriteAddress = startAddress & 0x00ff;
+        byte[] writeByteTemp = new byte[LONG_READ_MAX_NUMBER * 4];
+        int i = 0;
+        for (i = 0; (i+LONG_READ_MAX_NUMBER) <= (writeBytes.length / 4); i += LONG_READ_MAX_NUMBER) {
+            System.arraycopy(writeBytes, i * 4, writeByteTemp, 0, LONG_READ_MAX_NUMBER * 4);
+            boolean isSuc = longWriteSingle((byte) (currentWriteAddress & 0x00ff), writeByteTemp);
+            if (!isSuc) {
+                return false;
+            }
+            currentWriteAddress += LONG_READ_MAX_NUMBER;
+        }
+
+        if (writeBytes.length % (LONG_READ_MAX_NUMBER * 4) > 0) {
+            writeByteTemp = new byte[writeBytes.length % (LONG_READ_MAX_NUMBER * 4)];
+            System.arraycopy(writeBytes, i * 4, writeByteTemp, 0, writeBytes.length % (LONG_READ_MAX_NUMBER * 4));
+            boolean isSuc = longWriteSingle((byte) (currentWriteAddress & 0x00ff), writeByteTemp);
+            if (!isSuc) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -230,7 +270,33 @@ public class Ntag21x extends Ultralight {
      *                  卡片无响应时会抛出异常
      */
     public byte[] longRead(byte startAddress, byte endAddress) throws CardNoResponseException {
-        return longReadWithScheduleCallback(startAddress, endAddress, null);
+        if ( (startAddress & 0x00ff) > (endAddress & 0x00ff) ) {
+            throw new CardNoResponseException("Start Address must be smaller than end Address");
+        }
+
+        byte[] readDataBytes = new byte[((endAddress & 0x00ff) - (startAddress & 0x00ff) + 1) * 4];
+        int readDataLen = 0;
+
+        int currentStartAddress = startAddress & 0x00ff;
+        int currentEndAddress = currentStartAddress + LONG_READ_MAX_NUMBER - 1;
+        byte[] returnBytes;
+
+        if ( ((endAddress & 0x00ff) - (startAddress & 0x00ff) + 1) >=  LONG_READ_MAX_NUMBER) {
+            while ((currentEndAddress & 0x00ff) <= (endAddress & 0x00ff)) {
+                returnBytes = longReadSingle((byte) currentStartAddress, LONG_READ_MAX_NUMBER);
+                System.arraycopy(returnBytes, 0, readDataBytes, readDataLen, returnBytes.length);
+                readDataLen += LONG_READ_MAX_NUMBER * 4;
+                currentStartAddress = (currentEndAddress & 0x00ff) + 1;
+                currentEndAddress += LONG_READ_MAX_NUMBER;
+            }
+        }
+
+        int surplusBlock = ((endAddress & 0x00ff) - (startAddress & 0x00ff) + 1) % LONG_READ_MAX_NUMBER;
+        if ( surplusBlock != 0 ) {
+            returnBytes = longReadSingle((byte)(currentStartAddress & 0x00ff), surplusBlock);
+            System.arraycopy(returnBytes, 0, readDataBytes, readDataLen, surplusBlock * 4);
+        }
+        return readDataBytes;
     }
 
     /**
@@ -287,133 +353,6 @@ public class Ntag21x extends Ultralight {
     }
 
     /**
-     * 写一个NDEF消息到标签，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
-     * @param ndefMessage 要写的ndefMessage
-     * @return         true:写入成功  false：写入失败
-     * @throws CardNoResponseException
-     *                  卡片无响应时会抛出异常
-     */
-    public boolean NdefWrite(NdefMessage ndefMessage) throws CardNoResponseException {
-        return NdefWriteWithScheduleCallback(ndefMessage, null);
-    }
-
-    /**
-     * 写一个NDEF消息到标签，带读进度回调，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
-     * @param ndefMessage 要写的NDEF消息
-     * @param listener 写入过程中会不断回调写入进度
-     * @return         true:写入成功  false：写入失败
-     * @throws CardNoResponseException
-     *                  卡片无响应时会抛出异常
-     */
-    public boolean NdefWriteWithScheduleCallback(NdefMessage ndefMessage, onReceiveScheduleListener listener) throws CardNoResponseException {
-        mOnReceiveNdefWriteScheduleListener = listener;
-        byte[] NDEFTextByte = ndefMessage.toByteArray();
-        byte[] NDEFHandleByte;
-        if (NDEFTextByte.length >= 0xff) {
-            NDEFHandleByte = new byte[] {0x03, (byte) 0xff, (byte) ((NDEFTextByte.length >> 8) & 0x00ff), (byte) (NDEFTextByte.length & 0x00ff)};
-        }
-        else {
-            NDEFHandleByte = new byte[] {0x03, (byte) NDEFTextByte.length};
-        }
-
-        byte[] writeBytes = new byte[NDEFHandleByte.length + NDEFTextByte.length + 1];
-
-        int index = 0;
-        System.arraycopy(NDEFHandleByte, 0, writeBytes, index, NDEFHandleByte.length);
-        index += NDEFHandleByte.length;
-        System.arraycopy(NDEFTextByte, 0, writeBytes, index, NDEFTextByte.length);
-        writeBytes[writeBytes.length - 1] = (byte) 0xFE;
-
-        return longWriteWithScheduleCallback((byte) 4, writeBytes, new onReceiveScheduleListener() {
-            @Override
-            public void onReceiveSchedule(int rate) {
-                if (mOnReceiveNdefWriteScheduleListener != null) {
-                    mOnReceiveNdefWriteScheduleListener.onReceiveSchedule(rate);
-                }
-            }
-        });
-    }
-
-    /**
-     * 读NDEF消息，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
-     * @return         读到的NDEF消息
-     * @throws CardNoResponseException
-     *                  卡片无响应时会抛出异常
-     */
-    public NdefMessage NdefRead() throws CardNoResponseException {
-        return NdefReadWithScheduleCallback(null);
-    }
-
-    /**
-     * 读NDEF消息，带进度回调，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
-     * @return         读到的NDEF消息
-     * @throws CardNoResponseException
-     *                  卡片无响应时会抛出异常
-     */
-    public NdefMessage NdefReadWithScheduleCallback(onReceiveScheduleListener listener) throws CardNoResponseException {
-        byte[] returnBytes = read((byte)4);
-        if ( (returnBytes == null) || (returnBytes.length != 16) ) {
-            throw new CardNoResponseException("Read card fail");
-        }
-
-        //头是否正确
-        byte[] firstBlockBytes;
-        if ( (returnBytes[0] != 0x03) && (returnBytes[1] == 0x03) ) {
-            firstBlockBytes = new byte[11];
-            System.arraycopy(returnBytes, 5, firstBlockBytes, 0, 11);
-        }
-        else if (returnBytes[0] == 0x03) {
-            firstBlockBytes = returnBytes;
-        }
-        else {
-            throw new CardNoResponseException("No NDEF payload!");
-        }
-
-        //计算总长度
-        int tatol_len;
-        if (firstBlockBytes[1] == (byte)0xFF) {
-            tatol_len = (firstBlockBytes[3] & 0x00ff) + ((firstBlockBytes[2] & 0x00ff) << 8);
-        }
-        else {
-            tatol_len = firstBlockBytes[1] & 0x00ff;
-        }
-
-        //计算要读结束块地址
-        int needReadLen = tatol_len - (firstBlockBytes.length - 2);
-        int recordEndAddress = needReadLen / 4;
-        if (needReadLen % 4 != 0) {
-            recordEndAddress++;
-        }
-        recordEndAddress += 8;
-
-        byte[] ndefMsgBytes = new byte[tatol_len];
-        if (recordEndAddress > 8) {
-            //读取
-            returnBytes = longReadWithScheduleCallback((byte) 8, (byte)(recordEndAddress - 1), new onReceiveScheduleListener() {
-                @Override
-                public void onReceiveSchedule(int rate) {
-                    if (mOnReceiveNdefReadScheduleListener != null) {
-                        mOnReceiveNdefReadScheduleListener.onReceiveSchedule(rate);
-                    }
-                }
-            });
-
-            System.arraycopy(firstBlockBytes, 2, ndefMsgBytes, 0, firstBlockBytes.length - 2);
-            System.arraycopy(returnBytes, 0, ndefMsgBytes, firstBlockBytes.length - 2, tatol_len - (firstBlockBytes.length - 2));
-        }
-        else {
-            System.arraycopy(firstBlockBytes, 2, ndefMsgBytes, 0, tatol_len);
-        }
-
-        try {
-            return new NdefMessage(ndefMsgBytes);
-        } catch (FormatException e) {
-            e.printStackTrace();
-            throw new CardNoResponseException("No NDEF payload!");
-        }
-    }
-
-    /**
      * 写一个NDEF文本格式到标签，异步回调方式
      * @param text 要写的文本
      * @param listener 写入结果会通过listener回调
@@ -455,7 +394,28 @@ public class Ntag21x extends Ultralight {
      *                  卡片无响应时会抛出异常
      */
     public boolean NdefTextWrite(String text) throws CardNoResponseException {
-        return NdefTextWriteWithScheduleCallback(text, null);
+        byte[] rececrdByte = createTextRecord(text).getPayload();
+        System.out.println(rececrdByte);
+
+        NdefMessage ndefMessage = new NdefMessage(new NdefRecord[] {createTextRecord(text)});
+        byte[] NDEFTextByte = ndefMessage.toByteArray();
+        byte[] NDEFHandleByte;
+        if (NDEFTextByte.length >= 0xff) {
+            NDEFHandleByte = new byte[] {0x03, (byte) 0xff, (byte) ((NDEFTextByte.length >> 8) & 0x00ff), (byte) (NDEFTextByte.length & 0x00ff)};
+        }
+        else {
+            NDEFHandleByte = new byte[] {0x03, (byte) NDEFTextByte.length};
+        }
+
+        byte[] writeBytes = new byte[NDEFHandleByte.length + NDEFTextByte.length + 1];
+
+        int index = 0;
+        System.arraycopy(NDEFHandleByte, 0, writeBytes, index, NDEFHandleByte.length);
+        index += NDEFHandleByte.length;
+        System.arraycopy(NDEFTextByte, 0, writeBytes, index, NDEFTextByte.length);
+        writeBytes[writeBytes.length - 1] = (byte) 0xFE;
+
+        return longWrite((byte) 4, writeBytes);
     }
 
     /**
@@ -467,8 +427,36 @@ public class Ntag21x extends Ultralight {
      *                  卡片无响应时会抛出异常
      */
     public boolean NdefTextWriteWithScheduleCallback(String text, onReceiveScheduleListener listener) throws CardNoResponseException {
+        mOnReceiveNdefWriteScheduleListener = listener;
+        byte[] rececrdByte = createTextRecord(text).getPayload();
+        System.out.println(rececrdByte);
+
         NdefMessage ndefMessage = new NdefMessage(new NdefRecord[] {createTextRecord(text)});
-        return NdefWriteWithScheduleCallback(ndefMessage, listener);
+        byte[] NDEFTextByte = ndefMessage.toByteArray();
+        byte[] NDEFHandleByte;
+        if (NDEFTextByte.length >= 0xff) {
+            NDEFHandleByte = new byte[] {0x03, (byte) 0xff, (byte) ((NDEFTextByte.length >> 8) & 0x00ff), (byte) (NDEFTextByte.length & 0x00ff)};
+        }
+        else {
+            NDEFHandleByte = new byte[] {0x03, (byte) NDEFTextByte.length};
+        }
+
+        byte[] writeBytes = new byte[NDEFHandleByte.length + NDEFTextByte.length + 1];
+
+        int index = 0;
+        System.arraycopy(NDEFHandleByte, 0, writeBytes, index, NDEFHandleByte.length);
+        index += NDEFHandleByte.length;
+        System.arraycopy(NDEFTextByte, 0, writeBytes, index, NDEFTextByte.length);
+        writeBytes[writeBytes.length - 1] = (byte) 0xFE;
+
+        return longWriteWithScheduleCallback((byte) 4, writeBytes, new onReceiveScheduleListener() {
+            @Override
+            public void onReceiveSchedule(int rate) {
+                if (mOnReceiveNdefWriteScheduleListener != null) {
+                    mOnReceiveNdefWriteScheduleListener.onReceiveSchedule(rate);
+                }
+            }
+        });
     }
 
     /**
@@ -501,7 +489,57 @@ public class Ntag21x extends Ultralight {
      *                  卡片无响应时会抛出异常
      */
     public String NdefTextRead() throws CardNoResponseException {
-        return NdefTextReadWithScheduleCallback(null);
+        byte[] returnBytes = read((byte)4);
+        if ( (returnBytes == null) || (returnBytes.length != 16) ) {
+            throw new CardNoResponseException("Read card fail");
+        }
+        if ((returnBytes[0] == 0x03) || (returnBytes[1] == 0x03) ) {
+            int j;
+            int i;
+            byte[] imageBytes = NDEF_TYPE.getBytes();
+            boolean searchFlag = false;
+            for (i = 0; i < 15; i++) {
+                searchFlag = true;
+                for (j = i; (j < 16) && ((j - i) < 10); j++) {
+                    if (returnBytes[j] != imageBytes[j - i]) {
+                        searchFlag = false;
+                        break;
+                    }
+                }
+                if (searchFlag) {
+                    break;
+                }
+            }
+            if (searchFlag) {
+                int imageStartAddr = i;
+                int textLen;
+                if ((imageStartAddr > 4) && (returnBytes[i-3] == 0x00) && (returnBytes[i-4] == 0x00)) {
+                    textLen = (returnBytes[i - 1] & 0x00ff) + ((returnBytes[i - 2] & 0x00ff) << 8);
+                }
+                else {
+                    textLen = returnBytes[i - 1] & 0x00ff;
+                }
+                int recordLen = textLen + i + 10; //end
+                byte recordEndAddress = (byte) ((recordLen + 3) / 4 + 4);
+                returnBytes = longRead((byte) 4, recordEndAddress);
+
+                if ( (returnBytes == null) || (returnBytes.length < recordLen) || (returnBytes.length < textLen + imageStartAddr + 10)) {
+                    throw new CardNoResponseException("Read card fail");
+                }
+                try {
+                    return new String(returnBytes, imageStartAddr + 10,
+                            textLen, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new CardNoResponseException("No NDEF text payload!");
+                }
+            }
+            else {
+                throw new CardNoResponseException("No NDEF text payload!");
+            }
+        }
+        else {
+            throw new CardNoResponseException("No NDEF text payload!");
+        }
     }
 
     /**
@@ -512,20 +550,65 @@ public class Ntag21x extends Ultralight {
      *                  卡片无响应时会抛出异常
      */
     public String NdefTextReadWithScheduleCallback(onReceiveScheduleListener listener) throws CardNoResponseException {
-        NdefMessage ndefMessage = NdefReadWithScheduleCallback(listener);
-        if (ndefMessage != null) {
-            for (NdefRecord record : ndefMessage.getRecords()) {
-                if (Arrays.equals(record.getType(), NDEF_TYPE.getBytes())) {
-                    try {
-                        return new String(record.getPayload(), "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+        mOnReceiveNdefReadScheduleListener = listener;
+        byte[] returnBytes = read((byte)4);
+        if ( (returnBytes == null) || (returnBytes.length != 16) ) {
+            throw new CardNoResponseException("Read card fail");
+        }
+        if ((returnBytes[0] == 0x03) || (returnBytes[1] == 0x03) ) {
+            int j;
+            int i;
+            byte[] imageBytes = NDEF_TYPE.getBytes();
+            boolean searchFlag = false;
+            for (i = 0; i < 15; i++) {
+                searchFlag = true;
+                for (j = i; (j < 16) && ((j - i) < 10); j++) {
+                    if (returnBytes[j] != imageBytes[j - i]) {
+                        searchFlag = false;
+                        break;
                     }
                 }
+                if (searchFlag) {
+                    break;
+                }
+            }
+            if (searchFlag) {
+                int imageStartAddr = i;
+                int textLen;
+                if ((imageStartAddr > 4) && (returnBytes[i-3] == 0x00) && (returnBytes[i-4] == 0x00)) {
+                    textLen = (returnBytes[i - 1] & 0x00ff) + ((returnBytes[i - 2] & 0x00ff) << 8);
+                }
+                else {
+                    textLen = returnBytes[i - 1] & 0x00ff;
+                }
+                int recordLen = textLen + i + 10;
+                byte recordEndAddress = (byte) ((recordLen + 3) / 4 + 4);
+                returnBytes = longReadWithScheduleCallback((byte) 4, recordEndAddress, new onReceiveScheduleListener() {
+                    @Override
+                    public void onReceiveSchedule(int rate) {
+                        if (mOnReceiveNdefReadScheduleListener != null) {
+                            mOnReceiveNdefReadScheduleListener.onReceiveSchedule(rate);
+                        }
+                    }
+                });
+
+                if ( (returnBytes == null) || (returnBytes.length < recordLen) || (returnBytes.length < textLen + imageStartAddr + 10)) {
+                    throw new CardNoResponseException("Read card fail");
+                }
+                try {
+                    return new String(returnBytes, imageStartAddr + 10,
+                            textLen, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new CardNoResponseException("No NDEF text payload!");
+                }
+            }
+            else {
+                throw new CardNoResponseException("No NDEF text payload!");
             }
         }
-
-        throw new CardNoResponseException("No NDEF test payload!");
+        else {
+            throw new CardNoResponseException("No NDEF text payload!");
+        }
     }
 
     //创建一个封装要写入的文本的NdefRecord对象
@@ -550,23 +633,323 @@ public class Ntag21x extends Ultralight {
         System.arraycopy(textBytes, 0, data, 1 + langBytes.length,
                 textBytes.length);
         //根据前面设置的payload创建NdefRecord对象
-        NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, new byte[] {}, data);
+        NdefRecord record = new NdefRecord(NdefRecord.TNF_MIME_MEDIA,
+                NDEF_TYPE.getBytes(), new byte[] {}, text.getBytes(utfEncoding));
         return record;
     }
 
-    //创建一个NDEF MIME类型的记录
-    private NdefRecord createMIMERecord(String key) {
-        try {
-            return new NdefRecord(NdefRecord.TNF_MIME_MEDIA, "application/fisnfc".getBytes(), new byte[] {}, key.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+    /**
+     * 锁住page4-7 共计16个字节
+     */
+    public boolean NdefTextLockFirstBlock() throws CardNoResponseException {
+//        byte[] returnBytes = read((byte)2);
+//        byte[] writeBytes = new byte[4];
+//        writeBytes[0] = returnBytes[0];//序列号保留
+//        writeBytes[1] = returnBytes[1];//序列号保留
+//        writeBytes[2] = (byte)0xF0;
+//        writeBytes[3] = (byte)0x03;
+//        if(longWrite((byte) 2, writeBytes)){//锁住page4-9
+//            writeBytes[2] = (byte)0xF2;
+//            return  longWrite((byte) 2, writeBytes);//锁住BL4-9
+//        }else{
+//            return false;
+//        }
+        return true;
+
+    }
+
+    /**
+     * 动态锁，锁住page16-39 共计16个字节
+     */
+    public boolean NdefTextLockSecondBlock() throws CardNoResponseException {
+//        byte[] returnBytes = read((byte)2);
+//        byte[] writeBytes = new byte[4];
+//        writeBytes[0] = returnBytes[0];//序列号保留
+//        writeBytes[1] = returnBytes[1];//序列号保留
+//        writeBytes[2] = (byte)0xF0;
+//        writeBytes[3] = (byte)0x03;
+//        if(longWrite((byte) 2, writeBytes)){//锁住page4-9
+//            writeBytes[2] = (byte)0xF2;
+//            return  longWrite((byte) 2, writeBytes);//锁住BL4-9
+//        }else{
+//            return false;
+//        }
+        return true;
+
+    }
+
+    /**
+     * 判断第一个扇区是否写入,从page4开始
+     */
+    public boolean HasFirstField() throws CardNoResponseException {
+        byte[] returnBytes = read((byte)4);
+        if ( (returnBytes == null) || (returnBytes.length != 16) ) {
+            return false;
+        }
+        if ((returnBytes[0] == 0x03) || (returnBytes[1] == 0x03) ) {
+            int j;
+            int i;
+            byte[] imageBytes = NDEF_TYPE.getBytes();
+            boolean searchFlag = false;
+            for (i = 0; i < 15; i++) {
+                searchFlag = true;
+                for (j = i; (j < 16) && ((j - i) < 10); j++) {
+                    if (returnBytes[j] != imageBytes[j - i]) {
+                        searchFlag = false;
+                        break;
+                    }
+                }
+                if (searchFlag) {
+                    break;
+                }
+            }
+            if (searchFlag) {
+                int imageStartAddr = i; //"text/plain"在读到的4个page的Byte数组中出现在第几个Byte位
+                int textLen;
+                if ((imageStartAddr > 4) && (returnBytes[i-3] == 0x00) && (returnBytes[i-4] == 0x00)) {
+                    textLen = (returnBytes[i - 1] & 0x00ff) + ((returnBytes[i - 2] & 0x00ff) << 8);
+                }
+                else {
+                    textLen = returnBytes[i - 1] & 0x00ff;
+                }
+                if (textLen>0)
+                    return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+        return false;
+    }
+    /**
+     * 判断第二个扇区是否写入内容,从page16开始
+     */
+    public boolean HasSecondField() throws CardNoResponseException {
+        byte[] returnBytes = read((byte)16);
+        if ( (returnBytes == null) || (returnBytes.length != 16) ) {
+            return false;
+        }
+        if ((returnBytes[0] == 0x03) || (returnBytes[1] == 0x03) ) {
+            int j;
+            int i;
+            byte[] imageBytes = NDEF_TYPE.getBytes();
+            boolean searchFlag = false;
+            for (i = 0; i < 15; i++) {
+                searchFlag = true;
+                for (j = i; (j < 16) && ((j - i) < 10); j++) {
+                    if (returnBytes[j] != imageBytes[j - i]) {
+                        searchFlag = false;
+                        break;
+                    }
+                }
+                if (searchFlag) {
+                    break;
+                }
+            }
+            if (searchFlag) {
+                int imageStartAddr = i;
+                int textLen;
+                if ((imageStartAddr > 4) && (returnBytes[i-3] == 0x00) && (returnBytes[i-4] == 0x00)) {
+                    textLen = (returnBytes[i - 1] & 0x00ff) + ((returnBytes[i - 2] & 0x00ff) << 8);
+                }
+                else {
+                    textLen = returnBytes[i - 1] & 0x00ff;
+                }
+                if (textLen>0)
+                    return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+        return false;
+    }
+    /**
+     * 读取第二个扇区内容，从page地址为16开始
+     */
+    public String NdefTextReadSecTest() throws CardNoResponseException {
+        byte[] returnBytes;
+        int n=0;
+        int m=39;
+        returnBytes = longRead((byte)n,(byte)m);
+//        for(int k = 0 ; k<returnBytes.length ; k++){
+//            if(k%4==0)
+//                System.out.println("\npage"+(k/4+n)+":");
+//            System.out.print((char)returnBytes[k]+",");
+//        }
+        for(int l = 0 ; l<returnBytes.length ; l++){
+            if(l%4==0)
+                System.out.println("\npage"+(l/4+n)+":");
+            System.out.print(returnBytes[l]+" ");
+        }
+        returnBytes = read((byte)40);
+        System.out.println("page40:");
+        for(int l = 0 ; l<4 ; l++){
+            System.out.print(returnBytes[l]+" ");
+        }
+        returnBytes = read((byte)41);
+        System.out.println("page41:");
+        for(int l = 0 ; l<4 ; l++){
+            System.out.print(returnBytes[l]+" ");
+        }
+        returnBytes = read((byte)42);
+        System.out.println("page42:");
+        for(int l = 0 ; l<4 ; l++){
+            System.out.print(returnBytes[l]+" ");
+        }
+        returnBytes = read((byte)43);
+        System.out.println("page43:");
+        for(int l = 0 ; l<4 ; l++){
+            System.out.print(returnBytes[l]+" ");
+        }
+        returnBytes = read((byte)44);
+        System.out.println("page44:");
+        for(int l = 0 ; l<4 ; l++){
+            System.out.print(returnBytes[l]+" ");
+        }
+        return "true";
+    }
+
+    public boolean NdefTextWriteSecTest(String text) throws CardNoResponseException {
+        String pass = new String("2888");
+        boolean writePassword = write((byte)43,pass.getBytes());
+
+        byte[] page42 = read((byte)42);
+        byte[] access = new byte[4];
+        access[0]=page42[0];access[1]=page42[1];access[2]=page42[2];access[3]=page42[3];
+        access[0]|=(0<<7);
+        boolean writeAccess = write((byte)42,access);
+
+        byte[] page41 = read((byte)41);
+        byte[] auth0 = new byte[4];
+        auth0[0]=page41[0];auth0[1]=page41[1];auth0[2]=page41[2];
+        auth0[3]=(byte)0x00;
+        boolean writeAuth0 = write((byte)41,auth0);
+
+//        boolean unLock = pwdAuth(pass.getBytes());
+//        System.out.println("Auth result:"+unLock);
+
+//        byte[] page41 = read((byte)41);
+//        for(int l = 0 ; l<page41.length ; l++){
+//            System.out.print(page41[l]+" ");
+//        }
+
+//        byte[] page41 = read((byte)41);
+//        byte[] auth0 = new byte[4];
+//        auth0[0]=page41[0];auth0[1]=page41[1];auth0[2]=page41[2];
+//        auth0[3]=(byte)0x00;
+//        boolean writeAuth0=write((byte)41,auth0);
+//        System.out.println("Write Auth0 result:" + writeAuth0);
+
+//        byte[] page42 = read((byte)42);
+//        byte[] access = new byte[4];
+//        access[0]=page42[0];access[1]=page42[1];access[2]=page42[2];access[3]=page42[3];
+//        access[0]|=(1<<7)|(1<<6);
+//        boolean writeAccess=write((byte)42,access);
+//        System.out.println("Write Access result:" + writeAccess);
+
+//        passwordBytes[0]=(byte)49 ; passwordBytes[1]=(byte)50 ; passwordBytes[2]=(byte)51 ; passwordBytes[3]=(byte)52;
+//        if(true) {
+//            int n=4;
+//            byte[] r = read((byte)n);
+//            System.out.println("write page"+n+" result");
+//            for(int l = 0 ; l<r.length ; l++){
+//                System.out.print(r[l]+" ");
+//            }
+//            System.out.println("write page"+n+" result");
+//            return true;
+//        }
+//        else
+//            return false;
+        return true;
+    }
+
+
+    public String NdefTextReadSec() throws CardNoResponseException {
+        byte[] returnBytes = read((byte)16);
+        if ( (returnBytes == null) || (returnBytes.length != 16) ) {
+            throw new CardNoResponseException("Read card fail");
+        }
+        if ((returnBytes[0] == 0x03) || (returnBytes[1] == 0x03) ) {
+            int j;
+            int i;
+            byte[] imageBytes = NDEF_TYPE.getBytes();
+            boolean searchFlag = false;
+            for (i = 0; i < 15; i++) {
+                searchFlag = true;
+                for (j = i; (j < 16) && ((j - i) < 10); j++) {
+                    if (returnBytes[j] != imageBytes[j - i]) {
+                        searchFlag = false;
+                        break;
+                    }
+                }
+                if (searchFlag) {
+                    break;
+                }
+            }
+            if (searchFlag) {
+                int imageStartAddr = i;
+                int textLen;
+                if ((imageStartAddr > 4) && (returnBytes[i-3] == 0x00) && (returnBytes[i-4] == 0x00)) {
+                    textLen = (returnBytes[i - 1] & 0x00ff) + ((returnBytes[i - 2] & 0x00ff) << 8);
+                }
+                else {
+                    textLen = returnBytes[i - 1] & 0x00ff;
+                }
+                int recordLen = textLen + i + 10; //end
+                byte recordEndAddress = (byte) ((recordLen + 3) / 4 + 16);
+                returnBytes = longRead((byte) 16, recordEndAddress);
+
+                if ( (returnBytes == null) || (returnBytes.length < recordLen) || (returnBytes.length < textLen + imageStartAddr + 10)) {
+                    throw new CardNoResponseException("Read card fail");
+                }
+                try {
+                    return new String(returnBytes, imageStartAddr + 10,
+                            textLen, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new CardNoResponseException("No NDEF text payload!");
+                }
+            }
+            else {
+                throw new CardNoResponseException("No NDEF text payload!");
+            }
+        }
+        else {
+            throw new CardNoResponseException("No NDEF text payload!");
+        }
+    }
+    /**
+     * 写入第二个扇区，从page地址为16开始
+     */
+    public boolean NdefTextWriteSec(String text) throws CardNoResponseException {
+        byte[] rececrdByte = createTextRecord(text).getPayload();
+        System.out.println(rececrdByte);
+
+        NdefMessage ndefMessage = new NdefMessage(new NdefRecord[] {createTextRecord(text)});
+        byte[] NDEFTextByte = ndefMessage.toByteArray();
+        byte[] NDEFHandleByte;
+        if (NDEFTextByte.length >= 0xff) {
+            NDEFHandleByte = new byte[] {0x03, (byte) 0xff, (byte) ((NDEFTextByte.length >> 8) & 0x00ff), (byte) (NDEFTextByte.length & 0x00ff)};
+        }
+        else {
+            NDEFHandleByte = new byte[] {0x03, (byte) NDEFTextByte.length};
         }
 
-        return null;
+        byte[] writeBytes = new byte[NDEFHandleByte.length + NDEFTextByte.length + 1];
+
+        int index = 0;
+        System.arraycopy(NDEFHandleByte, 0, writeBytes, index, NDEFHandleByte.length);
+        index += NDEFHandleByte.length;
+        System.arraycopy(NDEFTextByte, 0, writeBytes, index, NDEFTextByte.length);
+        writeBytes[writeBytes.length - 1] = (byte) 0xFE;
+
+        return longWrite((byte) 16, writeBytes);
     }
 
-    //创建一个应用类型的记录
-    private NdefRecord createPackageRecord(String packageName) {
-        return NdefRecord.createApplicationRecord(packageName);
-    }
 }

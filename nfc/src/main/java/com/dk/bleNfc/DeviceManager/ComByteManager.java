@@ -48,9 +48,6 @@ public class ComByteManager {
     public final static byte ISO7816_POWE_OFF_CMD = (byte) 0x91;            //ISO7816掉电指令
     public final static byte ISO7816_CMD = (byte) 0x92;              //ISO7816命令传输指令
 
-    public final static byte SAVE_SERIAL_NUMBER_COM = (byte)0x83;            //保存序列号指令
-    public final static byte GET_SERIAL_NUMBER_COM = (byte)0x84;            //获取序列号指令
-
     //Comand run result define
     public final static byte COMAND_RUN_SUCCESSFUL = (byte) 0x90;            //命令运行成功
     public final static byte COMAND_RUN_ERROR = 0x6E;            //命令运行出错
@@ -611,16 +608,5 @@ public class ComByteManager {
     //bytes：转换成bytes后的名称
     public byte[] changeBleNameCmdBytes(byte[] bytes) {
         return data_framing_full(CHANGE_BLE_NAME_COM, bytes, bytes.length);
-    }
-
-    //保存序列号
-    //serialNumberBytes：序列号，小于等于32字节
-    public byte[] saveSerialNumberCmdBytes(byte[] serialNumberBytes) {
-        return data_framing_full(SAVE_SERIAL_NUMBER_COM, serialNumberBytes, serialNumberBytes.length);
-    }
-
-    //获取序列号
-    public byte[] getSerialNumberCmdBytes() {
-        return new byte[] {0x00, GET_SERIAL_NUMBER_COM};
     }
 }

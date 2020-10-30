@@ -19,7 +19,7 @@ import java.io.UnsupportedEncodingException;
  * Created by lochy on 16/1/19.
  */
 public class DeviceManager {
-    public final static String SDK_VERSIONS = "v2.2.0 20180621";
+    public final static String SDK_VERSIONS = "v2.1.0 20180131";
     private DeviceManagerCallback mDeviceManagerCallback = null;
     public BleManager bleManager = null;
 
@@ -68,8 +68,6 @@ public class DeviceManager {
     public onReceiveChangeBleNameListener mOnReceiveChangeBleNameListener;
     public onReceiveUlLongReadListener mOnReceiveUlLongReadListener;
     public onReceiveUlLongWriteListener mOnReceiveUlLongWriteListener;
-    public onReceiveSaveSerialNumberListener mOnReceiveSaveSerialNumberListener;
-    public onReceiveGetSerialNumberListener mOnReceiveGetSerialNumberListener;
 
     public final static byte  CARD_TYPE_NO_DEFINE = 0x00;           //卡片类型：未定义
     public final static byte  CARD_TYPE_ISO4443_A = 0x01;        //卡片类型ISO14443-A
@@ -307,16 +305,6 @@ public class DeviceManager {
     //ul卡任意长度写回调接口
     public interface onReceiveUlLongWriteListener {
         void onReceiveUlLongWrite(boolean isSuc);
-    }
-
-    //获取序列号回调接口
-    public interface onReceiveGetSerialNumberListener {
-        void onReceiveGetSerialNumber(boolean isSuc, byte[] serialNumberBytes);
-    }
-
-    //保存序列号回调接口
-    public interface onReceiveSaveSerialNumberListener {
-        void onReceiveSaveSerialNumber(boolean isSuc);
     }
 
     //根据蓝牙MAC地址连接设备接口
@@ -703,16 +691,6 @@ public class DeviceManager {
                         mOnReceiveChangeBleNameListener.onReceiveChangeBleName(isSuc);
                     }
                     break;
-                case ComByteManager.SAVE_SERIAL_NUMBER_COM:
-                    if (mOnReceiveSaveSerialNumberListener != null) {
-                        mOnReceiveSaveSerialNumberListener.onReceiveSaveSerialNumber(isSuc);
-                    }
-                    break;
-                case ComByteManager.GET_SERIAL_NUMBER_COM:
-                    if (mOnReceiveGetSerialNumberListener != null) {
-                        mOnReceiveGetSerialNumberListener.onReceiveGetSerialNumber(isSuc, rcvBytes);
-                    }
-                    break;
                 default:
                     break;
             }
@@ -1011,19 +989,6 @@ public class DeviceManager {
             e.printStackTrace();
         }
         bleManager.writeDataToCharacteristic(comByteManager.changeBleNameCmdBytes(bytes));
-    }
-
-    //保存序列号
-    //serialNumberBytes：序列号，必须8字节
-    public void requestSaveSerialNumber(byte[] serialNumberBytes, onReceiveSaveSerialNumberListener l) {
-        mOnReceiveSaveSerialNumberListener = l;
-        bleManager.writeDataToCharacteristic(comByteManager.saveSerialNumberCmdBytes(serialNumberBytes));
-    }
-
-    //获取序列号
-    public void requestGetSerialNumber(onReceiveGetSerialNumberListener l) {
-        mOnReceiveGetSerialNumberListener = l;
-        bleManager.writeDataToCharacteristic(comByteManager.getSerialNumberCmdBytes());
     }
 
     //PSam apdu指令传输

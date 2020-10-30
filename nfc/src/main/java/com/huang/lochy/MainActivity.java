@@ -942,8 +942,8 @@ public class MainActivity extends Activity {
 //                        } catch (UnsupportedEncodingException e) {
 //                            e.printStackTrace();
 //                        }
-                        NdefMessage writeNdefMessage = new NdefMessage(new NdefRecord[] {textRecord});
-                        boolean isSuc = ntag21x.NdefWrite(writeNdefMessage);
+                        //NdefMessage writeNdefMessage = new NdefMessage(new NdefRecord[] {textRecord});
+                        boolean isSuc = ntag21x.NdefTextWrite(writeText);
                         if (isSuc) {
                             msgBuffer.append("写NDEF成功\r\n");
                         }
@@ -1374,14 +1374,14 @@ public class MainActivity extends Activity {
 //                                handler.sendEmptyMessage(0);
 
                                 /*获取设备序列号*/
-                                try {
-                                    msgBuffer.append("\r\n开始获取设备序列号...\r\n");
-                                    handler.sendEmptyMessage(0);
-                                    byte[] serialNumberBytes = bleNfcDevice.getSerialNumber();
-                                    msgBuffer.append("设备序列号为：").append(StringTool.byteHexToSting(serialNumberBytes));
-                                }catch (DeviceNoResponseException e) {
-                                    e.printStackTrace();
-                                }
+                                //try {
+                                  //  msgBuffer.append("\r\n开始获取设备序列号...\r\n");
+                                    //handler.sendEmptyMessage(0);
+                                   // byte[] serialNumberBytes = bleNfcDevice.getSerialNumber();
+                                   // msgBuffer.append("设备序列号为：").append(StringTool.byteHexToSting(serialNumberBytes));
+                                //}catch (DeviceNoResponseException e) {
+                                //    e.printStackTrace();
+                               // }
 
                                 /*开启自动寻卡*/
                                 msgBuffer.append("\n开启自动寻卡...\r\n");

@@ -37,7 +37,7 @@ public class BleNfcDevice extends DeviceManager{
     }
 
     /**
-     * 获取设备当前电池电压，同步阻塞方式，注意：不能在主线程里运行
+     * 获取设备当前电池电压，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
      * @return         设备电池电压，单位：V
      * @throws DeviceNoResponseException
      *                  操作无响应时会抛出异常
@@ -65,7 +65,7 @@ public class BleNfcDevice extends DeviceManager{
     }
 
     /**
-     * 获取设备版本号，同步阻塞方式，注意：不能在主线程里运行
+     * 获取设备版本号，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
      * @return         设备版本号，1 字节
      * @throws DeviceNoResponseException
      *                  操作无响应时会抛出异常
@@ -93,7 +93,7 @@ public class BleNfcDevice extends DeviceManager{
     }
 
     /**
-     * 打开关闭防丢器功能，同步阻塞方式，注意：不能在主线程里运行
+     * 打开关闭防丢器功能，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
      * @param s         true - 打开
      *                  false - 关闭
      * @return         true - 防丢器功能已打开
@@ -132,7 +132,7 @@ public class BleNfcDevice extends DeviceManager{
     }
 
     /**
-     * 开启/关闭快速传输，只对安卓手机有效，同步阻塞方式，注意：不能在主线程里运行
+     * 开启/关闭快速传输，只对安卓手机有效，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
      * @param s         true - 打开
      *                  false - 关闭
      * @return         true - 快速传输已打开
@@ -171,7 +171,7 @@ public class BleNfcDevice extends DeviceManager{
     }
 
     /**
-     * 关闭蜂鸣器，同步阻塞方式，注意：不能在主线程里运行
+     * 关闭蜂鸣器，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
      * @return           true - 操作成功
      *                    false - 操作失败
      * @throws DeviceNoResponseException
@@ -208,7 +208,7 @@ public class BleNfcDevice extends DeviceManager{
     }
 
     /**
-     * 打开蜂鸣器指令，同步阻塞方式，注意：不能在主线程里运行
+     * 打开蜂鸣器指令，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
      * @param onDelayMs  打开蜂鸣器时间：0~0xffff，单位ms
      * @param offDelayMs 关闭蜂鸣器时间：0~0xffff，单位ms
      * @param n          蜂鸣器响多少声：0~255
@@ -248,7 +248,7 @@ public class BleNfcDevice extends DeviceManager{
     }
 
     /**
-     * 修改蓝牙名，同步阻塞方式，注意：不能在主线程里运行
+     * 修改蓝牙名，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
      * @param bleName   新蓝牙名称
      * @return         true - 操作成功
      *                  false - 操作失败
@@ -286,7 +286,7 @@ public class BleNfcDevice extends DeviceManager{
     }
 
     /**
-     * 开始自动寻卡，同步阻塞方式，注意：不能在主线程里运行
+     * 开始自动寻卡，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
      * @param delayMs      寻卡间隔,单位 10毫秒
      * @param bytCardType  ISO14443_P3 - 寻M1/UL卡
      *                      ISO14443_P4-寻CPU卡
@@ -326,7 +326,7 @@ public class BleNfcDevice extends DeviceManager{
     }
 
     /**
-     * 停止自动寻卡，同步阻塞方式，注意：不能在主线程里运行
+     * 停止自动寻卡，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
      * @return             true - 操作成功
      *                      false - 操作失败
      * @throws DeviceNoResponseException
@@ -363,7 +363,7 @@ public class BleNfcDevice extends DeviceManager{
     }
 
     /**
-     * 关闭RF天线，同步阻塞方式，注意：不能在主线程里运行
+     * 关闭RF天线，同步阻塞方式，注意：不能在蓝牙初始化的线程里运行
      * @return             true - 操作成功
      *                      false - 操作失败
      * @throws DeviceNoResponseException
@@ -397,85 +397,5 @@ public class BleNfcDevice extends DeviceManager{
         }
 
         return !isCmdRunSucFlag[0];
-    }
-
-    /**
-     * 修改设备保存的序列号，同步阻塞方式，注意：不能在主线程里运行
-     * @param serialNumberBytes  要修改的序列号，必须8字节
-     * @return         true - 操作成功
-     *                  false - 操作失败
-     * @throws DeviceNoResponseException
-     *                  操作无响应时会抛出异常
-     */
-    public boolean changeSerialNumber(byte[] serialNumberBytes) throws DeviceNoResponseException {
-        final byte[][] returnBytes = new byte[1][1];
-        final boolean[] isCmdRunSucFlag = {false};
-
-        final Semaphore semaphore = new Semaphore(0);
-        returnBytes[0] = null;
-
-        requestSaveSerialNumber(serialNumberBytes, new onReceiveSaveSerialNumberListener() {
-            @Override
-            public void onReceiveSaveSerialNumber(boolean isSuc) {
-                if (isSuc) {
-                    isCmdRunSucFlag[0] = true;
-                }
-                else {
-                    isCmdRunSucFlag[0] = false;
-                }
-                semaphore.release();
-            }
-        });
-
-        try {
-            semaphore.tryAcquire(DEVICE_NO_RESPONSE_TIME, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new DeviceNoResponseException("设备无响应");
-        }
-
-        return isCmdRunSucFlag[0];
-    }
-
-    /**
-     * 获取设备保存的序列号，设备默认的序列号是FFFFFFFFFFFFFFFF，同步阻塞方式，注意：不能在主线程里运行
-     * @return         返回的序列号，8字节
-     * @throws DeviceNoResponseException
-     *                  操作无响应时会抛出异常
-     */
-    public byte[] getSerialNumber() throws DeviceNoResponseException {
-        synchronized(this) {
-            final byte[][] returnBytes = new byte[1][1];
-            final boolean[] isCmdRunSucFlag = {false};
-
-            final Semaphore semaphore = new Semaphore(0);
-            returnBytes[0] = null;
-
-            requestGetSerialNumber(new onReceiveGetSerialNumberListener() {
-                @Override
-                public void onReceiveGetSerialNumber(boolean isCmdRunSuc, byte[] bytApduRtnData) {
-                    if (isCmdRunSuc) {
-                        returnBytes[0] = bytApduRtnData;
-                        isCmdRunSucFlag[0] = true;
-                    } else {
-                        returnBytes[0] = null;
-                        isCmdRunSucFlag[0] = false;
-                    }
-                    semaphore.release();
-                }
-            });
-
-            try {
-                semaphore.tryAcquire(DEVICE_NO_RESPONSE_TIME, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                throw new DeviceNoResponseException("设备无响应");
-            }
-
-            if (!isCmdRunSucFlag[0]) {
-                throw new DeviceNoResponseException("获取序列号失败");
-            }
-            return returnBytes[0];
-        }
     }
 }
