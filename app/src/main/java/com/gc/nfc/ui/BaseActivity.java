@@ -58,7 +58,9 @@ public abstract class BaseActivity extends Activity {
      */
     @SuppressLint("NewApi")
     public void requestPermissions() {
-        String[] deniedPermissions = new String[]{Manifest.permission.INTERNET};
+        String[] deniedPermissions = new String[]{Manifest.permission.INTERNET,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE};
         if (ContextCompat.checkSelfPermission(this, deniedPermissions[0]) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(deniedPermissions, PERMISSION_REQUEST_CODE);
         }

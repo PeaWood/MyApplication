@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set>
+    <objectAnimator xmlns:n1="http://schemas.android.com/apk/res/android"
+        n1:duration="@integer/ucrop_progress_loading_anim_time"
+        n1:propertyName="trimPathEnd"
+        n1:repeatCount="infinite"
+        n1:valueFrom="0"
+        n1:valueTo="1"
+        n1:valueType="floatType" />
+    <objectAnimator xmlns:n2="http://schemas.android.com/apk/res/android"
+        n2:duration="@integer/ucrop_progress_loading_anim_time"
+        n2:propertyName="strokeAlpha"
+        n2:repeatCount="infinite"
+        n2:valueFrom="1"
+        n2:valueTo="0"
+        n2:valueType="floatType" />
+</set>
