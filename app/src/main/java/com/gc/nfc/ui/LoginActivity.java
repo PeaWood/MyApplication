@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -20,7 +21,19 @@ import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
 import com.gc.nfc.utils.JellyInterpolator;
+
+import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
+import com.gc.nfc.interfaces.Netcallback;
+import com.gc.nfc.utils.NetUtil;
+
+import com.gc.nfc.utils.SharedPreferencesHelper;
 import com.google.gson.Gson;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -58,6 +71,74 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(password)) {
             Toast.makeText(LoginActivity.this, "请检查账号和密码", Toast.LENGTH_LONG).show();
         }
+        // get请求
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+
+        nrc.requestUrl = NetUrlConstant.LOGINURL;
+        nrc.context = this;
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("userId", name);
+        params.put("password", password);
+        nrc.setParams(params);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        if(response.getStatusLine().getStatusCode()==200){
+                            try {
+                                //设置登录会话的cookies
+                                NetUtil.setLoginCookies();
+                                JSONObject userJson = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
+                                JSONObject groupJson = userJson.getJSONObject("userGroup");
+                                JSONObject departmentJson =  userJson.getJSONObject("department");
+
+                                String groupCode = groupJson.optString("code");
+                                String groupName = groupJson.optString("name");
+                                String departmentCode = departmentJson.optString("code");
+                                String departmentName = departmentJson.optString("name");
+
+                                Intent data = new Intent();
+                                data.putExtra("userId", name);
+                                AppContext appContext = (AppContext) getApplicationContext();
+                                User user = new User();
+                                user.setUsername(name);
+                                user.setPassword(password);
+                                user.setDepartmentCode(departmentCode);
+                                user.setDepartmentName(departmentName);
+                                user.setGroupCode(groupCode);
+                                user.setGroupName(groupName);
+                                appContext.setUser(user);
+                                setResult(12, data);
+                                SharedPreferencesHelper.put("username", name);
+                                SharedPreferencesHelper.put("password", password);
+
+                                MediaPlayer music = MediaPlayer.create(LoginActivity.this, R.raw.start_working);
+                                music.start();
+
+
+                            }catch (IOException e){
+                                Toast.makeText(LoginActivity.this, "未知错误，异常！",
+                                        Toast.LENGTH_LONG).show();
+                            }catch (JSONException e) {
+                                Toast.makeText(LoginActivity.this, "未知错误，异常！",
+                                        Toast.LENGTH_LONG).show();
+                            }
+
+                        }else{
+                            Toast.makeText(LoginActivity.this, "账号或密码不正确", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(LoginActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(LoginActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }, nrc);
         Map map = new HashMap();
         map.put("userId", name);
         map.put("password", password);
