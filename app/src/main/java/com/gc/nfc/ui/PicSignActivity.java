@@ -305,7 +305,7 @@ public class PicSignActivity extends AppCompatActivity {
       TextView textView1 = this.binding.itemsTotalQuantity;
       StringBuilder stringBuilder2 = new StringBuilder();
       textView1.setText(stringBuilder2.append("X").append(Integer.toString(i)).toString());
-      SimpleAdapter simpleAdapter = new SimpleAdapter((Context)this, arrayList, R.layout.bottle_detail_items, new String[] { "goodName", "goodQuantity", "orignalPrice", "dealPrice" }, new int[] {R.id.items_goodName, R.id.items_goodQuantity, R.id.items_dealPrice  });
+      SimpleAdapter simpleAdapter = new SimpleAdapter((Context)this, arrayList, R.layout.order_detail_items, new String[] { "goodName", "goodQuantity", "orignalPrice", "dealPrice" }, new int[] {R.id.items_goodName, R.id.items_goodQuantity,R.id.items_orignalPrice, R.id.items_dealPrice  });
       this.m_listView.setAdapter((ListAdapter)simpleAdapter);
       setListViewHeightBasedOnChildren(this.m_listView);
     } catch (JSONException jSONException) {
@@ -342,12 +342,12 @@ public class PicSignActivity extends AppCompatActivity {
       this.m_recvAddr = str5;
       jSONObject2 = jSONObject2.getJSONObject("settlementType");
       if (jSONObject2.get("code").toString().equals("00003")) {
-        this.binding.itemsImageUserIcon.setImageResource(R.drawable.icon_logo);
+        this.binding.itemsImageUserIcon.setImageResource(R.mipmap.icon_ticket_user_white);
         this.m_isTicketUser = true;
         return;
       }
       if (jSONObject2.get("code").toString().equals("00002")) {
-        this.binding.itemsImageUserIcon.setImageResource(R.drawable.icon_logo);
+        this.binding.itemsImageUserIcon.setImageResource(R.mipmap.icon_month_user_white);
         this.m_isTicketUser = false;
         return;
       }
@@ -355,7 +355,7 @@ public class PicSignActivity extends AppCompatActivity {
       Toast.makeText((Context)this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
       return;
     }
-    this.binding.itemsImageUserIcon.setImageResource(R.drawable.icon_logo);
+    this.binding.itemsImageUserIcon.setImageResource(R.mipmap.icon_common_user_white);
     this.m_isTicketUser = false;
   }
   

@@ -9,8 +9,9 @@
         n1:id="@+id/items_goodName"
         n1:layout_width="200.0dip"
         n1:layout_height="wrap_content"
-        n1:layout_marginLeft="20.0dip"
-        n1:layout_marginTop="20.0dip"
+        n1:layout_alignBottom="@+id/items_dealPrice"
+        n1:layout_alignParentStart="true"
+        n1:layout_marginStart="20dp"
         n1:text="15公斤液化气"
         n1:textColor="@color/popup_main_background" />
 

@@ -146,7 +146,7 @@ public class ActivitySignBinding extends ViewDataBinding {
     sViewsWithIds.put(R.id.items_userCredit, 10);
     sViewsWithIds.put(R.id.linearLayout_orderThird, 11);
     sViewsWithIds.put(R.id.items_addressStatic, 12);
-    sViewsWithIds.put(R.id.items_addressStatic, 13);
+    sViewsWithIds.put(R.id.items_address, 13);
     sViewsWithIds.put(R.id.llytop2, 14);
     sViewsWithIds.put(R.id.listview, 15);
     sViewsWithIds.put(R.id.items_totalQuantity, 16);

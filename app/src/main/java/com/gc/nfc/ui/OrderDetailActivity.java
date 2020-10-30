@@ -101,6 +101,7 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
     private User m_user;
     private String strOrderType;
     private Timer timer;
+    private ImageView imageView;
 
     private void calculatePassedTime() {
         try {
@@ -380,12 +381,12 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
             m_recvAddr = str1;
             jSONObject2 = jSONObject2.getJSONObject("settlementType");
             if (jSONObject2.get("code").toString().equals("00003")) {
-                m_imageViewUserIcon.setImageResource(R.mipmap.icon_ticket_user);
+                m_imageViewUserIcon.setImageResource(R.mipmap.icon_ticket_user_white);
                 m_isTicketUser = true;
                 return;
             }
             if (jSONObject2.get("code").toString().equals("00002")) {
-                m_imageViewUserIcon.setImageResource(R.mipmap.icon_month_user);
+                m_imageViewUserIcon.setImageResource(R.mipmap.icon_month_user_white);
                 m_isTicketUser = false;
                 return;
             }
@@ -393,7 +394,7 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
             Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
             return;
         }
-        m_imageViewUserIcon.setImageResource(R.mipmap.icon_common_user);
+        m_imageViewUserIcon.setImageResource(R.mipmap.icon_common_user_white);
         m_isTicketUser = false;
     }
 
@@ -464,6 +465,13 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
             m_textViewTotalMountOrignal = (TextView) findViewById(R.id.items_totalMountOrignal);
             m_textViewTotalMountDeal = (TextView) findViewById(R.id.items_totalMountDeal);
             m_textViewPassedTime = (TextView) findViewById(R.id.items_passedTime);
+            imageView = (ImageView) findViewById(R.id.img_back);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
             m_buttonNext.setOnClickListener(this);
             m_imageViewNav.setOnClickListener(this);
             m_imageViewCall.setOnClickListener(this);
