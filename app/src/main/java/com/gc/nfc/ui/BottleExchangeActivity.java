@@ -992,20 +992,20 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                             return;
                         }
                         if (response.getStatusLine().getStatusCode() == 404) {
-                            Toast.makeText((Context)BottleExchangeActivity.this,"订单不存在", Toast.LENGTH_LONG).show();
+                            Toast.makeText(BottleExchangeActivity.this,"订单不存在", Toast.LENGTH_LONG).show();
                             return;
                         }
                         if (response.getStatusLine().getStatusCode() == 401) {
-                            Toast.makeText((Context)BottleExchangeActivity.this, "鉴权失败，请重新登录"+ response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(BottleExchangeActivity.this, "鉴权失败，请重新登录"+ response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
                             return;
                         }
-                        Toast.makeText((Context)BottleExchangeActivity.this, "支付失败"+ response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(BottleExchangeActivity.this, "支付失败"+ response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
                         return;
                     }
-                    Toast.makeText((Context)BottleExchangeActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+                    Toast.makeText(BottleExchangeActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
                     return;
                 }
-                Toast.makeText((Context)BottleExchangeActivity.this, "网络未连接", Toast.LENGTH_LONG).show();
+                Toast.makeText(BottleExchangeActivity.this, "网络未连接", Toast.LENGTH_LONG).show();
             }
         },netRequestConstant);
     }
@@ -1447,7 +1447,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                             setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + response.message() + "\r\n确认强制交接吗？").setIcon(R.mipmap.icon_common_user).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface param2DialogInterface, int param2Int) {
                             if (Tools.isFastClick()) {
-                                MediaPlayer.create((Context) BottleExchangeActivity.this, 2131558407).start();
+                                MediaPlayer.create( BottleExchangeActivity.this, 2131558407).start();
                                 if (isKP) {
                                     addKP(bottleCode);
                                     return;
@@ -1760,7 +1760,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             //    if (this.scale != null && this.scale.getDevicelist().size() == 1)
             //        this.scale.bleSend(this.scale.getDevicelist().get(0), (byte) 1);
             case R.id.button_next:
-                orderServiceQualityUpload(true);//测试
                 if (isSpecialOrder) {
                     Iterator<Map.Entry<String, String>> iterator = this.m_BottlesMapKP.entrySet().iterator();
                     while (iterator.hasNext()) {

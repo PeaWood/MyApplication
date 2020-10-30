@@ -2,6 +2,7 @@ package com.gc.nfc.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +10,7 @@ import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.se.omapi.Session;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -24,15 +26,15 @@ import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-//import com.alibaba.fastjson.JSON;
-//import com.alibaba.fastjson.TypeReference;
-//import com.amap.api.maps.model.LatLng;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.amap.api.maps.model.LatLng;
 import com.bumptech.glide.Glide;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.databinding.ActivitySignBinding;
 import com.gc.nfc.domain.User;
-//import com.gc.nfc.utils.NetUtil;
+import com.gc.nfc.utils.NetUtil;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -114,7 +116,7 @@ public class PicSignActivity extends AppCompatActivity {
   
   private String m_recvAddr;
   
-//  private LatLng m_recvLocation;
+  private LatLng m_recvLocation;
   
   private String m_taskId;
   
@@ -161,7 +163,8 @@ public class PicSignActivity extends AppCompatActivity {
   private String m_yjss;
   
   private Timer timer;
-  
+  private static String sessionid;
+
   private static String generateFileName() {
     return UUID.randomUUID().toString();
   }
@@ -365,10 +368,10 @@ public class PicSignActivity extends AppCompatActivity {
       StringBuilder stringBuilder4 = new StringBuilder();
       URL uRL = new URL(stringBuilder4.append("http://www.gasmart.com.cn/api/Untils/file?fileFolder=").append(paramString1).append("&fileNameHeader=").append(paramString2).toString());
       HttpURLConnection httpURLConnection = (HttpURLConnection)uRL.openConnection();
-//      if (NetUtil.m_loginCookies != null) {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        httpURLConnection.setRequestProperty("Cookie", stringBuilder.append("JSESSIONID=").append(NetUtil.SESSIONID).toString());
-//      }
+      if (NetUtil.m_loginCookies != null) {
+        StringBuilder stringBuilder = new StringBuilder();
+        httpURLConnection.setRequestProperty("Cookie", stringBuilder.append("JSESSIONID=").append(sessionid).toString());
+      }
       httpURLConnection.setReadTimeout(100000000);
       httpURLConnection.setConnectTimeout(100000000);
       httpURLConnection.setDoInput(true);
@@ -407,15 +410,16 @@ public class PicSignActivity extends AppCompatActivity {
         FileInputStream fileInputStream = new FileInputStream(file);
         byte[] arrayOfByte = new byte[5242880];
         while (true) {
-          int j = fileInputStream.read(arrayOfByte);
-          if (j != -1) {
-            dataOutputStream.write(arrayOfByte, 0, j);
-            continue;
-          } 
-          fileInputStream.close();
-          dataOutputStream.write("\r\n".getBytes());
-          i++;
-        } 
+            int j = fileInputStream.read(arrayOfByte);
+            if (j != -1) {
+                dataOutputStream.write(arrayOfByte, 0, j);
+            }else{
+                fileInputStream.close();
+                dataOutputStream.write("\r\n".getBytes());
+                i++;
+                break;
+            }
+        }
       } 
       StringBuilder stringBuilder1 = new StringBuilder();
       dataOutputStream.write(stringBuilder1.append("--").append(str).append("--").append("\r\n").toString().getBytes());
@@ -461,22 +465,22 @@ public class PicSignActivity extends AppCompatActivity {
       this.list_bottle = (List<Map<String, String>>)bundle.getSerializable("MapList");
       String str4 = bundle.getString("KPCode");
       String str1 = bundle.getString("ZPCode");
-//      TypeReference<HashMap<String, String>> typeReference2 = new TypeReference<HashMap<String, String>>() {
-//        };
-//      this.m_BottlesMapKPL = (Map<String, String>)JSON.parseObject(str4, typeReference2, new com.alibaba.fastjson.parser.Feature[0]);
-//      TypeReference<HashMap<String, String>> typeReference3 = new TypeReference<HashMap<String, String>>() {
-//
-//        };
-//      this.m_BottlesMapZPL = (Map<String, String>)JSON.parseObject(str1, typeReference3, new com.alibaba.fastjson.parser.Feature[0]);
-//      String str3 = this.SpecMap;
-//      TypeReference<HashMap<String, String>> typeReference1 = new TypeReference<HashMap<String, String>>() {
-//
-//        };
-//      this.m_BottlesSpecMap = (Map<String, String>)JSON.parseObject(str3, typeReference1, new com.alibaba.fastjson.parser.Feature[0]);
+      TypeReference<HashMap<String, String>> typeReference2 = new TypeReference<HashMap<String, String>>() {
+        };
+      this.m_BottlesMapKPL = (Map<String, String>)JSON.parseObject(str4, typeReference2, new com.alibaba.fastjson.parser.Feature[0]);
+      TypeReference<HashMap<String, String>> typeReference3 = new TypeReference<HashMap<String, String>>() {
+
+        };
+      this.m_BottlesMapZPL = (Map<String, String>)JSON.parseObject(str1, typeReference3, new com.alibaba.fastjson.parser.Feature[0]);
+      String str3 = this.SpecMap;
+      TypeReference<HashMap<String, String>> typeReference1 = new TypeReference<HashMap<String, String>>() {
+
+        };
+      this.m_BottlesSpecMap = (Map<String, String>)JSON.parseObject(str3, typeReference1, new com.alibaba.fastjson.parser.Feature[0]);
       setOrderDetailsInfo();
       setOrderHeadInfo();
-//      refleshBottlesListKP();
-//      refleshBottlesListZP();
+      refleshBottlesListKP();
+      refleshBottlesListZP();
       refleshBottlesListYJ();
     } catch (JSONException jSONException) {
       Toast.makeText((Context)this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
@@ -493,7 +497,7 @@ public class PicSignActivity extends AppCompatActivity {
       return;
     } 
     if (paramInt2 == 101)
-      Glide.with((FragmentActivity)this).load(path1 + ".sign").into(this.binding.img1); 
+      Glide.with(this).load(path1 + ".sign").into(this.binding.img1);
   }
   
   protected void onCreate(Bundle paramBundle) {
@@ -551,6 +555,8 @@ public class PicSignActivity extends AppCompatActivity {
             PicSignActivity.this.binding.btn1.setEnabled(false);
           }
         });
+    SharedPreferences share = getSharedPreferences("Session",Context.MODE_PRIVATE);
+    sessionid= share.getString("sessionid","null");
   }
   
   public void onRequestPermissionsResult(int paramInt, @NonNull String[] paramArrayOfString, @NonNull int[] paramArrayOfint) {

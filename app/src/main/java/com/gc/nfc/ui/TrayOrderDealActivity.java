@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +16,7 @@ import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -34,6 +36,7 @@ import com.gc.nfc.domain.RefoundDetail;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
+import com.gc.nfc.interfaces.Netcallback;
 import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
@@ -374,32 +377,32 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         }
         hashMap.put("payStatus", "PSPaied");
         netRequestConstant.setBody(hashMap);
-        //    getServer(new Netcallback() {
-        //          public void preccess(Object param1Object, boolean param1Boolean) {
-        //            if (param1Boolean) {
-        //              param1Object = param1Object;
-        //              if (param1Object != null) {
-        //                if (param1Object.getStatusLine().getStatusCode() == 200) {
-        //                  deliverOver();
-        //                  return;
-        //                }
-        //                if (param1Object.getStatusLine().getStatusCode() == 404) {
-        //                  Toast.makeText(TrayOrderDealActivity.this, "订单不存在", 1).show();
-        //                  return;
-        //                }
-        //                if (param1Object.getStatusLine().getStatusCode() == 401) {
-        //                  Toast.makeText(TrayOrderDealActivity.this, "鉴权失败，请重新登录" + param1Object.getStatusLine().getStatusCode(), 1).show();
-        //                  return;
-        //                }
-        //                Toast.makeText(TrayOrderDealActivity.this, "支付失败" + param1Object.getStatusLine().getStatusCode(), 1).show();
-        //                return;
-        //              }
-        //              Toast.makeText(TrayOrderDealActivity.this, "请求超时，请检查网络", 1).show();
-        //              return;
-        //            }
-        //            Toast.makeText(TrayOrderDealActivity.this, "网络未连接！", 1).show();
-        //          }
-        //        }netRequestConstant);
+        getServer(new Netcallback() {
+            public void preccess(Object param1Object, boolean param1Boolean) {
+                if (param1Boolean) {
+                    HttpResponse response = (HttpResponse) param1Object;
+                    if (response != null) {
+                        if (response.getStatusLine().getStatusCode() == 200) {
+                            deliverOver();
+                            return;
+                        }
+                        if (response.getStatusLine().getStatusCode() == 404) {
+                            Toast.makeText(TrayOrderDealActivity.this, "订单不存在", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        if (response.getStatusLine().getStatusCode() == 401) {
+                            Toast.makeText(TrayOrderDealActivity.this, "鉴权失败，请重新登录" + response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        Toast.makeText(TrayOrderDealActivity.this, "支付失败" + response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    Toast.makeText(TrayOrderDealActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Toast.makeText(TrayOrderDealActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+            }
+        }, netRequestConstant);
         return true;
     }
 
@@ -426,56 +429,56 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         netRequestConstant.setParams(hashMap1);
         netRequestConstant.setBody(hashMap2);
         netRequestConstant.isBodyJsonArray = false;
-        //    getServer(new Netcallback() {
-        //          public void preccess(Object param1Object, boolean param1Boolean) {
-        //            if (param1Boolean) {
-        //              param1Object = param1Object;
-        //              if (param1Object != null) {
-        //                if (param1Object.getStatusLine().getStatusCode() == 200) {
-        //                  Toast.makeText(TrayOrderDealActivity.this, "订单配送成功", 1).show();
-        //                  MediaPlayer.create(TrayOrderDealActivity.this, 2131558402).start();
-        //                  param1Object = new Intent(getApplicationContext(), MainlyActivity.class);
-        //                  Bundle bundle = new Bundle();
-        //                  bundle.putInt("switchTab", 1);
-        //                  param1Object.putExtras(bundle);
-        //                  startActivity((Intent)param1Object);
-        //                  finish();
-        //                  return;
-        //                }
-        //                Toast.makeText(TrayOrderDealActivity.this, "订单配送失败", 1).show();
-        //                return;
-        //              }
-        //              Toast.makeText(TrayOrderDealActivity.this, "请求超时，请检查网络", 1).show();
-        //              return;
-        //            }
-        //            Toast.makeText(TrayOrderDealActivity.this, "网络未连接！", 1).show();
-        //          }
-        //        }netRequestConstant);
+        getServer(new Netcallback() {
+            public void preccess(Object param1Object, boolean param1Boolean) {
+                if (param1Boolean) {
+                    HttpResponse response = (HttpResponse) param1Object;
+                    if (param1Object != null) {
+                        if (response.getStatusLine().getStatusCode() == 200) {
+                            Toast.makeText(TrayOrderDealActivity.this, "订单配送成功", Toast.LENGTH_LONG).show();
+                            MediaPlayer.create(TrayOrderDealActivity.this, R.raw.finish_order).start();
+                            Intent intent = new Intent(getApplicationContext(), MainlyActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("switchTab", 1);
+                            intent.putExtras(bundle);
+                            startActivity((Intent) param1Object);
+                            finish();
+                            return;
+                        }
+                        Toast.makeText(TrayOrderDealActivity.this, "订单配送失败", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    Toast.makeText(TrayOrderDealActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Toast.makeText(TrayOrderDealActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+            }
+        }, netRequestConstant);
         return true;
     }
 
     private void getRefoundNeededParams(final String bottleCodeTemp) {
-        //    final View layout = getLayoutInflater().inflate(2131361918, null);
-        //    AlertDialog.Builder builder = (new AlertDialog.Builder(this)).setTitle("请输入").setIcon(2131165392).setView(view).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-        //          public void onClick(DialogInterface param1DialogInterface, int param1Int) {
-        //            EditText editText1 = (EditText)layout.findViewById(2131230847);
-        //            EditText editText2 = (EditText)layout.findViewById(2131230837);
-        //            String str1 = editText1.getText().toString();
-        //            String str2 = editText2.getText().toString();
-        //            TrayOrderDealActivity.access$902(TrayOrderDealActivity.this, str2);
-        //            if (str1.length() == 0 || str2.length() == 0) {
-        //              Toast.makeText(TrayOrderDealActivity.this, "输入有误，请重新输入！", 1).show();
-        //              return;
-        //            }
-        //            RefoundDetail refoundDetail = (RefoundDetail)m_BottlesMapKP.get(bottleCodeTemp);
-        //            refoundDetail.original_price = str1;
-        //            refoundDetail.chongzhuang_weight = str2;
-        //            m_BottlesMapKP.put(bottleCodeTemp, refoundDetail);
-        //            refleshBottlesMapKP();
-        //          }
-        //        });
-        //    builder.setCancelable(false);
-        //    builder.show();
+//        final View layout = getLayoutInflater().inflate(2131361918, null);
+//        AlertDialog.Builder builder = (new AlertDialog.Builder(this)).setTitle("请输入").setIcon(2131165392).setView(view).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//              public void onClick(DialogInterface param1DialogInterface, int param1Int) {
+//                EditText editText1 = (EditText)layout.findViewById(2131230847);
+//                EditText editText2 = (EditText)layout.findViewById(2131230837);
+//                String str1 = editText1.getText().toString();
+//                String str2 = editText2.getText().toString();
+//                TrayOrderDealActivity.access$902(TrayOrderDealActivity.this, str2);
+//                if (str1.length() == 0 || str2.length() == 0) {
+//                  Toast.makeText(TrayOrderDealActivity.this, "输入有误，请重新输入！", 1).show();
+//                  return;
+//                }
+//                RefoundDetail refoundDetail = (RefoundDetail)m_BottlesMapKP.get(bottleCodeTemp);
+//                refoundDetail.original_price = str1;
+//                refoundDetail.chongzhuang_weight = str2;
+//                m_BottlesMapKP.put(bottleCodeTemp, refoundDetail);
+//                refleshBottlesMapKP();
+//              }
+//            });
+//        builder.setCancelable(false);
+//        builder.show();
     }
 
     private String getResponseMessage(HttpResponse paramHttpResponse) {
@@ -568,7 +571,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
             textView3.setText(stringBuilder1.append("￥").append(String.format("%.2f", new Object[]{double_1})).toString());
             TextView textView1 = m_textViewResidualGasFee;
             stringBuilder1 = new StringBuilder();
-            textView1.setText(stringBuilder1.append("￥").append(String.format("%.2f", new Object[] { double_2 })).toString());
+            textView1.setText(stringBuilder1.append("￥").append(String.format("%.2f", new Object[]{double_2})).toString());
             m_totalFee = String.format("%.2f", new Object[]{double_3});
         } catch (JSONException jSONException) {
             Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
@@ -783,12 +786,12 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
                     Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                 }
                 String string = response.body().string();
-                Logger.e("refleshPayStatus: "+ string);
+                Logger.e("refleshPayStatus: " + string);
                 Gson gson = new Gson();
                 Data_Order data_order = gson.fromJson(string, Data_Order.class);
                 if (data_order.getItems().size() == 1) {
                     try {
-                        setOrderAppendInfo(new JSONObject(gson.toJson( data_order.getItems().get(0))));
+                        setOrderAppendInfo(new JSONObject(gson.toJson(data_order.getItems().get(0))));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

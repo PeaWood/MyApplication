@@ -3,6 +3,7 @@ package com.gc.nfc.ui;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
@@ -93,12 +94,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 JSONObject userJson = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
                                 JSONObject groupJson = userJson.getJSONObject("userGroup");
                                 JSONObject departmentJson =  userJson.getJSONObject("department");
-
                                 String groupCode = groupJson.optString("code");
                                 String groupName = groupJson.optString("name");
                                 String departmentCode = departmentJson.optString("code");
                                 String departmentName = departmentJson.optString("name");
-
                                 Intent data = new Intent();
                                 data.putExtra("userId", name);
                                 AppContext appContext = (AppContext) getApplicationContext();
@@ -113,11 +112,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 setResult(12, data);
                                 SharedPreferencesHelper.put("username", name);
                                 SharedPreferencesHelper.put("password", password);
-
                                 MediaPlayer music = MediaPlayer.create(LoginActivity.this, R.raw.start_working);
                                 music.start();
-
-
                             }catch (IOException e){
                                 Toast.makeText(LoginActivity.this, "未知错误，异常！",
                                         Toast.LENGTH_LONG).show();
@@ -221,6 +217,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         requestWindowFeature(1);
         ((AppContext) getApplication()).setPreferences(getPreferences(MODE_PRIVATE));
         setContentView(R.layout.activity_login);
+        SharedPreferencesHelper.initial((Context)this);
         this.mBtnLogin = (TextView) findViewById(R.id.main_btn_login);
         this.progress = findViewById(R.id.layout_progress);
         this.mInputLayout = findViewById(R.id.input_layout);
