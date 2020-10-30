@@ -32,7 +32,7 @@ import com.gc.nfc.http.Logger;
 
 public class NetUtil {
 	private static CookieStore m_tempCookies = null;//临时cookies
-	private static CookieStore m_loginCookies = null;//登陆会话的cookies
+	public static CookieStore m_loginCookies = null;//登陆会话的cookies
 
 
 	public static void setLoginCookies(){
