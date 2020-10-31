@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -24,18 +23,19 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-//import com.alibaba.fastjson.JSON;
-//import com.alibaba.fastjson.TypeReference;
-//import com.amap.api.maps.model.LatLng;
+
+import com.amap.api.maps.model.LatLng;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.domain.User;
-import com.gc.nfc.interfaces.Netcallback;
-import java.io.BufferedReader;
+
+import org.apache.http.HttpResponse;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -43,11 +43,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class OrderDealActivity extends BaseActivity implements View.OnClickListener, AbsListView.OnScrollListener {
   public static String m_orderPayStatus;
@@ -160,7 +155,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
   
   private String m_recvAddr;
   
-//  private LatLng m_recvLocation;
+  private LatLng m_recvLocation;
   
   private Spinner m_spinnerPaytype;
   

@@ -69,7 +69,6 @@ import com.gc.nfc.utils.Tools;
 import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -775,7 +774,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
             return null;
         }
-        //        JSONArray jSONArray = new JSONArray();//我自己给加上的  防止报错
     }
 
     private void getBottleWeight(final String bottleCodeTemp, final boolean isZP) {
@@ -837,7 +835,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             Integer integer1 = 0;
             for (String str1 : this.m_BottlesMapZP.keySet()) {
                 StringBuilder stringBuilder = new StringBuilder();
-                ;
                 String str2 = getBottleSpec(str1);
                 if (str2 == null) {
                     updateBottleSpec(str1);
@@ -1008,44 +1005,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 Toast.makeText(BottleExchangeActivity.this, "网络未连接", Toast.LENGTH_LONG).show();
             }
         },netRequestConstant);
-    }
-
-    private void orderServiceQualityUpload2(boolean paramBoolean) {
-        Map<String, String> map = new HashMap();
-        if (paramBoolean) {
-            map.put("orderServiceQuality", "OSQNegative");
-        } else {
-            map.put("orderServiceQuality", "OSQPositive");
-        }
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.PUT(OkHttpUtil.URL + "/Orders/" + this.m_orderId, map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                Logger.e("orderServiceQualityUpload: " + response.code());
-                Logger.e("orderServiceQualityUpload: "+response.message());
-                Logger.e("orderServiceQualityUpload: "+response.body().string());
-                if (response.code() == 200) {
-                    handler_old.sendEmptyMessageDelayed(0, 500L);
-                    return;
-                }
-                if (response.code() == 404) {
-                    Toast.makeText(BottleExchangeActivity.this, "订单不存在", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (response.code() == 401) {
-                    Toast.makeText(BottleExchangeActivity.this, "鉴权失败，请重新登录" + response.code(), Toast.LENGTH_LONG).show();
-                    return;
-                }
-                //测试
-                jumpToOrderDeal();
-                Toast.makeText(BottleExchangeActivity.this, "支付失败" + response.code(), Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
     private boolean readWriteCardDemo(int paramInt) {
@@ -1350,18 +1309,19 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         for (byte b = 0; b < i; b++) {
             int j = paramString.charAt(b) - 48;
             if (b != i - 1 && j != 0) {
-                (new String[11])[0] = "十";
-                (new String[11])[1] = "百";
-                (new String[11])[2] = "千";
-                (new String[11])[3] = "万";
-                (new String[11])[4] = "十";
-                (new String[11])[5] = "百";
-                (new String[11])[6] = "千";
-                (new String[11])[7] = "亿";
-                (new String[11])[8] = "十";
-                (new String[11])[9] = "百";
-                (new String[11])[10] = "千";
-                str = str + arrayOfString[j] + (new String[11])[i - 2 - b];
+                String[] strings = new String[11];
+                strings[0] = "十";
+                strings[1] = "百";
+                strings[2] = "千";
+                strings[3] = "万";
+                strings[4] = "十";
+                strings[5] = "百";
+                strings[6] = "千";
+                strings[7] = "亿";
+                strings[8] = "十";
+                strings[9] = "百";
+                strings[10] = "千";
+                str = str + arrayOfString[j] + strings[i - 2 - b];
             } else {
                 str = str + arrayOfString[j];
             }
@@ -1396,17 +1356,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     public void bottleTakeOverUnit(final String bottleCode, String paramString2, String paramString3, String paramString4, String paramString5, boolean paramBoolean1, final boolean isKP) {
-        //测试
-        /*
-        if (isKP) {
-            addKP(bottleCode);
-            return;
-        }
-        if (!isKP) {
-            addZP(bottleCode);
-            return;
-        }
-        */
         boolean bool = false;
         if (this.m_BottlesMapKP.containsKey(bottleCode))
             bool = true;
@@ -1416,9 +1365,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             Toast.makeText(this, "钢瓶号：" + bottleCode + "    请勿重复提交！", Toast.LENGTH_SHORT).show();
             return;
         }
-
         Map map = new HashMap();
-
         String url=OkHttpUtil.URL + "/GasCylinder/check/" + bottleCode+"?srcUserId="+paramString2+"&targetUserId="+paramString3+"&serviceStatus="+paramString4+"&enableForce="+String.valueOf(paramBoolean1)+"&note="+paramString5;
         Logger.e("URL: " + url);
         OkHttpUtil util = OkHttpUtil.getInstance(this);
@@ -1447,7 +1394,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                             setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + response.message() + "\r\n确认强制交接吗？").setIcon(R.mipmap.icon_common_user).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface param2DialogInterface, int param2Int) {
                             if (Tools.isFastClick()) {
-                                MediaPlayer.create( BottleExchangeActivity.this, 2131558407).start();
+                                MediaPlayer.create( BottleExchangeActivity.this, R.raw.music).start();
                                 if (isKP) {
                                     addKP(bottleCode);
                                     return;
@@ -1606,7 +1553,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     void init() {
-        Logger.e("BottleExchangeActivity");
         try {
             TextToSpeech textToSpeech = new TextToSpeech(this, this);//将文字快速转化为语音进行播放或者保存为音频文件
             tts = textToSpeech;
@@ -1688,7 +1634,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             AdapterView.OnItemLongClickListener onItemLongClickListener2 = new AdapterView.OnItemLongClickListener() {
                 public boolean onItemLongClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
                     String str = ((TextView) param1View.findViewById(R.id.items_number)).getText().toString();
-
                     getBottleWeight(str, true);
                     return true;
                 }
@@ -1756,9 +1701,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         Intent intent;
         Bundle bundle;
         switch (paramView.getId()) {
-            //case 2131230819:
-            //    if (this.scale != null && this.scale.getDevicelist().size() == 1)
-            //        this.scale.bleSend(this.scale.getDevicelist().get(0), (byte) 1);
             case R.id.button_next:
                 if (isSpecialOrder) {
                     Iterator<Map.Entry<String, String>> iterator = this.m_BottlesMapKP.entrySet().iterator();
@@ -1779,7 +1721,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                     }
                 }
                 if (m_deliveryUser.getScanType() == 0 || m_deliveryUser.getScanType() == 3) {
-                    Logger.e(isBottlesQuantityOK());
                     if (!isBottlesQuantityOK()) {
                         return;
                     }
