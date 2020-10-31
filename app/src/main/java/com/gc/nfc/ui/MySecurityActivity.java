@@ -1,5 +1,6 @@
 package com.gc.nfc.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -40,16 +41,16 @@ public class MySecurityActivity extends BaseActivity implements View.OnClickList
     private ImageView imageView;
 
     private void switchActivity(int paramInt) {
-        //    try {
-        //      Intent intent = new Intent();
-        //      Bundle bundle = new Bundle();
-        //      bundle.putString("check", m_checkOrderListJson.getJSONObject(paramInt).toString());
-        //      intent.setClass((Context)this, SecurityDetailActivity.class);
-        //      intent.putExtras(bundle);
-        //      startActivity(intent);
-        //    } catch (JSONException jSONException) {
-        //      Toast.makeText((Context)this, "异常" + jSONException.toString(), 1).show();
-        //    }
+        try {
+            Intent intent = new Intent();
+            Bundle bundle = new Bundle();
+            bundle.putString("check", m_checkOrderListJson.getJSONObject(paramInt).toString());
+            intent.setClass(this, SecurityDetailActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        } catch (JSONException jSONException) {
+            Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
+        }
     }
 
     void init() {

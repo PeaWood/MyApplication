@@ -201,6 +201,10 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".ui.SecurityDetailActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.QianZiActivity"/>
         <activity android:label="空瓶回收"
             android:launchMode="singleTop"

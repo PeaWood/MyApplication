@@ -33,7 +33,7 @@
                     n1:textSize="20.0sp" />
 
                 <TextView
-                    n1:id="@id/msgText"
+                    n1:id="@+id/msgText"
                     n1:layout_width="wrap_content"
                     n1:layout_height="wrap_content"
                     n1:layout_gravity="center"
@@ -43,7 +43,7 @@
                     n1:textSize="18.0sp" />
 
                 <ImageView
-                    n1:id="@id/imageView_search"
+                    n1:id="@+id/imageView_search"
                     n1:layout_width="30.0dip"
                     n1:layout_height="30.0dip"
                     n1:layout_alignParentRight="true"
@@ -61,7 +61,7 @@
                 n1:visibility="visible">
 
                 <TextView
-                    n1:id="@id/items_orderSn"
+                    n1:id="@+id/items_orderSn"
                     n1:layout_width="wrap_content"
                     n1:layout_height="wrap_content"
                     n1:layout_marginLeft="16.0dip"
@@ -70,13 +70,13 @@
                     n1:textSize="18.0sp" />
 
                 <LinearLayout
-                    n1:id="@id/linearLayout_orderFirst"
+                    n1:id="@+id/linearLayout_orderFirst"
                     n1:layout_width="fill_parent"
                     n1:layout_height="wrap_content"
                     n1:orientation="horizontal">
 
                     <TextView
-                        n1:id="@id/items_creatTime"
+                        n1:id="@+id/items_creatTime"
                         n1:layout_width="wrap_content"
                         n1:layout_height="wrap_content"
                         n1:layout_marginLeft="16.0dip"
@@ -86,7 +86,7 @@
                         n1:textSize="14.0sp" />
 
                     <TextView
-                        n1:id="@id/items_passedTime"
+                        n1:id="@+id/items_passedTime"
                         n1:layout_width="wrap_content"
                         n1:layout_height="wrap_content"
                         n1:layout_marginLeft="0.0dip"
@@ -135,7 +135,7 @@
                     n1:id="@+id/linearLayout_orderThird"
                     n1:layout_width="fill_parent"
                     n1:layout_height="wrap_content"
-                    n1:layout_below="@id/linearLayout_orderSecond"
+                    n1:layout_below="@+id/linearLayout_orderSecond"
                     n1:orientation="horizontal">
 
                     <TextView
