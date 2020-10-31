@@ -100,7 +100,6 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
     private TextView m_textview_qp;
     private User m_user;
     private String strOrderType;
-    private Timer timer;
     private ImageView imageView;
 
     private void calculatePassedTime() {
@@ -253,10 +252,6 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
         } catch (JSONException jSONException) {
             Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
         }
-    }
-
-    private String getResponseMessage(HttpResponse paramHttpResponse) {
-        return null;
     }
 
     private void setListViewHeightBasedOnChildren(ListView paramListView) {

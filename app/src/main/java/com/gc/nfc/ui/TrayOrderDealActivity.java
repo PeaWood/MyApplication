@@ -2,6 +2,7 @@ package com.gc.nfc.ui;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -216,11 +217,10 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
     }
 
     private void OrderCalculate() {
-        Map map = new HashMap();
-        map.put("customerId", m_curUserId);
-        JSONArray jSONArray = new JSONArray();
+        JSONArray bodyarray = new JSONArray();
+        HashMap<Object, Object> body = new HashMap<Object, Object>();
         try {
-            Iterator iterator = m_BottlesMapKP.entrySet().iterator();
+            Iterator<Map.Entry<String, RefoundDetail>> iterator = this.m_BottlesMapKP.entrySet().iterator();
             while (iterator.hasNext()) {
                 RefoundDetail refoundDetail = (RefoundDetail) ((Map.Entry) iterator.next()).getValue();
                 JSONObject jSONObject = new JSONObject();
@@ -242,82 +242,80 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
                     jSONObject.put("standWeight", refoundDetail.chongzhuang_weight);
                     jSONObject.put("dealPrice", refoundDetail.original_price);
                 }
-                jSONArray.put(jSONObject);
+                bodyarray.put(jSONObject);
             }
         } catch (JSONException jSONException) {
-            Toast.makeText(this, "订单残气计算请求构建失败！" + jSONException.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "订单残气请求构建失败！" + jSONException.getMessage(), Toast.LENGTH_LONG).show();
             return;
         }
-        map.put("jsonArray", jSONArray.toString());
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.PUT(OkHttpUtil.URL + "/Orders/Caculate/" + m_orderId, map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                Logger.e("OrderCalculate: " + response.code());
-                Logger.e("OrderCalculate: " + response.message());
-                Logger.e("OrderCalculate: " + response.body().string());
-                if (response.code() != 200) {
-                    //                    refleshBottlesMapKP();
-                    //                    refleshPayStatus();
-                    Toast.makeText(TrayOrderDealActivity.this, response.message(), Toast.LENGTH_LONG).show();
-                    //                    return;
+        body.put("jsonArray", bodyarray);
+        NetRequestConstant netRequestConstant = new NetRequestConstant();
+        netRequestConstant.setType(BaseActivity.HttpRequestType.PUT);
+        StringBuilder stringBuilder = new StringBuilder();
+        netRequestConstant.requestUrl = stringBuilder.append("http://www.gasmart.com.cn/api/Orders/Caculate/").append(this.m_orderId).toString()+"?customerId="+this.m_curUserId;
+        netRequestConstant.context = this;
+        netRequestConstant.setBody(body);
+        netRequestConstant.isBodyJsonArray = true;
+        getServer(new Netcallback() {
+            public void preccess(Object param1Object, boolean param1Boolean) {
+                if (param1Boolean) {
+                    HttpResponse response = (HttpResponse) param1Object;
+                    if (param1Object != null) {
+                        Logger.e("getStatusCode() =="+response.getStatusLine().getStatusCode());
+                        if (response.getStatusLine().getStatusCode() == 200) {
+                            try {
+                                JSONObject jSONObject = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
+                                JSONArray jSONArray = jSONObject.getJSONArray("items");
+                                for (byte b = 0; b < jSONArray.length(); b++) {
+                                    JSONObject jSONObject1 = jSONArray.getJSONObject(b);
+                                    param1Boolean = jSONObject1.getBoolean("success");
+                                    String str = jSONObject1.getString("gasCynNumber");
+                                    RefoundDetail refoundDetail = m_BottlesMapKP.get(str);
+                                    if (refoundDetail.note == null) {
+                                        String str1 = new String();
+                                        refoundDetail.note = str1;
+                                    }
+                                    refoundDetail.note = jSONObject1.getString("note");
+                                    if (param1Boolean) {
+                                        JSONObject jSONObject2 = jSONObject1.getJSONObject("gasRefoundDetail");
+                                        jSONObject2.getString("orderSn");
+                                        DoubleCast(Double.valueOf(jSONObject2.getDouble("dealPrice")));
+                                        jSONObject2.getString("prevOrder");
+                                        jSONObject2.getString("prevGoodsCode");
+                                        refoundDetail.isOK = true;
+                                        refoundDetail.kp_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("refoundWeight")));
+                                        refoundDetail.tare_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("tareWeight")));
+                                        refoundDetail.canqi_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("remainGas")));
+                                        refoundDetail.chongzhuang_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("standWeight")));
+                                        refoundDetail.original_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("dealPrice")));
+                                        refoundDetail.gas_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("unitPrice")));
+                                        refoundDetail.canqi_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("refoundSum")));
+                                        refoundDetail.forceCaculate = jSONObject2.getBoolean("forceCaculate");
+                                    } else {
+                                        refoundDetail.isOK = false;
+                                    }
+                                    m_BottlesMapKP.put(str, refoundDetail);
+                                }
+                                refleshBottlesMapKP();
+                                refleshPayStatus();
+                            } catch (JSONException jSONException) {
+                                Toast.makeText(TrayOrderDealActivity.this, "异常" + jSONException.toString() + jSONException.getMessage(), Toast.LENGTH_LONG).show();
+                            } catch (IOException iOException) {
+                                Toast.makeText(TrayOrderDealActivity.this, "异常" + iOException.toString() + iOException.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                            return;
+                        }
+                        refleshBottlesMapKP();
+                        refleshPayStatus();
+                        Toast.makeText(TrayOrderDealActivity.this, getResponseMessage((HttpResponse) param1Object), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    Toast.makeText(TrayOrderDealActivity.this, "请求超时，请价差网络", Toast.LENGTH_LONG).show();
+                    return;
                 }
-                //                Logger.e("OrderCalculate: "+response.body().string());
-                //                Gson gson = new Gson();
-                //                Data_Caculate data_caculate = gson.fromJson(response.body().string(), Data_Caculate.class);
-                //                for (byte b = 0; b < data_caculate.getItems().size(); b++) {
-                //                    Data_Caculate.ItemsBean itemsBean = data_caculate.getItems().get(b);
-                //                    param1Boolean = jSONObject1.getBoolean("success");
-                //                    String str = jSONObject1.getString("gasCynNumber");
-                //                    param1Object = m_BottlesMapKP.get(str);
-                //                    if (((RefoundDetail)param1Object).note == null) {
-                //                      String str1 = new String();
-                //                      this();
-                //                      ((RefoundDetail)param1Object).note = str1;
-                //                    }
-                //                    ((RefoundDetail)param1Object).note = jSONObject1.getString("note");
-                //                    if (param1Boolean) {
-                //                      JSONObject jSONObject2 = jSONObject1.getJSONObject("gasRefoundDetail");
-                //                      jSONObject2.getString("orderSn");
-                //                      DoubleCast(Double.valueOf(jSONObject2.getDouble("dealPrice")));
-                //                      jSONObject2.getString("prevOrder");
-                //                      jSONObject2.getString("prevGoodsCode");
-                //                      ((RefoundDetail)param1Object).isOK = true;
-                //                      ((RefoundDetail)param1Object).kp_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("refoundWeight")));
-                //                      ((RefoundDetail)param1Object).tare_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("tareWeight")));
-                //                      ((RefoundDetail)param1Object).canqi_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("remainGas")));
-                //                      ((RefoundDetail)param1Object).chongzhuang_weight = DoubleCast(Double.valueOf(jSONObject2.getDouble("standWeight")));
-                //                      ((RefoundDetail)param1Object).original_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("dealPrice")));
-                //                      ((RefoundDetail)param1Object).gas_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("unitPrice")));
-                //                      ((RefoundDetail)param1Object).canqi_price = DoubleCast(Double.valueOf(jSONObject2.getDouble("refoundSum")));
-                //                      ((RefoundDetail)param1Object).forceCaculate = jSONObject2.getBoolean("forceCaculate");
-                //                    } else {
-                //                      ((RefoundDetail)param1Object).isOK = false;
-                //                    }
-                //                    m_BottlesMapKP.put(str, param1Object);
-                //                }
-                //try {
-                //  JSONObject jSONObject = new JSONObject();
-                //  this(EntityUtils.toString(param1Object.getEntity(), "UTF-8"));
-                //  JSONArray jSONArray = jSONObject.getJSONArray("items");
-                //  for (byte b = 0; b < jSONArray.length(); b++) {
-                //    JSONObject jSONObject1 = jSONArray.getJSONObject(b);
-
-                //  }
-                //  refleshBottlesMapKP();
-                //  refleshPayStatus();
-                //} catch (JSONException jSONException) {
-                //  Toast.makeText(TrayOrderDealActivity.this, "异常" + jSONException.toString() + jSONException.getMessage(), 1).show();
-                //} catch (IOException iOException) {
-                //  Toast.makeText(TrayOrderDealActivity.this, "异常" + iOException.toString() + iOException.getMessage(), 1).show();
-                //}
+                Toast.makeText(TrayOrderDealActivity.this, "网络未连接", Toast.LENGTH_LONG).show();
             }
-        });
+        }, netRequestConstant);
     }
 
     private void PayOnScan() {
@@ -458,27 +456,27 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
     }
 
     private void getRefoundNeededParams(final String bottleCodeTemp) {
-//        final View layout = getLayoutInflater().inflate(2131361918, null);
-//        AlertDialog.Builder builder = (new AlertDialog.Builder(this)).setTitle("请输入").setIcon(2131165392).setView(view).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//              public void onClick(DialogInterface param1DialogInterface, int param1Int) {
-//                EditText editText1 = (EditText)layout.findViewById(2131230847);
-//                EditText editText2 = (EditText)layout.findViewById(2131230837);
-//                String str1 = editText1.getText().toString();
-//                String str2 = editText2.getText().toString();
-//                TrayOrderDealActivity.access$902(TrayOrderDealActivity.this, str2);
-//                if (str1.length() == 0 || str2.length() == 0) {
-//                  Toast.makeText(TrayOrderDealActivity.this, "输入有误，请重新输入！", 1).show();
-//                  return;
-//                }
-//                RefoundDetail refoundDetail = (RefoundDetail)m_BottlesMapKP.get(bottleCodeTemp);
-//                refoundDetail.original_price = str1;
-//                refoundDetail.chongzhuang_weight = str2;
-//                m_BottlesMapKP.put(bottleCodeTemp, refoundDetail);
-//                refleshBottlesMapKP();
-//              }
-//            });
-//        builder.setCancelable(false);
-//        builder.show();
+        final View layout = getLayoutInflater().inflate(R.layout.upload_refound_params, null);
+        AlertDialog.Builder builder = (new AlertDialog.Builder(this)).setTitle("请输入").setIcon(R.drawable.icon_bottle).setView(layout).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+              public void onClick(DialogInterface param1DialogInterface, int param1Int) {
+                EditText editText1 = (EditText)layout.findViewById(R.id.input_originalPrice);
+                EditText editText2 = (EditText)layout.findViewById(R.id.input_chongzhuangWeight);
+                String str1 = editText1.getText().toString();
+                String str2 = editText2.getText().toString();
+                chongzhuang = str2;
+                if (str1.length() == 0 || str2.length() == 0) {
+                  Toast.makeText(TrayOrderDealActivity.this, "输入有误，请重新输入！", Toast.LENGTH_LONG).show();
+                  return;
+                }
+                RefoundDetail refoundDetail = (RefoundDetail)m_BottlesMapKP.get(bottleCodeTemp);
+                refoundDetail.original_price = str1;
+                refoundDetail.chongzhuang_weight = str2;
+                m_BottlesMapKP.put(bottleCodeTemp, refoundDetail);
+                refleshBottlesMapKP();
+              }
+            });
+        builder.setCancelable(false);
+        builder.show();
     }
 
     private String getResponseMessage(HttpResponse paramHttpResponse) {
@@ -684,7 +682,6 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         appContext = (AppContext) getApplicationContext();
         m_deliveryUser = appContext.getUser();
         GetDepLeader();
-        Logger.e("size = " + m_BottlesMapKP.size());
         if (m_BottlesMapKP.size() != 0) {
             OrderCalculate();
         } else {
@@ -693,8 +690,8 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         ListView listView = m_listView_kp;
         AdapterView.OnItemLongClickListener onItemLongClickListener = new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
-                String str = ((TextView) param1View.findViewById(R.id.textview_SSFee)).getText().toString();//这个id不太确定
-                if ((m_BottlesMapKP.get(str)).isOK) {
+                String str = ((TextView) param1View.findViewById(R.id.items_number)).getText().toString();//这个id不太确定
+                if (m_BottlesMapKP.get(str).isOK) {
                     Toast.makeText(TrayOrderDealActivity.this, "计算完成，无需干预！", Toast.LENGTH_SHORT).show();
                     return true;
                 }

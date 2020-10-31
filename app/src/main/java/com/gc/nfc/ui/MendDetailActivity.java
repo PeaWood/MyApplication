@@ -1,14 +1,11 @@
 package com.gc.nfc.ui;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,7 +16,6 @@ import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +25,28 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.dk.bleNfc.BleManager.BleManager;
+import com.dk.bleNfc.BleManager.Scanner;
+import com.dk.bleNfc.BleManager.ScannerCallback;
+import com.dk.bleNfc.BleNfcDeviceService;
+import com.dk.bleNfc.DeviceManager.BleNfcDevice;
+import com.dk.bleNfc.DeviceManager.DeviceManagerCallback;
+import com.dk.bleNfc.Exception.CardNoResponseException;
+import com.dk.bleNfc.Exception.DeviceNoResponseException;
+import com.dk.bleNfc.Tool.StringTool;
+import com.dk.bleNfc.card.Ntag21x;
+import com.gc.nfc.R;
+import com.gc.nfc.app.AppContext;
+import com.gc.nfc.domain.User;
+
+import org.apache.http.HttpResponse;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 //import com.amap.api.maps.model.LatLng;
 //import com.amap.api.maps.model.Poi;
 //import com.amap.api.navi.AMapNavi;
@@ -37,33 +55,6 @@ import android.widget.Toast;
 //import com.amap.api.navi.AmapNaviType;
 //import com.amap.api.navi.INaviInfoCallback;
 //import com.amap.api.navi.model.AMapNaviLocation;
-
-import com.dk.bleNfc.BleManager.BleManager;
-import com.dk.bleNfc.BleManager.Scanner;
-import com.dk.bleNfc.BleManager.ScannerCallback;
-import com.dk.bleNfc.BleNfcDeviceService;
-import com.dk.bleNfc.DeviceManager.BleNfcDevice;
-import com.dk.bleNfc.DeviceManager.ComByteManager;
-import com.dk.bleNfc.DeviceManager.DeviceManager;
-import com.dk.bleNfc.DeviceManager.DeviceManagerCallback;
-import com.dk.bleNfc.Exception.CardNoResponseException;
-import com.dk.bleNfc.Exception.DeviceNoResponseException;
-import com.dk.bleNfc.Tool.StringTool;
-import com.dk.bleNfc.card.Mifare;
-import com.dk.bleNfc.card.Ntag21x;
-import com.gc.nfc.R;
-import com.gc.nfc.app.AppContext;
-import com.gc.nfc.common.NetRequestConstant;
-import com.gc.nfc.domain.User;
-import com.gc.nfc.interfaces.Netcallback;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 //INaviInfoCallback
 public class MendDetailActivity extends BaseActivity implements View.OnClickListener{
     private AppContext appContext;
