@@ -1,10 +1,7 @@
 package com.gc.nfc.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.AbsListView;
@@ -24,8 +21,6 @@ import com.gc.nfc.http.OkHttpUtil;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;

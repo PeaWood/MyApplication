@@ -33,13 +33,6 @@ import okhttp3.Response;
 import q.rorbin.badgeview.Badge;
 import q.rorbin.badgeview.QBadgeView;
 
-//import com.gc.nfc.R;
-//import com.gc.nfc.app.AppContext;
-//import com.gc.nfc.common.NetRequestConstant;
-//import com.gc.nfc.domain.User;
-//import com.gc.nfc.interfaces.Netcallback;
-//import com.gc.nfc.utils.SharedPreferencesHelper;
-
 public class MineActivity extends BaseActivity implements View.OnClickListener {
     Badge badgeMends;
     Badge badgeSecurity;

@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.domain.Data_Repair;
-import com.gc.nfc.domain.Data_TaskOrders;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
@@ -31,11 +30,6 @@ import java.util.Map;
 
 import okhttp3.Request;
 import okhttp3.Response;
-
-//import com.gc.nfc.app.AppContext;
-//import com.gc.nfc.common.NetRequestConstant;
-//import com.gc.nfc.domain.User;
-//import com.gc.nfc.interfaces.Netcallback;
 
 public class MyCheckActivity extends BaseActivity implements AbsListView.OnScrollListener {
     public static JSONArray m_checkOrderListJson;

@@ -4,15 +4,12 @@ package com.gc.nfc.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
 import android.support.v4.content.ContextCompat;
-import android.widget.Toast;
 
 import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.http.ThreadPool;
@@ -20,12 +17,6 @@ import com.gc.nfc.interfaces.Netcallback;
 import com.gc.nfc.utils.NetUtil;
 
 import org.apache.http.HttpResponse;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * Created by lenovo on 2020/9/23

@@ -2,16 +2,12 @@ package com.gc.nfc.ui;
 
 import android.app.AlertDialog;
 import android.app.TabActivity;
-import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.StrictMode;
 import android.support.annotation.RequiresApi;

@@ -5,7 +5,6 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -17,17 +16,15 @@ import android.widget.Toast;
 
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
+import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_User;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
-import com.gc.nfc.utils.JellyInterpolator;
-
-import com.gc.nfc.common.NetRequestConstant;
-import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.interfaces.Netcallback;
+import com.gc.nfc.utils.JellyInterpolator;
 import com.gc.nfc.utils.NetUtil;
-
 import com.gc.nfc.utils.SharedPreferencesHelper;
 import com.google.gson.Gson;
 

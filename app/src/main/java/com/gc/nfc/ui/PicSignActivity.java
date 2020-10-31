@@ -10,9 +10,7 @@ import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.se.omapi.Session;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +24,7 @@ import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.amap.api.maps.model.LatLng;
@@ -35,10 +34,14 @@ import com.gc.nfc.app.AppContext;
 import com.gc.nfc.databinding.ActivitySignBinding;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.utils.NetUtil;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -51,9 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.UUID;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class PicSignActivity extends AppCompatActivity {
   public static String m_orderPayStatus;
