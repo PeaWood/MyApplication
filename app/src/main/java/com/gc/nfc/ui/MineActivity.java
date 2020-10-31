@@ -168,7 +168,7 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.lL_recycle:
                 //退换货
-//                startActivity(new Intent(this, BottleRecycleActivity.class));
+                startActivity(new Intent(this, BottleRecycleActivity.class));
                 break;
             case R.id.lL_mapView:
                 //查看地图
