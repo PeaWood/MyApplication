@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -56,6 +57,7 @@ import com.gc.nfc.interfaces.Netcallback;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -213,8 +215,8 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
   private final ServiceConnection mServiceConnection = new ServiceConnection() {
       public void onServiceConnected(ComponentName param1ComponentName, IBinder param1IBinder) {
         BleNfcDeviceService bleNfcDeviceService = ((BleNfcDeviceService.LocalBinder)param1IBinder).getService();
-//        CheckDetailActivity.access$102(CheckDetailActivity.this, bleNfcDeviceService.bleNfcDevice);
-//        CheckDetailActivity.access$202(CheckDetailActivity.this, bleNfcDeviceService.scanner);
+        bleNfcDevice = bleNfcDeviceService.bleNfcDevice;
+        mScanner = bleNfcDeviceService.scanner;
         bleNfcDeviceService.setDeviceManagerCallback(deviceManagerCallback);
         bleNfcDeviceService.setScannerCallback(scannerCallback);
         searchNearestBleDevice();
@@ -290,17 +292,17 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
   private ProgressDialog readWriteDialog = null;
   
   private ScannerCallback scannerCallback = new ScannerCallback() {
-      public void onReceiveScanDevice(BluetoothDevice param1BluetoothDevice, int param1Int, byte[] param1ArrayOfbyte) {
-        super.onReceiveScanDevice(param1BluetoothDevice, param1Int, param1ArrayOfbyte);
+      public void onReceiveScanDevice(BluetoothDevice device, int param1Int, byte[] param1ArrayOfbyte) {
+        super.onReceiveScanDevice(device, param1Int, param1ArrayOfbyte);
         if (Build.VERSION.SDK_INT >= 21)
-          System.out.println("Activity搜到设备：" + param1BluetoothDevice.getName() + " 信号强度：" + param1Int + " scanRecord：" + StringTool.byteHexToSting(param1ArrayOfbyte)); 
+          System.out.println("Activity搜到设备：" + device.getName() + " 信号强度：" + param1Int + " scanRecord：" + StringTool.byteHexToSting(param1ArrayOfbyte));
         if (param1ArrayOfbyte != null && StringTool.byteHexToSting(param1ArrayOfbyte).contains("017f5450") && param1Int >= -55) {
           handlerBlue.sendEmptyMessage(0);
           if (mNearestBle != null) {
             if (param1Int > lastRssi) {
               mNearestBleLock.lock();
               try {
-//                CheckDetailActivity.access$702(CheckDetailActivity.this, param1BluetoothDevice);
+                mNearestBle = device;
                 return;
               } finally {
                 mNearestBleLock.unlock();
@@ -310,7 +312,7 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
           } 
           mNearestBleLock.lock();
           try {
-//            CheckDetailActivity.access$702(CheckDetailActivity.this, param1BluetoothDevice);
+            mNearestBle = device;
             mNearestBleLock.unlock();
             return;
           } finally {
@@ -331,118 +333,116 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
   TextView tv;
   
   private void GetDeviceSatus() {
-//    NetRequestConstant netRequestConstant = new NetRequestConstant();
-//    netRequestConstant.setType(HttpRequestType.GET);
-//    netRequestConstant.context = this;
-//    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-//    if (this.m_iDeviceType == 0 || this.m_iDeviceType == 3) {
-//      netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/GasCynTray";
-//      hashMap.put("number", this.m_deviceNumber);
-//    } else {
-//      netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Olfactometer";
-//      hashMap.put("code", this.m_deviceNumber);
-//    }
-//    netRequestConstant.setParams(hashMap);
-//    getServer(new Netcallback() {
-//          public void preccess(Object param1Object, boolean param1Boolean) {
-//            if (param1Boolean) {
-//              param1Object = param1Object;
-//              if (param1Object != null) {
-//                if (param1Object.getStatusLine().getStatusCode() == 200) {
-//                  try {
-//                    JSONObject jSONObject = new JSONObject();
-//                    this(EntityUtils.toString(param1Object.getEntity(), "UTF-8"));
-//                    param1Object = jSONObject.getJSONArray("items");
-//                    if (param1Object.length() == 1) {
-//                      String str = param1Object.getJSONObject(0).getString("uploadTime");
-//                      if (str.length() == 0) {
-//                        m_imageViewDeviceStatus.setImageResource(2131165431);
-//                        return;
-//                      }
-//                      param1Object = new Date();
-//                      SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-d HH:mm:ss");
-//                      Date date = simpleDateFormat.parse(str);
-//                      if (getDiffSecond((Date)param1Object, date) > 86400L) {
-//                        m_imageViewDeviceStatus.setImageResource(2131165431);
-//                        return;
-//                      }
-//                      m_imageViewDeviceStatus.setImageResource(2131165432);
-//                      return;
-//                    }
-//                    showToast("设备不存在！");
-//                  } catch (JSONException jSONException) {
-//                    Toast.makeText(CheckDetailActivity.this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
-//                  } catch (IOException iOException) {
-//                    Toast.makeText(CheckDetailActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
-//                  } catch (ParseException parseException) {
-//                    Toast.makeText(CheckDetailActivity.this, "异常" + parseException.toString(), Toast.LENGTH_LONG).show();
-//                  }
-//                  return;
-//                }
-//                Toast.makeText(CheckDetailActivity.this, "用户卡查询失败", Toast.LENGTH_LONG).show();
-//                return;
-//              }
-//              Toast.makeText(CheckDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
-//              return;
-//            }
-//            Toast.makeText(CheckDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
-//          }
-//        }netRequestConstant);
+    NetRequestConstant netRequestConstant = new NetRequestConstant();
+    netRequestConstant.setType(HttpRequestType.GET);
+    netRequestConstant.context = this;
+    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
+    if (this.m_iDeviceType == 0 || this.m_iDeviceType == 3) {
+      netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/GasCynTray";
+      hashMap.put("number", this.m_deviceNumber);
+    } else {
+      netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Olfactometer";
+      hashMap.put("code", this.m_deviceNumber);
+    }
+    netRequestConstant.setParams(hashMap);
+    getServer(new Netcallback() {
+          public void preccess(Object param1Object, boolean param1Boolean) {
+            if (param1Boolean) {
+              HttpResponse response=(HttpResponse)param1Object;
+              if (param1Object != null) {
+                if (response.getStatusLine().getStatusCode() == 200) {
+                  try {
+                    JSONObject jSONObject = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
+                    JSONArray items = jSONObject.getJSONArray("items");
+                    if (items.length() == 1) {
+                      String str = items.getJSONObject(0).getString("uploadTime");
+                      if (str.length() == 0) {
+                        m_imageViewDeviceStatus.setImageResource(R.drawable.msg_error);
+                        return;
+                      }
+                      param1Object = new Date();
+                      SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-d HH:mm:ss");
+                      Date date = simpleDateFormat.parse(str);
+                      if (getDiffSecond((Date)param1Object, date) > 86400L) {
+                        m_imageViewDeviceStatus.setImageResource(R.drawable.msg_info);
+                        return;
+                      }
+                      m_imageViewDeviceStatus.setImageResource(R.drawable.msg_info);
+                      return;
+                    }
+                    showToast("设备不存在！");
+                  } catch (JSONException jSONException) {
+                    Toast.makeText(CheckDetailActivity.this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
+                  } catch (IOException iOException) {
+                    Toast.makeText(CheckDetailActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
+                  } catch (ParseException parseException) {
+                    Toast.makeText(CheckDetailActivity.this, "异常" + parseException.toString(), Toast.LENGTH_LONG).show();
+                  }
+                  return;
+                }
+                Toast.makeText(CheckDetailActivity.this, "用户卡查询失败", Toast.LENGTH_LONG).show();
+                return;
+              }
+              Toast.makeText(CheckDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+              return;
+            }
+            Toast.makeText(CheckDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+          }
+        },netRequestConstant);
   }
   
   private void GetUserCard() {
-//    if (this.m_currentCustomerId == null) {
-//      showToast("客户资料被删除！");
-//      return;
-//    }
-//    NetRequestConstant netRequestConstant = new NetRequestConstant();
-//    netRequestConstant.setType(HttpRequestType.GET);
-//    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/UserCard";
-//    netRequestConstant.context = this;
-//    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-//    hashMap.put("userId", this.m_currentCustomerId);
-//    hashMap.put("status", Integer.valueOf(1));
-//    netRequestConstant.setParams(hashMap);
-//    getServer(new Netcallback() {
-//          public void preccess(Object param1Object, boolean param1Boolean) {
-//            if (param1Boolean) {
-//              param1Object = param1Object;
-//              if (param1Object != null) {
-//                if (param1Object.getStatusLine().getStatusCode() == 200) {
-//                  try {
-//                    JSONObject jSONObject = new JSONObject();
-//                    this(EntityUtils.toString(param1Object.getEntity(), "UTF-8"));
-//                    param1Object = jSONObject.getJSONArray("items");
-//                    if (param1Object.length() == 1) {
-//                      CheckDetailActivity.access$1502(CheckDetailActivity.this, param1Object.getJSONObject(0).getString("number"));
-//                      return;
-//                    }
-//                    CheckDetailActivity.access$1502(CheckDetailActivity.this, (String)null);
-//                    showToast("该用户未绑定用户卡");
-//                  } catch (JSONException jSONException) {
-//                    Toast.makeText(CheckDetailActivity.this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
-//                  } catch (IOException iOException) {
-//                    Toast.makeText(CheckDetailActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
-//                  }
-//                  return;
-//                }
-//                Toast.makeText(CheckDetailActivity.this, "用户卡查询失败", Toast.LENGTH_LONG).show();
-//                return;
-//              }
-//              Toast.makeText(CheckDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
-//              return;
-//            }
-//            Toast.makeText(CheckDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
-//          }
-//        }netRequestConstant);
+    if (this.m_currentCustomerId == null) {
+      showToast("客户资料被删除！");
+      return;
+    }
+    NetRequestConstant netRequestConstant = new NetRequestConstant();
+    netRequestConstant.setType(HttpRequestType.GET);
+    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/UserCard";
+    netRequestConstant.context = this;
+    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
+    hashMap.put("userId", this.m_currentCustomerId);
+    hashMap.put("status", Integer.valueOf(1));
+    netRequestConstant.setParams(hashMap);
+    getServer(new Netcallback() {
+          public void preccess(Object param1Object, boolean param1Boolean) {
+            if (param1Boolean) {
+              HttpResponse response=(HttpResponse)param1Object;
+              if (param1Object != null) {
+                if (response.getStatusLine().getStatusCode() == 200) {
+                  try {
+                    JSONObject jSONObject = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
+                    JSONArray items = jSONObject.getJSONArray("items");
+                    if (items.length() == 1) {
+                      m_handedUserCard = items.getJSONObject(0).getString("number");
+                      return;
+                    }
+                    m_handedUserCard= (String)null;
+                    showToast("该用户未绑定用户卡");
+                  } catch (JSONException jSONException) {
+                    Toast.makeText(CheckDetailActivity.this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
+                  } catch (IOException iOException) {
+                    Toast.makeText(CheckDetailActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
+                  }
+                  return;
+                }
+                Toast.makeText(CheckDetailActivity.this, "用户卡查询失败", Toast.LENGTH_LONG).show();
+                return;
+              }
+              Toast.makeText(CheckDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+              return;
+            }
+            Toast.makeText(CheckDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+          }
+        },netRequestConstant);
   }
   
   private void blueDeviceInitial() {
-//    this.msgText = (TextView)findViewById(2131230953);
-//    this.m_imageViewSearchBlue = (ImageView)findViewById(2131230818);
-//    this.m_imageViewSearchBlue.setOnClickListener(new StartSearchButtonListener());
-//    this.msgBuffer = new StringBuffer();
-//    bindService(new Intent(this, BleNfcDeviceService.class), this.mServiceConnection, 1);
+    this.msgText = (TextView)findViewById(R.id.msgText);
+    this.m_imageViewSearchBlue = (ImageView)findViewById(R.id.imageView_search);
+    this.m_imageViewSearchBlue.setOnClickListener(new StartSearchButtonListener());
+    this.msgBuffer = new StringBuffer();
+    bindService(new Intent(this, BleNfcDeviceService.class), this.mServiceConnection, Context.BIND_AUTO_CREATE);
   }
   
   private long getDiffSecond(Date paramDate1, Date paramDate2) {
@@ -462,81 +462,79 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
   }
   
   private void orderServiceQualityShow() {
-//    GetUserCard();
-//    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//    View view = View.inflate(this, 2131361920, null);
-//    builder.setIcon(2131165405);
-//    builder.setTitle("用户卡评价(" + this.m_handedUserCard + ")");
-//    AlertDialog alertDialog = builder.create();
-//    alertDialog.setView(view);
-//    alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//          public void onDismiss(DialogInterface param1DialogInterface) {
-//            CheckDetailActivity.access$1702(CheckDetailActivity.this, false);
-//          }
-//        });
-//    alertDialog.show();
-//    Window window = alertDialog.getWindow();
-//    window.setGravity(17);
-//    window.setLayout(-1, -2);
-//    this.m_orderServiceQualityShowFlag = true;
+    GetUserCard();
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    View view = View.inflate(this, R.layout.user_evaluate, null);
+    builder.setIcon(R.drawable.icon_logo);
+    builder.setTitle("用户卡评价(" + this.m_handedUserCard + ")");
+    AlertDialog alertDialog = builder.create();
+    alertDialog.setView(view);
+    alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+          public void onDismiss(DialogInterface param1DialogInterface) {
+            m_orderServiceQualityShowFlag=false;
+          }
+        });
+    alertDialog.show();
+    Window window = alertDialog.getWindow();
+    window.setGravity(17);
+    window.setLayout(-1, -2);
+    this.m_orderServiceQualityShowFlag = true;
   }
   
   private void orderServiceQualityUpload(boolean paramBoolean) {
-//    NetRequestConstant netRequestConstant = new NetRequestConstant();
-//    netRequestConstant.setType(HttpRequestType.PUT);
-//    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Repair/" + this.m_businessKey;
-//    netRequestConstant.context = this;
-//    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-//    if (paramBoolean) {
-//      hashMap.put("processStatus", "PTSolved");
-//      int i = this.m_spinnerCheckType.getSelectedItemPosition();
-//      (new String[5])[0] = "BadWarnDevice";
-//      (new String[5])[1] = "BadWarnRestart";
-//      (new String[5])[2] = "LackWaterWarn";
-//      (new String[5])[3] = "NouseWarn";
-//      (new String[5])[4] = "OtherWarn";
-//      hashMap.put("repairResultType", (new String[5])[i]);
-//      if (this.m_editTextPs.getText() != null)
-//        hashMap.put("resloveInfo", this.m_editTextPs.getText().toString());
-//      netRequestConstant.setBody(hashMap);
-//      getServer(new Netcallback() {
-//            public void preccess(Object param1Object, boolean param1Boolean) {
-//              if (param1Boolean) {
-//                param1Object = param1Object;
-//                if (param1Object != null) {
-//                  if (param1Object.getStatusLine().getStatusCode() == 200) {
-//                    param1Object = Toast.makeText(CheckDetailActivity.this, "处理成功！", 1);
-//                    param1Object.setGravity(17, 0, 0);
-//                    param1Object.show();
-//                    MediaPlayer.create(CheckDetailActivity.this, 2131558403).start();
-//                    param1Object = new Intent(getApplicationContext(), MainlyActivity.class);
-//                    Bundle bundle = new Bundle();
-//                    bundle.putInt("switchTab", 2);
-//                    param1Object.putExtras(bundle);
-//                    startActivity((Intent)param1Object);
-//                    finish();
-//                    return;
-//                  }
-//                  if (param1Object.getStatusLine().getStatusCode() == 404) {
-//                    Toast.makeText(CheckDetailActivity.this, "巡检失败", Toast.LENGTH_LONG).show();
-//                    return;
-//                  }
-//                  if (param1Object.getStatusLine().getStatusCode() == 401) {
-//                    Toast.makeText(CheckDetailActivity.this, "鉴权失败，请重新登录" + param1Object.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
-//                    return;
-//                  }
-//                  Toast.makeText(CheckDetailActivity.this, "巡检失败" + param1Object.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
-//                  return;
-//                }
-//                Toast.makeText(CheckDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
-//                return;
-//              }
-//              Toast.makeText(CheckDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
-//            }
-//          }netRequestConstant);
-//      return;
-//    }
-//    showToast("客户不同意！");
+    NetRequestConstant netRequestConstant = new NetRequestConstant();
+    netRequestConstant.setType(HttpRequestType.PUT);
+    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Repair/" + this.m_businessKey;
+    netRequestConstant.context = this;
+    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
+    if (paramBoolean) {
+      hashMap.put("processStatus", "PTSolved");
+      int i = this.m_spinnerCheckType.getSelectedItemPosition();
+      (new String[5])[0] = "BadWarnDevice";
+      (new String[5])[1] = "BadWarnRestart";
+      (new String[5])[2] = "LackWaterWarn";
+      (new String[5])[3] = "NouseWarn";
+      (new String[5])[4] = "OtherWarn";
+      hashMap.put("repairResultType", (new String[5])[i]);
+      if (this.m_editTextPs.getText() != null)
+        hashMap.put("resloveInfo", this.m_editTextPs.getText().toString());
+      netRequestConstant.setBody(hashMap);
+      getServer(new Netcallback() {
+            public void preccess(Object param1Object, boolean param1Boolean) {
+              if (param1Boolean) {
+                HttpResponse response=(HttpResponse)param1Object;
+                if (param1Object != null) {
+                  if (response.getStatusLine().getStatusCode() == 200) {
+                    Toast.makeText(CheckDetailActivity.this, "处理成功！", Toast.LENGTH_LONG).show();
+                    MediaPlayer.create(CheckDetailActivity.this, 2131558403).start();
+                    Intent intent = new Intent(getApplicationContext(), MainlyActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("switchTab", 2);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                    finish();
+                    return;
+                  }
+                  if (response.getStatusLine().getStatusCode() == 404) {
+                    Toast.makeText(CheckDetailActivity.this, "巡检失败", Toast.LENGTH_LONG).show();
+                    return;
+                  }
+                  if (response.getStatusLine().getStatusCode() == 401) {
+                    Toast.makeText(CheckDetailActivity.this, "鉴权失败，请重新登录" + response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                    return;
+                  }
+                  Toast.makeText(CheckDetailActivity.this, "巡检失败" + response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                  return;
+                }
+                Toast.makeText(CheckDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+                return;
+              }
+              Toast.makeText(CheckDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+            }
+          },netRequestConstant);
+      return;
+    }
+    showToast("客户不同意！");
   }
   
   private boolean readWriteCardDemo(int paramInt) {
@@ -708,21 +706,21 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
   }
   
   public void callPhone(String paramString) {
-//    Intent intent1;
-//    if (ActivityCompat.checkSelfPermission(this, "android.permission.CALL_PHONE") != 0) {
-//      if (ActivityCompat.shouldShowRequestPermissionRationale(this, "android.permission.CALL_PHONE")) {
-//        Toast.makeText(this, "请授权！", Toast.LENGTH_LONG).show();
-//        intent1 = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
-//        intent1.setData(Uri.fromParts("package", getPackageName(), null));
-//        startActivity(intent1);
-//        return;
-//      }
-//      ActivityCompat.requestPermissions(this, new String[] { "android.permission.CALL_PHONE" }, 1);
-//      return;
-//    }
-//    Intent intent2 = new Intent("android.intent.action.CALL");
-//    intent2.setData(Uri.parse("tel:" + intent1));
-//    startActivity(intent2);
+    Intent intent1;
+    if (ActivityCompat.checkSelfPermission(this, "android.permission.CALL_PHONE") != 0) {
+      if (ActivityCompat.shouldShowRequestPermissionRationale(this, "android.permission.CALL_PHONE")) {
+        Toast.makeText(this, "请授权！", Toast.LENGTH_LONG).show();
+        intent1 = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
+        intent1.setData(Uri.fromParts("package", getPackageName(), null));
+        startActivity(intent1);
+        return;
+      }
+      ActivityCompat.requestPermissions(this, new String[] { "android.permission.CALL_PHONE" }, 1);
+      return;
+    }
+    Intent intent2 = new Intent("android.intent.action.CALL");
+    intent2.setData(Uri.parse("tel:" + paramString));
+    startActivity(intent2);
   }
   
   void init() {
@@ -773,28 +771,31 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
   
   public void onClick(View paramView) {
     switch (paramView.getId()) {
-      default:
-        return;
-      case 2131230765:
+      case R.id.button_next:
         if (m_orderStatus == 0)
-          getOrderOps(); 
-      case 2131230816:
+          getOrderOps();
+          break;
+      case R.id.imageView_nav:
         switchNavBar();
-      case 2131230812:
+        break;
+      case R.id.imageView_call:
         callPhone(m_customerPhone);
-      case 2131230814:
+        break;
+      case R.id.imageView_deviceReflesh:
         GetDeviceSatus();
-      case 2131230817:
+        break;
+      case R.id.imageView_pic:
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putString("fileFolder", "repair");
+        bundle.putString("fileNameHeader", m_businessKey);
+        bundle.putInt("MaxPicCount", 4);
+        intent.setClass(this, PicSelActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
         break;
     } 
-    Intent intent = new Intent();
-    Bundle bundle = new Bundle();
-    bundle.putString("fileFolder", "repair");
-    bundle.putString("fileNameHeader", m_businessKey);
-    bundle.putInt("MaxPicCount", 4);
-    intent.setClass(this, PicSelActivity.class);
-    intent.putExtras(bundle);
-    startActivity(intent);
+
   }
   
   protected void onCreate(Bundle paramBundle) {
@@ -805,7 +806,7 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
     super.onDestroy();
     if (readWriteDialog != null)
       readWriteDialog.dismiss();
-//    unbindService(mServiceConnection);
+    unbindService(mServiceConnection);
   }
   
   protected void onResume() {
