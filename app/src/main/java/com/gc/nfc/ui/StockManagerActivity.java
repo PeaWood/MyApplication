@@ -807,18 +807,19 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     for (byte b = 0; b < i; b++) {
       int j = paramString.charAt(b) - 48;
       if (b != i - 1 && j != 0) {
-        (new String[11])[0] = "十";
-        (new String[11])[1] = "百";
-        (new String[11])[2] = "千";
-        (new String[11])[3] = "万";
-        (new String[11])[4] = "十";
-        (new String[11])[5] = "百";
-        (new String[11])[6] = "千";
-        (new String[11])[7] = "亿";
-        (new String[11])[8] = "十";
-        (new String[11])[9] = "百";
-        (new String[11])[10] = "千";
-        str = str + arrayOfString[j] + (new String[11])[i - 2 - b];
+          String[] strings = new String[11];
+          strings[0] = "十";
+          strings[1] = "百";
+          strings[2] = "千";
+          strings[3] = "万";
+          strings[4] = "十";
+          strings[5] = "百";
+          strings[6] = "千";
+          strings[7] = "亿";
+          strings[8] = "十";
+          strings[9] = "百";
+          strings[10] = "千";
+          str = str + arrayOfString[j] + strings[i - 2 - b];
       } else {
         str = str + arrayOfString[j];
       } 

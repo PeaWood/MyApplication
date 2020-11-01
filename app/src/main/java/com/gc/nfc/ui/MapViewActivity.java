@@ -71,9 +71,12 @@ public class MapViewActivity extends BaseActivity {
                     Data_SysUsers.ItemsBean itemsBean = data_sysUsers.getItems().get(b);
                     String str1 = itemsBean.getUserId();
                     String str2 = itemsBean.getName();
-                    double d1 = itemsBean.getUserPosition().getLongitude();
-                    double d2 = itemsBean.getUserPosition().getLatitude();
-                    MapViewActivity.this.reflesh_makers(str1, str2, d1, d2);
+                    Data_SysUsers.ItemsBean.UserPositionBean userPosition = itemsBean.getUserPosition();
+                    if (userPosition != null) {
+                        double d1 = userPosition.getLongitude();
+                        double d2 = userPosition.getLatitude();
+                        MapViewActivity.this.reflesh_makers(str1, str2, d1, d2);
+                    }
                 }
             }
         });
