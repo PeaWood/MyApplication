@@ -3,9 +3,11 @@ package com.gc.nfc.ui;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Process;
@@ -46,51 +48,25 @@ import q.rorbin.badgeview.QBadgeView;
 //import com.gc.nfc.utils.OnePixelReceiver;
 
 public class MainlyActivity extends TabActivity implements View.OnClickListener {
-    private static final String MYCHECK_STRING = "MYCHECK_STRING";
-
-    private static final String MYORDERS_STRING = "MYORDERS_STRING";
-
-    private static final String MYSELF_STRING = "MYSELF_STRING";
-
     private static final String PROCESS_NAME = "com.gc.nfc";
-
-    private static final String VALIDORDERS_STRING = "VALIDORDERS_STRING";
-
     Badge badgeGrab;
-
     Badge badgeOrder;
-
     Badge badgeRepair;
-
     private long exitTime = 0L;
-
     private TabHost host;
-
     private ImageView img_mine;
-
     private ImageView img_mycheck;
-
     private ImageView img_myorders;
-
     private ImageView img_validorders;
-
     private LinearLayout linearlayout_mine;
-
     private LinearLayout linearlayout_mycheck;
-
     private LinearLayout linearlayout_myorders;
-
     private LinearLayout linearlayout_validorders;
-
     private JobScheduler mJobScheduler;
     private Intent m_IntentAmapServeice;
-
     private TextView text_mine;
-
     private TextView text_mycheck;
-
     private TextView text_myorders;
-
     private TextView text_validorders;
 
     private void addAlias(String paramString) {
@@ -180,16 +156,6 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
             return false;
         }
         return super.dispatchKeyEvent(paramKeyEvent);
-    }
-
-    public void exit() {
-        if (System.currentTimeMillis() - this.exitTime > 2000L) {
-            Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
-            this.exitTime = System.currentTimeMillis();
-            return;
-        }
-        finish();
-        System.exit(0);
     }
 
     public void initView() {
@@ -312,13 +278,13 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
                 this.host.setCurrentTabByTag("MYSELF_STRING");
             }
         }
-        //    this.mOnepxReceiver = new OnePixelReceiver();
-        //    IntentFilter intentFilter = new IntentFilter();
-        //    intentFilter.addAction("android.intent.action.SCREEN_OFF");
-        //    intentFilter.addAction("android.intent.action.SCREEN_ON");
-        //    intentFilter.addAction("android.intent.action.USER_PRESENT");
-        //    registerReceiver((BroadcastReceiver)this.mOnepxReceiver, intentFilter);
-        //    startJobScheduler(this.m_userId);
+        //this.mOnepxReceiver = new OnePixelReceiver();
+        //IntentFilter intentFilter = new IntentFilter();
+        //intentFilter.addAction("android.intent.action.SCREEN_OFF");
+        //intentFilter.addAction("android.intent.action.SCREEN_ON");
+        //intentFilter.addAction("android.intent.action.USER_PRESENT");
+        //registerReceiver((BroadcastReceiver)this.mOnepxReceiver, intentFilter);
+        //startJobScheduler(this.m_userId);
         initialCloudPushService();
     }
 
