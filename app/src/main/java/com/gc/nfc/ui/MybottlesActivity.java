@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -20,8 +19,6 @@ import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
 import com.google.gson.Gson;
 
-import org.json.JSONArray;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,24 +28,16 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MybottlesActivity extends BaseActivity implements View.OnClickListener, AbsListView.OnScrollListener {
-    public static JSONArray m_bottlesListJson;
     private TextView m_totalCountTextView;
     private String m_userId;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
     private ImageView imageView;
-    private void switchActivity(int paramInt) {
-    }
 
     void init() {
         requestWindowFeature(1);
         setContentView(R.layout.activity_my_bottles);
         listView = findViewById(R.id.listview);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
-                switchActivity(param1Int);
-            }
-        });
         imageView = (ImageView) findViewById(R.id.img_back);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
