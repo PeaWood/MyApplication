@@ -1,5 +1,6 @@
 package com.gc.nfc.ui;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,6 +34,7 @@ import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
+import com.gc.nfc.http.OkHttpUtil;
 import com.gc.nfc.interfaces.Netcallback;
 
 import org.apache.http.HttpResponse;
@@ -53,6 +55,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class OrderDealActivity extends BaseActivity implements View.OnClickListener, AbsListView.OnScrollListener {
     public static String m_orderPayStatus;
 
@@ -68,20 +73,20 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
 
     private SimpleDateFormat formatter;
 
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         public void handleMessage(Message param1Message) {
             super.handleMessage(param1Message);
             switch (param1Message.what) {
-                default:
-                    return;
                 case 257:
+                    if (swipeRefreshLayout.isRefreshing())
+                        swipeRefreshLayout.setRefreshing(false);
                     break;
             }
-            if (swipeRefreshLayout.isRefreshing())
-                swipeRefreshLayout.setRefreshing(false);
         }
     };
 
+    @SuppressLint("HandlerLeak")
     private Handler handlerDelayCommit = new Handler() {
         public void handleMessage(Message param1Message) {
             if (m_depLeader == null) {
@@ -203,6 +208,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
                         if (response.getStatusLine().getStatusCode() == 200) {
                             try {
                                 JSONObject jSONObject = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
+                                Logger.e("GetDepLeader : " + jSONObject.toString());
                                 JSONArray jsonArray = jSONObject.getJSONArray("items");
                                 for (byte b = 0; b < jsonArray.length(); b++) {
                                     if (b == 0) {
@@ -332,11 +338,17 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
         hashMap.put("actualAmount", m_yjss);
         hashMap.put("electDepositDetails", detail);
         netRequestConstant.setBody(hashMap);
+        netRequestConstant.isBodyJsonArray = true;
         getServer(new Netcallback() {
             public void preccess(Object param1Object, boolean param1Boolean) {
                 if (param1Boolean) {
                     HttpResponse response = (HttpResponse) param1Object;
                     if (response != null) {
+                        try {
+                            Logger.e("押金单 ： "+EntityUtils.toString(response.getEntity(), "UTF-8"));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         if (response.getStatusLine().getStatusCode() == 201) {
                             handlerDelayCommit.sendEmptyMessageDelayed(0, 1000L);
                             return;
@@ -439,7 +451,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
                             Bundle bundle = new Bundle();
                             bundle.putInt("switchTab", 1);
                             intent.putExtras(bundle);
-                            startActivity((Intent) param1Object);
+                            startActivity(intent);
                             finish();
                             return;
                         }
@@ -460,6 +472,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             JSONObject jSONObject = m_OrderJson;
             LatLng latLng = new LatLng(jSONObject.getDouble("recvLatitude"), jSONObject.getDouble("recvLongitude"));
             m_recvLocation = latLng;
+            Logger.e("getRecvLocation");
         } catch (JSONException jSONException) {
             Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
         }
@@ -532,16 +545,20 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
 
     private void setOrderAppendInfo() {
         try {
+            Logger.e("setOrderAppendInfo");
             String str = m_OrderJson.getJSONObject("payStatus").get("name").toString();
             m_textViewPayStatus.setText(str);
+            Logger.e("setOrderAppendInfo    " + str);
         } catch (JSONException jSONException) {
             Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void setOrderDetailsInfo() {
+        Logger.e("setOrderDetailsInfo");
         try {
             JSONArray jSONArray = m_OrderJson.getJSONArray("orderDetailList");
+            detail = jSONArray;
             ArrayList arrayList = new ArrayList();
             for (byte b = 0; b < jSONArray.length(); b++) {
                 JSONObject jSONObject1 = jSONArray.getJSONObject(b);
@@ -555,12 +572,14 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
                 arrayList.add(hashMap);
             }
             new SimpleAdapter(this, arrayList, R.layout.bottle_detail_items, new String[]{"goodName", "goodQuantity", "dealPrice"}, new int[]{R.id.items_goodName, R.id.items_goodQuantity, R.id.items_dealPrice});
+            Logger.e("setOrderDetailsInfo finish");
         } catch (JSONException jSONException) {
             Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void setOrderHeadInfo() {
+        Logger.e("setOrderHeadInfo");
         try {
             JSONObject jSONObject1 = m_OrderJson;
             m_orderId = jSONObject1.get("orderSn").toString();
@@ -570,6 +589,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             jSONObject2 = jSONObject1.getJSONObject("customer");
             m_curUserId = jSONObject2.get("userId").toString();
             m_curUserSettlementType = jSONObject2.getJSONObject("settlementType");
+            Logger.e("setOrderHeadInfo finish");
         } catch (JSONException jSONException) {
             Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
         }
@@ -694,6 +714,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
                             try {
                                 JSONObject jsonObject = new JSONObject(EntityUtils.toString(httpResponse.getEntity(), "UTF-8"));
                                 m_ValidCouponJsonArray = jsonObject.getJSONArray("items");
+                                Logger.e("m_ValidCouponJsonArray : " + m_ValidCouponJsonArray);
                             } catch (IOException iOException) {
                                 Toast.makeText(OrderDealActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
                             } catch (JSONException jSONException) {
@@ -727,6 +748,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
                             try {
                                 JSONObject jSONObject = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
                                 m_ValidTicketJsonArray = jSONObject.getJSONArray("items");
+                                Logger.e("m_ValidTicketJsonArray : " + m_ValidTicketJsonArray);
                             } catch (IOException iOException) {
                                 Toast.makeText(OrderDealActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
                             } catch (JSONException jSONException) {
@@ -749,6 +771,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             Bundle bundle = getIntent().getExtras();
             String str1 = bundle.getString("order");
             JSONObject jSONObject = new JSONObject(str1);
+            Logger.e("jSONObject"+str1);
             m_OrderJson = jSONObject;
             m_taskId = bundle.getString("taskId");
             m_businessKey = bundle.getString("businessKey");
@@ -922,18 +945,23 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
                 startActivityForResult(intent2, 1);
                 break;
             case R.id.button_next:
-                if (!picResult)
+                if (!picResult) {
                     Toast.makeText(this, "客户未签名！", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 if (m_depLeader == null) {
                     Toast.makeText(this, "所属店长查询失败！请再次提交！", Toast.LENGTH_LONG).show();
                     GetDepLeader();
+                    return;
                 }
                 Toast.makeText(this, "正在提交，请稍等。。。", Toast.LENGTH_LONG).show();
                 m_buttonNext.setText("正在提交...");
                 m_buttonNext.setBackgroundColor(getResources().getColor(R.color.textgray));
                 m_buttonNext.setEnabled(false);
-                if (detail != null)
+                if (detail != null) {
                     createElectDep();
+                    return;
+                }
                 handlerDelayCommit.sendEmptyMessageDelayed(0, 1000L);
                 break;
             case R.id.imageView_ticketSelect:
@@ -976,7 +1004,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
                                 if (jsonArray.length() == 1) {
                                     OrderDealActivity.m_orderPayStatus = jsonArray.getJSONObject(0).getJSONObject("payStatus").getString("name");
                                     m_textViewPayStatus.setText(OrderDealActivity.m_orderPayStatus);
-                                    Logger.e("OrderDealActivity.m_orderPayStatus = "+OrderDealActivity.m_orderPayStatus);
+                                    Logger.e("OrderDealActivity.m_orderPayStatus = " + OrderDealActivity.m_orderPayStatus);
                                 }
                             } catch (IOException iOException) {
                                 Toast.makeText(OrderDealActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();

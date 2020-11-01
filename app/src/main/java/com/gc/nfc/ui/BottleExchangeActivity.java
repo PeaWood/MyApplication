@@ -937,6 +937,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             hashMap.put("price", String.valueOf(this.m_bfp_price_50kg));
             arrayList.add(hashMap);
         }
+        this.m_bundle.putString("order", m_OrderJson.toString());
         this.m_bundle.putString("ElectDepDetails", str);
         this.m_bundle.putString("YJD_YS", this.m_yjp_ys_total);
         this.m_bundle.putString("YJD_SS", this.m_yjp_ss_total);

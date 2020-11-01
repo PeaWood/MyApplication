@@ -66,7 +66,6 @@ import com.amap.api.navi.INaviInfoCallback;
 import com.amap.api.navi.model.AMapNaviLocation;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.interfaces.Netcallback;
-import com.amap.api.navi.INaviInfoCallback;
 
 public class MendDetailActivity extends BaseActivity implements View.OnClickListener, INaviInfoCallback{
     private AppContext appContext;
@@ -478,7 +477,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
                       Bundle bundle = new Bundle();
                       bundle.putInt("switchTab", 2);
                       intent.putExtras(bundle);
-                      MendDetailActivity.this.startActivity((Intent)param1Object);
+                      MendDetailActivity.this.startActivity(intent);
                       MendDetailActivity.this.finish();
                      return;
                   }
