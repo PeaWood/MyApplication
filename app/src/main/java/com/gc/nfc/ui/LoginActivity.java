@@ -3,7 +3,6 @@ package com.gc.nfc.ui;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -18,15 +17,11 @@ import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.common.NetUrlConstant;
-import com.gc.nfc.domain.Data_User;
 import com.gc.nfc.domain.User;
-import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
 import com.gc.nfc.interfaces.Netcallback;
 import com.gc.nfc.utils.JellyInterpolator;
 import com.gc.nfc.utils.NetUtil;
 import com.gc.nfc.utils.SharedPreferencesHelper;
-import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -37,14 +32,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import okhttp3.Request;
-import okhttp3.Response;
-
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
     private TextView mBtnLogin;
-    private float mHeight;
     private View mInputLayout;
-    private float mWidth;
     private ObjectAnimator m_animator;
     private EditText et_pin;
     private EditText et_name;
@@ -52,7 +42,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private String name;
     private String password;
 
-    private void inputAnimator(View paramView, float paramFloat1, float paramFloat2) {
+    private void inputAnimator() {
         this.progress.setVisibility(View.VISIBLE);
         progressAnimator(this.progress);
         this.mInputLayout.setVisibility(View.INVISIBLE);
@@ -72,7 +62,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         // get请求
         NetRequestConstant nrc = new NetRequestConstant();
         nrc.setType(HttpRequestType.GET);
-
         nrc.requestUrl = NetUrlConstant.LOGINURL;
         nrc.context = this;
         Map<String, Object> params = new HashMap<String, Object>();
@@ -106,11 +95,26 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 user.setGroupCode(groupCode);
                                 user.setGroupName(groupName);
                                 appContext.setUser(user);
-                                setResult(12, data);
                                 SharedPreferencesHelper.put("username", name);
                                 SharedPreferencesHelper.put("password", password);
                                 MediaPlayer music = MediaPlayer.create(LoginActivity.this, R.raw.start_working);
                                 music.start();
+                                if (user.getGroupCode().equals("00005") || user.getGroupCode().equals("00006")) {
+                                    //StockManagerActivity
+                                    Toast.makeText(LoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                if (user.getGroupCode().equals("00003")) {
+                                    //配送员
+                                    Intent starter = new Intent(LoginActivity.this, MainlyActivity.class);
+                                    startActivity(starter);
+                                    LoginActivity.this.finish();
+                                    return;
+                                }
+                                if (user.getGroupCode().equals("00007")) {
+                                    //DiaoBoActivity
+                                    Toast.makeText(LoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
+                                }
                             }catch (IOException e){
                                 Toast.makeText(LoginActivity.this, "未知错误，异常！",
                                         Toast.LENGTH_LONG).show();
@@ -132,59 +136,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 }
             }
         }, nrc);
-        Map map = new HashMap();
-        map.put("userId", name);
-        map.put("password", password);
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/sysusers/login", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(LoginActivity.this, "网络连接错误！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(LoginActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                String string = response.body().string();
-                Logger.e("login: " + string);
-                Gson gson = new Gson();
-                Data_User userdata = gson.fromJson(string, Data_User.class);
-                User user = new User();
-                user.setUsername(name);
-                user.setPassword(password);
-                user.setDepartmentCode(userdata.getDepartment().getCode());
-                user.setDepartmentName(userdata.getDepartment().getName());
-                user.setGroupCode(userdata.getUserGroup().getCode());
-                user.setGroupName(userdata.getUserGroup().getName());
-                if (userdata.getGasTakeOverStatus() != null) {
-                    user.setScanType(userdata.getGasTakeOverStatus().getIndex());
-                } else {
-                    user.setScanType(0);
-                }
-                AppContext appContext = (AppContext) LoginActivity.this.getApplicationContext();
-                appContext.setUser(user);
-                MediaPlayer.create(LoginActivity.this, R.raw.start_working).start();
-                if (user.getGroupCode().equals("00005") || user.getGroupCode().equals("00006")) {
-                    //StockManagerActivity
-                    Toast.makeText(LoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (user.getGroupCode().equals("00003")) {
-                    //配送员
-                    Intent starter = new Intent(LoginActivity.this, MainlyActivity.class);
-                    startActivity(starter);
-                    LoginActivity.this.finish();
-                    return;
-                }
-                if (user.getGroupCode().equals("00007")) {
-                    //DiaoBoActivity
-                    Toast.makeText(LoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
     }
 
     private void progressAnimator(View paramView) {
@@ -214,19 +165,17 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         requestWindowFeature(1);
         ((AppContext) getApplication()).setPreferences(getPreferences(MODE_PRIVATE));
         setContentView(R.layout.activity_login);
-        SharedPreferencesHelper.initial((Context)this);
-        this.mBtnLogin = (TextView) findViewById(R.id.main_btn_login);
+        SharedPreferencesHelper.initial(this);
+        this.mBtnLogin = findViewById(R.id.main_btn_login);
         this.progress = findViewById(R.id.layout_progress);
         this.mInputLayout = findViewById(R.id.input_layout);
-        this.et_name = (EditText) findViewById(R.id.input_userId);
-        this.et_pin = (EditText) findViewById(R.id.input_password);
+        this.et_name = findViewById(R.id.input_userId);
+        this.et_pin = findViewById(R.id.input_password);
         this.mBtnLogin.setOnClickListener(this);
     }
 
     public void onClick(View paramView) {
-        this.mWidth = this.mBtnLogin.getMeasuredWidth();
-        this.mHeight = this.mBtnLogin.getMeasuredHeight();
-        inputAnimator(this.mInputLayout, this.mWidth, this.mHeight);
+        inputAnimator();
     }
 
     protected void onCreate(Bundle paramBundle) {
