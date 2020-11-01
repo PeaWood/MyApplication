@@ -4,11 +4,36 @@
     n1:layout_height="fill_parent"
     n1:background="@color/backgroundcolor"
     n1:orientation="vertical">
+    <LinearLayout
+        n1:id="@+id/linearLayout"
+        n1:layout_width="match_parent"
+        n1:layout_height="50.0dip"
+        n1:background="@color/colorPrimary"
+        n1:orientation="horizontal">
+        <ImageView
+            n1:id="@+id/img_back"
+            n1:layout_width="25dip"
+            n1:layout_height="25dip"
+            n1:layout_gravity="center"
+            n1:layout_marginLeft="5.0dip"
+            n1:contentDescription="@null"
+            n1:src="@drawable/back_arrow" />
+        <TextView
+            n1:layout_width="wrap_content"
+            n1:layout_height="wrap_content"
+            n1:layout_gravity="center"
+            n1:layout_marginLeft="16.0dip"
+            n1:layout_weight="1.0"
+            n1:text="巡检详情"
+            n1:textColor="@color/white"
+            n1:textSize="25.0sp" />
+    </LinearLayout>
 
     <ScrollView
         n1:layout_width="fill_parent"
         n1:layout_height="fill_parent"
         n1:layout_above="@id/llybuttom"
+        n1:layout_below="@id/linearLayout"
         n1:fadingEdge="none">
 
         <LinearLayout

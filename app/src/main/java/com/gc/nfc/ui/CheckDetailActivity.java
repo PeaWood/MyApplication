@@ -298,6 +298,8 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
 
     private ProgressDialog readWriteDialog = null;
 
+    private ImageView imageView;
+
     private ScannerCallback scannerCallback = new ScannerCallback() {
         public void onReceiveScanDevice(BluetoothDevice device, int param1Int, byte[] param1ArrayOfbyte) {
             super.onReceiveScanDevice(device, param1Int, param1ArrayOfbyte);
@@ -762,6 +764,13 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
             m_spinnerCheckType = (Spinner) findViewById(R.id.spinner_checkType);
             m_editTextPs = (EditText) findViewById(R.id.input_note);
             m_imageDeviceReflesh = (ImageView) findViewById(R.id.imageView_deviceReflesh);
+            imageView = (ImageView) findViewById(R.id.img_back);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
             m_buttonNext.setOnClickListener(this);
             m_imageViewNav.setOnClickListener(this);
             m_imageViewCall.setOnClickListener(this);
