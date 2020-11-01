@@ -61,7 +61,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private void login() {
         name = et_name.getText().toString();
         password = et_pin.getText().toString();
-        name = "dby";
+        name = "psy";
         password = "111111";
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(password)) {
             Toast.makeText(LoginActivity.this, "请检查账号和密码", Toast.LENGTH_LONG).show();
@@ -134,8 +134,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 appContext.setUser(user);
                 MediaPlayer.create(LoginActivity.this, R.raw.start_working).start();
                 if (user.getGroupCode().equals("00005") || user.getGroupCode().equals("00006")) {
+                    Intent starter = new Intent(LoginActivity.this, StockManagerActivity.class);
+                    startActivity(starter);
+                    LoginActivity.this.finish();
                     //StockManagerActivity
-                    Toast.makeText(LoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
+//                    Toast.makeText(LoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
                     return;
                 }
                 if (user.getGroupCode().equals("00003")) {
