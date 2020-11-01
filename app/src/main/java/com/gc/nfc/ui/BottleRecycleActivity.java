@@ -316,6 +316,8 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
 
     private ProgressDialog readWriteDialog = null;
 
+    private ImageView imageView;
+
     private ScannerCallback scannerCallback = new ScannerCallback() {
         public void onReceiveScanDevice(BluetoothDevice param1BluetoothDevice, int param1Int, byte[] param1ArrayOfbyte) {
             super.onReceiveScanDevice(param1BluetoothDevice, param1Int, param1ArrayOfbyte);
@@ -681,6 +683,13 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
         radioButton_kp_recyle = (RadioButton) findViewById(R.id.radioButton_kp_recyle);
         radioButton_zp_recyle = (RadioButton) findViewById(R.id.radioButton_zp_recyle);
         radioButton_zp_reput = (RadioButton) findViewById(R.id.radioButton_zp_reput);
+        imageView = (ImageView) findViewById(R.id.img_back);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         m_imageViewKPEye.setOnClickListener(this);
         m_addKPManual.setOnClickListener(this);
         m_buttonNext.setOnClickListener(this);

@@ -3,6 +3,8 @@ package com.gc.nfc.ui;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.amap.api.maps2d.AMap;
@@ -35,7 +37,7 @@ public class MapViewActivity extends BaseActivity {
     private UiSettings mUiSettings;
 
     private MapView mapView;
-
+    private ImageView imageView;
     Runnable r = new Runnable() {
         public void run() {
             MapViewActivity.this.get_ps_location();
@@ -118,6 +120,13 @@ public class MapViewActivity extends BaseActivity {
         super.onCreate(paramBundle);
         setContentView(R.layout.activity_map_view);
         this.mapView = (MapView) findViewById(R.id.map);
+        imageView = (ImageView) findViewById(R.id.img_back);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         this.mapView.onCreate(paramBundle);
         mapinit();
         MapsInitializer.loadWorldGridMap(true);
