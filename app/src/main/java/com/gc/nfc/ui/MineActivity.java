@@ -183,6 +183,12 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
         showUserInfo();
     }
 
+    protected void onRestart() {
+        super.onRestart();
+        refleshVaildMends();
+        refleshVaildSecuritys();
+    }
+
     /**
      * 顶部个人信息
      */
