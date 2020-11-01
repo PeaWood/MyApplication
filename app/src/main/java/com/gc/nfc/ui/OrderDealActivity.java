@@ -191,6 +191,8 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private ImageView imageView;
+
     private void GetDepLeader() {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
@@ -808,6 +810,13 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             m_textViewTotalFee = (TextView) findViewById(R.id.textview_totalFee);//商品总价
             m_imageViewTicketSelect = (ImageView) findViewById(R.id.imageView_ticketSelect);//气票选择图标
             m_imageViewCouponSelect = (ImageView) findViewById(R.id.imageView_couponSelect);//优惠券选择图标
+            imageView = (ImageView) findViewById(R.id.img_back);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
             m_imageViewTicketSelect.setOnClickListener(this);
             m_imageViewCouponSelect.setOnClickListener(this);
             m_imageViewPic = (ImageView) findViewById(R.id.imageView_pic);//拍照的选择按钮
