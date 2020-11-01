@@ -669,7 +669,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         AdapterView.OnItemSelectedListener onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
                 switch (param1Int) {
-                    case 0:
+                    case 2:
                         PayOnScan();
                         break;
                 }

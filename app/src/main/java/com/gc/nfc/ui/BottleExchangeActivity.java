@@ -869,14 +869,9 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             intent.setClass(this, OrderDealActivity.class);
         }
         JSONArray jSONArray = createElectDepDetails();
-        this.m_bundle.putString("YJD_YS", this.m_yjp_ys_total);
-        this.m_bundle.putString("YJD_SS", this.m_yjp_ss_total);
-        this.m_bundle.putString("KPCode", JSON.toJSONString(this.m_BottlesMapKP));
-        this.m_bundle.putString("ZPCode", JSON.toJSONString(this.m_BottlesMapZP));
         String str = "";
         if (jSONArray != null)
             str = String.valueOf(jSONArray);
-        this.m_bundle.putString("ElectDepDetails", str);
         ArrayList<HashMap<Object, Object>> arrayList = new ArrayList();
         if (this.m_yjp_quantity_5kg != 0) {
             HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
@@ -941,6 +936,11 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             hashMap.put("price", String.valueOf(this.m_bfp_price_50kg));
             arrayList.add(hashMap);
         }
+        this.m_bundle.putString("ElectDepDetails", str);
+        this.m_bundle.putString("YJD_YS", this.m_yjp_ys_total);
+        this.m_bundle.putString("YJD_SS", this.m_yjp_ss_total);
+        this.m_bundle.putString("KPCode", JSON.toJSONString(this.m_BottlesMapKP));
+        this.m_bundle.putString("ZPCode", JSON.toJSONString(this.m_BottlesMapZP));
         this.m_bundle.putSerializable("MapList", arrayList);
         this.m_bundle.putString("SpecMap", new JSONObject(this.m_BottlesSpecMap).toString());
         intent.putExtras(this.m_bundle);

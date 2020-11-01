@@ -15,7 +15,6 @@ import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 
 public class AppContext extends Application {
-  //
   private String groupCode;
   
   private String groupName;
@@ -91,7 +90,7 @@ public class AppContext extends Application {
   
   public void onCreate() {
     super.onCreate();
-    initCloudChannel((Context)this);
+    initCloudChannel(this);
   }
   
   public void setGroupCode(String paramString) {
@@ -107,7 +106,7 @@ public class AppContext extends Application {
   }
   
   public void setPreferences(SharedPreferences paramSharedPreferences) {
-    Logger.e("setPreferences: " );
+    Logger.e("<---AppContext setPreferences--->" );
     this.preferences = paramSharedPreferences;
   }
   
@@ -120,7 +119,7 @@ public class AppContext extends Application {
   }
   
   public void setUser(User paramUser) {
-    Logger.e("<---setUser--->");
+    Logger.e("<---AppContext setUser--->");
     user = paramUser;
     SharedPreferences.Editor editor = this.preferences.edit();
     editor.putString("username", paramUser.getUsername());
@@ -129,7 +128,7 @@ public class AppContext extends Application {
   }
 
     public void logout() {
-      Logger.e("<---logout--->");
+      Logger.e("<---AppContext logout--->");
       SharedPreferences.Editor editor = this.preferences.edit();
       editor.putString("username", "");
       editor.putString("password", "");

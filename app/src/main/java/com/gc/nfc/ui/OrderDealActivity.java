@@ -231,6 +231,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void PayOnScan() {
+        Logger.e("PayOnScan");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = View.inflate(this, R.layout.pay_on_scan, null);
         ImageView imageView = (ImageView) view.findViewById(R.id.items_imageViewScanCode);
@@ -253,9 +254,8 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             Window window = alertDialog.getWindow();
             window.setGravity(17);
             window.setLayout(-1, -2);
-        } catch (MalformedURLException malformedURLException) {
-
-        } catch (IOException iOException) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -819,7 +819,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             AdapterView.OnItemSelectedListener onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
                 public void onItemSelected(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
                     switch (param1Int) {
-                        case 0:
+                        case 2:
                             PayOnScan();
                             break;
                     }
@@ -976,6 +976,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
                                 if (jsonArray.length() == 1) {
                                     OrderDealActivity.m_orderPayStatus = jsonArray.getJSONObject(0).getJSONObject("payStatus").getString("name");
                                     m_textViewPayStatus.setText(OrderDealActivity.m_orderPayStatus);
+                                    Logger.e("OrderDealActivity.m_orderPayStatus = "+OrderDealActivity.m_orderPayStatus);
                                 }
                             } catch (IOException iOException) {
                                 Toast.makeText(OrderDealActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
