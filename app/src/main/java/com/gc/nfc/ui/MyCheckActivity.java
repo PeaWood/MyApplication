@@ -31,7 +31,7 @@ import java.util.Map;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MyCheckActivity extends BaseActivity implements AbsListView.OnScrollListener {
+public class MyCheckActivity extends BaseActivity {
     public static JSONArray m_checkOrderListJson;
     private int[] colorResouce = new int[]{R.color.orange, R.color.orange, R.color.orange, R.color.orange};
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -58,7 +58,7 @@ public class MyCheckActivity extends BaseActivity implements AbsListView.OnScrol
         swipeRefreshLayout = findViewById(R.id.main_srl);
         lv_check.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
-                MyCheckActivity.this.switchActivity(param1Int);
+                switchActivity(param1Int);
             }
         });
         swipeRefreshLayout.setColorSchemeResources(colorResouce);
@@ -73,12 +73,6 @@ public class MyCheckActivity extends BaseActivity implements AbsListView.OnScrol
     protected void onResume() {
         super.onResume();
         refleshVaildChecks(false);
-    }
-
-    public void onScroll(AbsListView paramAbsListView, int paramInt1, int paramInt2, int paramInt3) {
-    }
-
-    public void onScrollStateChanged(AbsListView paramAbsListView, int paramInt) {
     }
 
     /**

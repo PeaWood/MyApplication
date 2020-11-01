@@ -1,7 +1,6 @@
 package com.gc.nfc.ui;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -38,7 +37,6 @@ import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
 import com.google.gson.Gson;
 
-import org.apache.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
 
 import okhttp3.Request;
 import okhttp3.Response;
