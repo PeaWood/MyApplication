@@ -17,6 +17,7 @@
             n1:orientation="vertical">
 
             <LinearLayout
+                n1:visibility="gone"
                 n1:layout_width="fill_parent"
                 n1:layout_height="30.0dip"
                 n1:background="@color/colorPrimary"
