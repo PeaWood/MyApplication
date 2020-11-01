@@ -61,7 +61,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private void login() {
         name = et_name.getText().toString();
         password = et_pin.getText().toString();
-        name = "dby";
+        name = "psy";
         password = "111111";
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(password)) {
             Toast.makeText(LoginActivity.this, "请检查账号和密码", Toast.LENGTH_LONG).show();

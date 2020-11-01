@@ -161,50 +161,48 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
     private Handler handlerBlue = new Handler() {
         public void handleMessage(Message param1Message) {
             msgText.setText(msgBuffer);
-            if (bleNfcDevice.isConnection() == 2 || bleNfcDevice.isConnection() == 1)
-                ;
-            switch (param1Message.what) {
-                default:
-                    return;
-                case 3:
-                    (new Thread(new Runnable() {
-                        public void run() {
-                            try {
-                                bleNfcDevice.getDeviceVersions();
-                                handlerBlue.sendEmptyMessage(0);
-                                if (bleNfcDevice.getDeviceBatteryVoltage() < 3.61D) {
-                                    msgBuffer.append("(电量低)");
-                                } else {
-                                    msgBuffer.append("(电量充足)");
+            if (bleNfcDevice.isConnection() == 2 || bleNfcDevice.isConnection() == 1) {
+                switch (param1Message.what) {
+                    case 3:
+                        (new Thread(new Runnable() {
+                            public void run() {
+                                try {
+                                    bleNfcDevice.getDeviceVersions();
+                                    handlerBlue.sendEmptyMessage(0);
+                                    if (bleNfcDevice.getDeviceBatteryVoltage() < 3.61D) {
+                                        msgBuffer.append("(电量低)");
+                                    } else {
+                                        msgBuffer.append("(电量充足)");
+                                    }
+                                    handlerBlue.sendEmptyMessage(0);
+                                    if (bleNfcDevice.androidFastParams(true))
+                                        ;
+                                    handlerBlue.sendEmptyMessage(0);
+                                    handlerBlue.sendEmptyMessage(0);
+                                    startAutoSearchCard();
+                                } catch (DeviceNoResponseException deviceNoResponseException) {
+                                    deviceNoResponseException.printStackTrace();
                                 }
-                                handlerBlue.sendEmptyMessage(0);
-                                if (bleNfcDevice.androidFastParams(true))
-                                    ;
-                                handlerBlue.sendEmptyMessage(0);
-                                handlerBlue.sendEmptyMessage(0);
-                                startAutoSearchCard();
-                            } catch (DeviceNoResponseException deviceNoResponseException) {
-                                deviceNoResponseException.printStackTrace();
                             }
-                        }
-                    })).start();
-                case 137:
-                    break;
+                        })).start();
+                    case 137:
+                        String[] arrayOfString = param1Message.obj.toString().split(":");
+                        if (arrayOfString.length != 2)
+                            showToast("无效卡格式！");
+                        String str1 = arrayOfString[0];
+                        String str2 = arrayOfString[1];
+                        if (m_handedUserCard == null)
+                            showToast("该用户未绑定用户卡");
+                        if (!str2.equals(m_handedUserCard))
+                            showToast("非本人卡号！");
+                        if (str1.equals("Y"))
+                            orderServiceQualityUpload(true);
+                        if (str1.equals("N"))
+                            orderServiceQualityUpload(false);
+                        showToast("无效卡格式！");
+                        break;
+                }
             }
-            String[] arrayOfString = param1Message.obj.toString().split(":");
-            if (arrayOfString.length != 2)
-                showToast("无效卡格式！");
-            String str1 = arrayOfString[0];
-            String str2 = arrayOfString[1];
-            if (m_handedUserCard == null)
-                showToast("该用户未绑定用户卡");
-            if (!str2.equals(m_handedUserCard))
-                showToast("非本人卡号！");
-            if (str1.equals("Y"))
-                orderServiceQualityUpload(true);
-            if (str1.equals("N"))
-                orderServiceQualityUpload(false);
-            showToast("无效卡格式！");
         }
     };
 
@@ -322,7 +320,6 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
     };
 
     private Toast toast = null;
-
     TextView tv;
 
     private void GetUserCard() {
@@ -333,7 +330,7 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
         netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/UserCard";
-        netRequestConstant.context = (Context) this;
+        netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("userId", m_currentCustomerId);
         hashMap.put("status", Integer.valueOf(1));
@@ -354,26 +351,26 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
                                 m_handedUserCard = null;
                                 showToast("该用户未绑定用户卡");
                             } catch (JSONException jSONException) {
-                                Toast.makeText((Context) SecurityDetailActivity.this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(SecurityDetailActivity.this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
                             } catch (IOException iOException) {
-                                Toast.makeText((Context) SecurityDetailActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(SecurityDetailActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
                             }
                             return;
                         }
-                        Toast.makeText((Context) SecurityDetailActivity.this, "用户卡查询失败", Toast.LENGTH_LONG).show();
+                        Toast.makeText(SecurityDetailActivity.this, "用户卡查询失败", Toast.LENGTH_LONG).show();
                         return;
                     }
-                    Toast.makeText((Context) SecurityDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SecurityDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
                     return;
                 }
-                Toast.makeText((Context) SecurityDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+                Toast.makeText(SecurityDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
             }
         }, netRequestConstant);
     }
 
     private void blueDeviceInitial() {
-        msgText = (TextView)findViewById(R.id.msgText);
-        m_imageViewSearchBlue= (ImageView) findViewById(R.id.imageView_search);
+        msgText = (TextView) findViewById(R.id.msgText);
+        m_imageViewSearchBlue = (ImageView) findViewById(R.id.imageView_search);
         m_imageViewSearchBlue.setOnClickListener(new StartSearchButtonListener());
         msgBuffer = new StringBuffer();
         //ble_nfc服务初始化
@@ -383,7 +380,7 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
 
     private void getOrderOps() {
         if (m_user == null) {
-            Toast.makeText((Context) this, "未登录！", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "未登录！", Toast.LENGTH_LONG).show();
             return;
         }
         if (m_user.getScanType() == 0 || m_user.getScanType() == 1) {
@@ -391,10 +388,6 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
             return;
         }
         orderServiceQualityUpload(true);
-    }
-
-    private String getResponseMessage(HttpResponse paramHttpResponse) {
-        return null;
     }
 
     private void orderServiceQualityShow() {
@@ -421,7 +414,7 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.PUT);
         netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Security/" + m_businessKey;
-        netRequestConstant.context = (Context) this;
+        netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         if (paramBoolean) {
             hashMap.put("processStatus", "PTSolved");
@@ -433,7 +426,7 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
                         HttpResponse response = (HttpResponse) param1Object;
                         if (response != null) {
                             if (response.getStatusLine().getStatusCode() == 200) {
-                                Toast toast = Toast.makeText((Context) SecurityDetailActivity.this, "处理成功！", Toast.LENGTH_LONG);
+                                Toast toast = Toast.makeText(SecurityDetailActivity.this, "处理成功！", Toast.LENGTH_LONG);
                                 toast.setGravity(17, 0, 0);
                                 toast.show();
                                 MediaPlayer.create(SecurityDetailActivity.this, R.raw.finish_order).start();
@@ -446,20 +439,20 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
                                 return;
                             }
                             if (response.getStatusLine().getStatusCode() == 404) {
-                                Toast.makeText((Context) SecurityDetailActivity.this, "安检处理失败", Toast.LENGTH_LONG).show();
+                                Toast.makeText(SecurityDetailActivity.this, "安检处理失败", Toast.LENGTH_LONG).show();
                                 return;
                             }
                             if (response.getStatusLine().getStatusCode() == 401) {
-                                Toast.makeText((Context) SecurityDetailActivity.this, "鉴权失败，请重新登录" + response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(SecurityDetailActivity.this, "鉴权失败，请重新登录" + response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
                                 return;
                             }
-                            Toast.makeText((Context) SecurityDetailActivity.this, "安检处理失败" + response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(SecurityDetailActivity.this, "安检处理失败" + response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
                             return;
                         }
-                        Toast.makeText((Context) SecurityDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+                        Toast.makeText(SecurityDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
                         return;
                     }
-                    Toast.makeText((Context) SecurityDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SecurityDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
                 }
             }, netRequestConstant);
             return;
@@ -569,13 +562,13 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
 
     private void showToast(String paramString) {
         if (toast == null) {
-            toast = Toast.makeText((Context) this, null, Toast.LENGTH_SHORT);
+            toast = Toast.makeText(this, null, Toast.LENGTH_SHORT);
             toast.setGravity(17, 0, 0);
             LinearLayout linearLayout = (LinearLayout) toast.getView();
             WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             DisplayMetrics displayMetrics = new DisplayMetrics();
             windowManager.getDefaultDisplay().getMetrics(displayMetrics);
-            tv = new TextView((Context) this);
+            tv = new TextView(this);
             linearLayout.getBackground().setAlpha(0);
             tv.setTextSize(40.0F);
             tv.setTextColor(getResources().getColor(R.color.bar_grey));
@@ -608,14 +601,14 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
         LatLng latLng2 = appContext.getLocation();
         LatLng latLng1 = appContext.getLocation();
         AmapNaviPage.getInstance().showRouteActivity(getApplicationContext(), new AmapNaviParams(new Poi("当前位置", latLng2, ""), null, new Poi(m_recvAddr, latLng1, ""), AmapNaviType.DRIVER), this);
-        AMapNavi.getInstance((Context) this).setUseInnerVoice(true);
+        AMapNavi.getInstance(this).setUseInnerVoice(true);
     }
 
     public void callPhone(String paramString) {
         Intent intent1;
-        if (ActivityCompat.checkSelfPermission((Context) this, "android.permission.CALL_PHONE") != 0) {
+        if (ActivityCompat.checkSelfPermission(this, "android.permission.CALL_PHONE") != 0) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, "android.permission.CALL_PHONE")) {
-                Toast.makeText((Context) this, "请授权！", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "请授权！", Toast.LENGTH_LONG).show();
                 intent1 = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
                 intent1.setData(Uri.fromParts("package", getPackageName(), null));
                 startActivity(intent1);
@@ -635,15 +628,15 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
             appContext = (AppContext) getApplicationContext();
             m_user = appContext.getUser();
             if (m_user == null) {
-                Toast.makeText((Context) this, "登陆会话失效", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent((Context) this, AutoLoginActivity.class);
+                Toast.makeText(this, "登陆会话失效", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(this, AutoLoginActivity.class);
                 startActivity(intent);
                 finish();
                 return;
             }
             String str = getIntent().getExtras().getString("check");
             JSONObject jSONObject = new JSONObject(str);
-            Logger.e("jSONObject = "+str);
+            Logger.e("jSONObject = " + str);
             m_CheckJson = jSONObject;
             m_buttonNext = (Button) findViewById(R.id.button_next);
             m_textViewOrderSn = (TextView) findViewById(R.id.items_orderSn);
@@ -674,7 +667,7 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
             m_orderServiceQualityShowFlag = false;
             GetUserCard();
         } catch (JSONException jSONException) {
-            Toast.makeText((Context) this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -690,9 +683,9 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
     public void onClick(View paramView) {
         switch (paramView.getId()) {
             case R.id.button_next:
-                if (m_editTextPs.getText().toString().length() > 0 && m_orderStatus == 1){
+                if (m_editTextPs.getText().toString().length() > 0 && m_orderStatus == 1) {
                     getOrderOps();
-                }else{
+                } else {
                     Toast.makeText(this, "请填写处理结果！", Toast.LENGTH_LONG).show();
                 }
                 break;
@@ -708,7 +701,7 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
                 bundle.putString("fileFolder", "security");
                 bundle.putString("fileNameHeader", m_businessKey);
                 bundle.putInt("MaxPicCount", 4);
-                intent.setClass((Context) this, PicSelActivity.class);
+                intent.setClass(this, PicSelActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
                 break;
