@@ -54,14 +54,13 @@
 
     <permission
         android:name="com.gc.nfc.permission.MIPUSH_RECEIVE"
+        tools:replace="android:protectionLevel"
         android:protectionLevel="signatureOrSystem" />
     <permission
         android:name="com.gc.nfc.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.gc.nfc.permission.MIPUSH_RECEIVE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="com.gc.nfc.permission.C2D_MESSAGE" />
 
     <application
 
@@ -75,10 +74,21 @@
         android:appComponentFactory="111"
         android:networkSecurityConfig="@xml/network_security_config"
         tools:ignore="GoogleAppIndexingWarning">
-        <meta-data android:name="com.amap.api.v2.apikey" android:value="ffda4c68ede19c14999d37d75ab1d20a"/>
+
+        <meta-data android:name="com.amap.api.v2.apikey"
+            android:value="ffda4c68ede19c14999d37d75ab1d20a"/>
+
         <service android:name="com.amap.api.location.APSService"/>
+
+        <meta-data android:name="com.alibaba.app.appkey"
+            android:value="27568238"/> <!-- 请填写你自己的- appKey -->
+
+        <meta-data android:name="com.alibaba.app.appsecret"
+            android:value="4426d78842565ad66df7d712915cf59d"/> <!-- 请填写你自己的appSecret -->
+
         <!--<service android:name="com.dk.bleNfc.BleNfcDeviceService"/>-->
         <!--<service android:enabled="true" android:exported="true" android:name="com.gc.nfc.utils.AmapLocationService"/>-->
+
         <provider android:authorities="com.gc.nfc.provider"
                    android:exported="false"
                    android:grantUriPermissions="true"
@@ -86,6 +96,20 @@
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
                    android:resource="@xml/file_paths"/>
         </provider>
+
+        <receiver
+            android:name="com.gc.nfc.receiver.MyMessageReceiver"
+            android:exported="false"> <!-- 为保证receiver安全，建议设置不可导出，如需对其他应用开放可通过android：permission进行限制 -->
+            <intent-filter>
+                <action android:name="com.alibaba.push2.action.NOTIFICATION_OPENED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.alibaba.push2.action.NOTIFICATION_REMOVED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.alibaba.sdk.android.push.RECEIVE" />
+            </intent-filter>
+        </receiver>
         <activity android:configChanges="keyboardHidden|orientation|screenSize"
             android:name="com.amap.api.navi.AmapRouteActivity"
             android:theme="@android:style/Theme.NoTitleBar"/>
