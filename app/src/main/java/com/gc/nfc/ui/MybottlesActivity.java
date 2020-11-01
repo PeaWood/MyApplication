@@ -27,7 +27,7 @@ import java.util.Map;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MybottlesActivity extends BaseActivity implements View.OnClickListener, AbsListView.OnScrollListener {
+public class MybottlesActivity extends BaseActivity implements View.OnClickListener {
     private TextView m_totalCountTextView;
     private String m_userId;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -62,16 +62,6 @@ public class MybottlesActivity extends BaseActivity implements View.OnClickListe
 
     protected void onCreate(Bundle paramBundle) {
         super.onCreate(paramBundle);
-    }
-
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    public void onScroll(AbsListView paramAbsListView, int paramInt1, int paramInt2, int paramInt3) {
-    }
-
-    public void onScrollStateChanged(AbsListView paramAbsListView, int paramInt) {
     }
 
     public void refleshVaildBottles(boolean isrefresh) {
