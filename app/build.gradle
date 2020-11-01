@@ -40,7 +40,11 @@ android {
     }
 
     useLibrary 'org.apache.http.legacy'
-
+    repositories {
+        flatDir {
+            dirs 'libs' //this way we can find the .aar file in libs folder
+        }
+    }
 }
 
 dependencies {
@@ -72,13 +76,15 @@ dependencies {
     //    implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
     //    implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation project(':nfc')
-//    implementation 'com.aliyun.ams:alicloud-android-push:3.2.2'
-//    implementation 'com.aliyun.ams:alicloud-android-utdid:2.5.1-proguard'
-//    implementation 'com.aliyun.ams:alicloud-android-utils:1.1.6.4'
-//    implementation 'com.aliyun.ams:alicloud-android-ut:5.4.4'
-//    implementation 'com.aliyun.ams:alicloud-android-beacon:1.0.4.3'
-//    implementation 'com.aliyun.ams:alicloud-android-agoo:4.0.0-emas'
-//    implementation 'com.taobao.android:accs_sdk_taobao:4.0.0-emas'
-//    implementation 'com.taobao.android:networksdk:3.5.5.2-open'
-//    implementation 'com.taobao.android:tnet4android:3.1.14.7-all'
+    implementation (name:'alicloud-android-accs-4.0.0-emas', ext: 'aar')
+    implementation (name:'alicloud-android-agoo-4.0.0-emas', ext: 'aar')
+    implementation (name:'alicloud-android-push-3.2.2', ext: 'aar')
+    implementation (name:'alicloud-android-third-push-3.2.2', ext: 'aar')
+    implementation (name:'huawei-push-2.6.3.305', ext: 'aar')
+    implementation (name:'huawei-push-base-2.6.3.305', ext: 'aar')
+    implementation (name:'meizu-push-3.9.7', ext: 'aar')
+    implementation (name:'opush-2.1.0-fix', ext: 'aar')
+    implementation (name:'third_vivopush-2.9.0.1', ext: 'aar')
+    implementation (name:'tnet4android-3.1.14.7-all', ext: 'aar')
+
 }
