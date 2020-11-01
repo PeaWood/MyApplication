@@ -54,6 +54,7 @@ import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.domain.User;
+import com.gc.nfc.http.Logger;
 import com.gc.nfc.interfaces.Netcallback;
 
 import org.apache.http.HttpResponse;
@@ -359,9 +360,10 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
                         if (response.getStatusLine().getStatusCode() == 200) {
                             try {
                                 JSONObject jSONObject = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
+                                Logger.e("GetDeviceSatus : "+jSONObject.toString());
                                 JSONArray items = jSONObject.getJSONArray("items");
                                 if (items.length() == 1) {
-                                    String str = items.getJSONObject(0).getString("uploadTime");
+                                    String str = items.getJSONObject(0).getString("updateTime");
                                     if (str.length() == 0) {
                                         m_imageViewDeviceStatus.setImageResource(R.drawable.msg_error);
                                         return;
@@ -370,7 +372,7 @@ public class CheckDetailActivity extends BaseActivity implements View.OnClickLis
                                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-d HH:mm:ss");
                                     Date date = simpleDateFormat.parse(str);
                                     if (getDiffSecond((Date) param1Object, date) > 86400L) {
-                                        m_imageViewDeviceStatus.setImageResource(R.drawable.msg_info);
+                                        m_imageViewDeviceStatus.setImageResource(R.drawable.msg_error);
                                         return;
                                     }
                                     m_imageViewDeviceStatus.setImageResource(R.drawable.msg_info);

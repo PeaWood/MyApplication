@@ -1,6 +1,5 @@
 package com.gc.nfc.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,9 +13,7 @@ import android.widget.Toast;
 
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
-import com.gc.nfc.domain.Data_Mend;
 import com.gc.nfc.domain.Data_Order;
-import com.gc.nfc.domain.Data_TaskOrders;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
@@ -34,7 +31,7 @@ import java.util.Map;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class HistoryOrdersActivity extends BaseActivity implements View.OnClickListener, AbsListView.OnScrollListener {
+public class HistoryOrdersActivity extends BaseActivity {
     public static JSONArray m_taskOrderListJson;
 
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -83,9 +80,6 @@ public class HistoryOrdersActivity extends BaseActivity implements View.OnClickL
         });
     }
 
-    public void onClick(View paramView) {
-    }
-
     protected void onCreate(Bundle paramBundle) {
         super.onCreate(paramBundle);
     }
@@ -98,12 +92,6 @@ public class HistoryOrdersActivity extends BaseActivity implements View.OnClickL
 
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-    public void onScroll(AbsListView paramAbsListView, int paramInt1, int paramInt2, int paramInt3) {
-    }
-
-    public void onScrollStateChanged(AbsListView paramAbsListView, int paramInt) {
     }
 
     public void refleshVaildOrders(boolean isrefresh) {
