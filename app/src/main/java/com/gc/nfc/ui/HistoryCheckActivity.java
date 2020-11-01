@@ -30,7 +30,7 @@ import java.util.Map;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class HistoryCheckActivity extends BaseActivity implements View.OnClickListener, AbsListView.OnScrollListener {
+public class HistoryCheckActivity extends BaseActivity {
     public static JSONArray m_checkOrderListJson;
 
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -76,9 +76,6 @@ public class HistoryCheckActivity extends BaseActivity implements View.OnClickLi
         });
     }
 
-    public void onClick(View paramView) {
-    }
-
     protected void onCreate(Bundle paramBundle) {
         super.onCreate(paramBundle);
     }
@@ -87,12 +84,6 @@ public class HistoryCheckActivity extends BaseActivity implements View.OnClickLi
     protected void onResume() {
         super.onResume();
         refleshVaildChecks(false);
-    }
-
-    public void onScroll(AbsListView paramAbsListView, int paramInt1, int paramInt2, int paramInt3) {
-    }
-
-    public void onScrollStateChanged(AbsListView paramAbsListView, int paramInt) {
     }
 
     public void refleshVaildChecks(boolean isrefresh) {
