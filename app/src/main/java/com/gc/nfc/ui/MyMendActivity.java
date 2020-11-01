@@ -153,7 +153,7 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
                     stringBuilder1 = new StringBuilder();
                     hashMap.put("userPhone", stringBuilder1.append("电话：").append(bean.getRecvPhone()).toString());
                     hashMap.put("orderStatus", "待处理");
-                    hashMap.put("userIcon", R.mipmap.ic_menu_user_on);
+                    hashMap.put("userIcon", R.drawable.alert);
                     list.add(hashMap);
                 }
                 SimpleAdapter simpleAdapter = new SimpleAdapter(MyMendActivity.this,

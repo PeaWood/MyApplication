@@ -284,6 +284,7 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
     private TextView msgText = null;
 
     private ProgressDialog readWriteDialog = null;
+    private ImageView imageView;
 
     private ScannerCallback scannerCallback = new ScannerCallback() {
         public void onReceiveScanDevice(BluetoothDevice param1BluetoothDevice, int param1Int, byte[] param1ArrayOfbyte) {
@@ -657,6 +658,13 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
             m_editTextPs = (EditText) findViewById(R.id.input_note);
             m_textViewCheckType = (TextView) findViewById(R.id.textview_checkType);
             m_textview_checkDetail = (TextView) findViewById(R.id.textview_checkDetail);
+            imageView = (ImageView) findViewById(R.id.img_back);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
             m_buttonNext.setOnClickListener(this);
             m_imageViewNav.setOnClickListener(this);
             m_imageViewCall.setOnClickListener(this);

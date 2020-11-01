@@ -155,7 +155,7 @@ public class MySecurityActivity extends BaseActivity implements View.OnClickList
                     stringBuilder1 = new StringBuilder();
                     hashMap.put("userPhone", stringBuilder1.append("电话：").append(itemsBean.getRecvPhone()).toString());
                     hashMap.put("orderStatus", "待处理");
-                    hashMap.put("userIcon", R.mipmap.ic_menu_user_on);
+                    hashMap.put("userIcon", R.drawable.alert);
                     list.add(hashMap);
                 }
                 SimpleAdapter simpleAdapter = new SimpleAdapter(MySecurityActivity.this,

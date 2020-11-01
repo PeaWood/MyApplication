@@ -17,7 +17,7 @@ android {
 
         ndk {
             //选择要添加的对应cpu类型的.so库。
-            abiFilters "armeabi-v7a" , "arm64-v8a", "x86", "x86_64"
+            abiFilters "armeabi-v7a" , "arm64-v8a", "x86", "x86_64",'armeabi'
         }
 
     }
@@ -72,4 +72,13 @@ dependencies {
     //    implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
     //    implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation project(':nfc')
+//    implementation 'com.aliyun.ams:alicloud-android-push:3.2.2'
+//    implementation 'com.aliyun.ams:alicloud-android-utdid:2.5.1-proguard'
+//    implementation 'com.aliyun.ams:alicloud-android-utils:1.1.6.4'
+//    implementation 'com.aliyun.ams:alicloud-android-ut:5.4.4'
+//    implementation 'com.aliyun.ams:alicloud-android-beacon:1.0.4.3'
+//    implementation 'com.aliyun.ams:alicloud-android-agoo:4.0.0-emas'
+//    implementation 'com.taobao.android:accs_sdk_taobao:4.0.0-emas'
+//    implementation 'com.taobao.android:networksdk:3.5.5.2-open'
+//    implementation 'com.taobao.android:tnet4android:3.1.14.7-all'
 }

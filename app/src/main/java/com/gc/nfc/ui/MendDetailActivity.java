@@ -299,6 +299,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   private TextView msgText = null;
   
   private ProgressDialog readWriteDialog = null;
+  private ImageView imageView;
   
   private ScannerCallback scannerCallback = new ScannerCallback() {
     @Override
@@ -739,6 +740,13 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
 //      this.m_editTextPs = (EditText)findViewById(2131230846);
 //      this.m_textViewCheckType = (TextView)findViewById(2131231096);
 //      this.m_textview_checkDetail = (TextView)findViewById(2131231095);
+        imageView = (ImageView) findViewById(R.id.img_back);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
       //this.m_buttonNext.setOnClickListener(this);
       //this.m_imageViewNav.setOnClickListener(this);
       //this.m_imageViewCall.setOnClickListener(this);
