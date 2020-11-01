@@ -366,6 +366,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     private RadioGroup radioGroup_nfc = null;
     private ProgressDialog readWriteDialog = null;
     //  private scalerSDK scale;
+    private ImageView imageView;
 
     private ScannerCallback scannerCallback = new ScannerCallback() {
         @Override
@@ -1580,6 +1581,13 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             m_imageAddZPManual = (ImageView) findViewById(R.id.imageView_addZPManual);
             msgText_weightDevice = (TextView) findViewById(R.id.msgText_weightDevice);
             m_imageView_search_weightDevice = (ImageView) findViewById(R.id.imageView_search_weightDevice);
+            imageView = (ImageView) findViewById(R.id.img_back);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
             m_imageView_search_weightDevice.setOnClickListener(this);
             m_imageViewZPEye.setOnClickListener(this);
             m_imageViewKPEye.setOnClickListener(this);

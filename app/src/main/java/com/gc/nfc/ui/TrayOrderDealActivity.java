@@ -173,6 +173,8 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private ImageView imageView;
+
     private String DoubleCast(Double paramDouble) {
         NumberFormat numberFormat = NumberFormat.getNumberInstance();
         numberFormat.setMaximumFractionDigits(2);
@@ -613,6 +615,13 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
             m_textViewCouponAmount = (TextView) findViewById(R.id.textview_couponAmount);//优惠金额
             m_imageViewPic = (ImageView) findViewById(R.id.imageView_pic);//拍照上传
             m_imageViewSign = (ImageView) findViewById(R.id.imageSign_pic);//电子签名  这个有问题 原来没有定义这个图片
+            imageView = (ImageView) findViewById(R.id.img_back);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
             m_imageViewPic.setOnClickListener(this);
             m_imageViewSign.setOnClickListener(this);
             m_textViewResidualGasFee = (TextView) findViewById(R.id.textview_residualGasFee);//残气抵扣
