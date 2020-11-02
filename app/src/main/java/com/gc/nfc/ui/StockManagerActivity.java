@@ -46,13 +46,13 @@ import com.dk.bleNfc.Exception.CardNoResponseException;
 import com.dk.bleNfc.Exception.DeviceNoResponseException;
 import com.dk.bleNfc.Tool.StringTool;
 import com.dk.bleNfc.card.Ntag21x;
-//import com.dk.weightScale.ScaleDevice;
-//import com.dk.weightScale.scalerSDK;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.interfaces.Netcallback;
+import com.gc.nfc.sca.ScaleDevice;
+import com.gc.nfc.sca.scalerSDK;
 import com.gc.nfc.utils.SharedPreferencesHelper;
 import com.gc.nfc.utils.Tools;
 //import com.google.zxing.integration.android.IntentIntegrator;
@@ -86,12 +86,12 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
         super.onReceiveConnectBtDevice(param1Boolean);
         if (param1Boolean) {
           System.out.println("Activity设备连接成功");
-          StockManagerActivity.this.msgBuffer.delete(0, StockManagerActivity.this.msgBuffer.length());
-          StockManagerActivity.this.msgBuffer.append("设备连接成功!");
-          if (StockManagerActivity.this.mNearestBle != null);
+          msgBuffer.delete(0, msgBuffer.length());
+          msgBuffer.append("设备连接成功!");
+          if (mNearestBle != null);
           try {
             Thread.sleep(500L);
-            StockManagerActivity.this.handler.sendEmptyMessage(3);
+            handler.sendEmptyMessage(3);
           } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
           } 
@@ -110,9 +110,9 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
       public void onReceiveDisConnectDevice(boolean param1Boolean) {
         super.onReceiveDisConnectDevice(param1Boolean);
         System.out.println("Activity设备断开链接");
-        StockManagerActivity.this.msgBuffer.delete(0, StockManagerActivity.this.msgBuffer.length());
-        StockManagerActivity.this.msgBuffer.append("设备断开链接!");
-        StockManagerActivity.this.handler.sendEmptyMessage(0);
+        msgBuffer.delete(0, msgBuffer.length());
+        msgBuffer.append("设备断开链接!");
+        handler.sendEmptyMessage(0);
       }
       
       public void onReceiveInitCiphy(boolean param1Boolean) {
@@ -136,16 +136,16 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                 public void run() {
                   try {
                     boolean bool;
-                    if (StockManagerActivity.this.bleNfcDevice.isAutoSearchCard()) {
-                      StockManagerActivity.this.bleNfcDevice.stoptAutoSearchCard();
-                      bool = StockManagerActivity.this.readWriteCardDemo(cardTypeTemp);
-                      StockManagerActivity.this.startAutoSearchCard();
+                    if (bleNfcDevice.isAutoSearchCard()) {
+                      bleNfcDevice.stoptAutoSearchCard();
+                      bool = readWriteCardDemo(cardTypeTemp);
+                      startAutoSearchCard();
                     } else {
-                      bool = StockManagerActivity.this.readWriteCardDemo(cardTypeTemp);
-                      StockManagerActivity.this.bleNfcDevice.closeRf();
+                      bool = readWriteCardDemo(cardTypeTemp);
+                      bleNfcDevice.closeRf();
                     } 
                     if (bool) {
-                      StockManagerActivity.this.bleNfcDevice.openBeep(50, 50, 3);
+                      bleNfcDevice.openBeep(50, 50, 3);
                       return;
                     } 
                   } catch (DeviceNoResponseException deviceNoResponseException) {
@@ -165,64 +165,64 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
   
   private Handler handler = new Handler() {
       public void handleMessage(Message param1Message) {
-        StockManagerActivity.this.msgText.setText(StockManagerActivity.this.msgBuffer);
-        if (StockManagerActivity.this.bleNfcDevice.isConnection() == 2 || StockManagerActivity.this.bleNfcDevice.isConnection() == 1);
+        msgText.setText(msgBuffer);
+        if (bleNfcDevice.isConnection() == 2 || bleNfcDevice.isConnection() == 1);
         switch (param1Message.what) {
           case 3:
             (new Thread(new Runnable() {
                   public void run() {
                     try {
-                      StockManagerActivity.this.bleNfcDevice.getDeviceVersions();
-                      StockManagerActivity.this.handler.sendEmptyMessage(0);
-                      if (StockManagerActivity.this.bleNfcDevice.getDeviceBatteryVoltage() < 3.61D) {
-                        StockManagerActivity.this.msgBuffer.append("(电量低)");
+                      bleNfcDevice.getDeviceVersions();
+                      handler.sendEmptyMessage(0);
+                      if (bleNfcDevice.getDeviceBatteryVoltage() < 3.61D) {
+                        msgBuffer.append("(电量低)");
                       } else {
-                        StockManagerActivity.this.msgBuffer.append("(电量充足)");
+                        msgBuffer.append("(电量充足)");
                       } 
-                      StockManagerActivity.this.handler.sendEmptyMessage(0);
-                      if (StockManagerActivity.this.bleNfcDevice.androidFastParams(true));
-                      StockManagerActivity.this.handler.sendEmptyMessage(0);
-                      StockManagerActivity.this.handler.sendEmptyMessage(0);
-                      StockManagerActivity.this.startAutoSearchCard();
+                      handler.sendEmptyMessage(0);
+                      if (bleNfcDevice.androidFastParams(true));
+                      handler.sendEmptyMessage(0);
+                      handler.sendEmptyMessage(0);
+                      startAutoSearchCard();
                     } catch (DeviceNoResponseException deviceNoResponseException) {
                       deviceNoResponseException.printStackTrace();
                     } 
                   }
                 })).start();
           case 136:
-              if (StockManagerActivity.this.m_takerOverUserId == null)
-                  StockManagerActivity.this.showToast("请扫码获取交接人信息！");
+              if (m_takerOverUserId == null)
+                  showToast("请扫码获取交接人信息！");
               String str = param1Message.obj.toString();
               if (str == null)
-                  StockManagerActivity.this.showToast("空标签！");
+                  showToast("空标签！");
               new String();
-              if (StockManagerActivity.this.m_selected_nfc_model == 0) {
+              if (m_selected_nfc_model == 0) {
                   String str1 = null;
-                  if (StockManagerActivity.this.m_curLoginUserId.getGroupCode().equals("00005")) {
+                  if (m_curLoginUserId.getGroupCode().equals("00005")) {
                       str1 = "2";
-                  } else if (StockManagerActivity.this.m_curLoginUserId.getGroupCode().equals("00006")) {
+                  } else if (m_curLoginUserId.getGroupCode().equals("00006")) {
                       str1 = "1";
                   } else {
                       Toast.makeText((Context)StockManagerActivity.this, "非充气站或门店账户，请退出！", Toast.LENGTH_LONG).show();
                   }
-                  StockManagerActivity.this.judgeBottleScrap(str, str1);
+                  judgeBottleScrap(str, str1);
               }
-              if (StockManagerActivity.this.m_selected_nfc_model == 1) {
+              if (m_selected_nfc_model == 1) {
                   String str1 = "";
-                  if (StockManagerActivity.this.m_curLoginUserId.getGroupCode().equals("00005")) {
-                      if (StockManagerActivity.this.m_takeOverGroupCode.equals("00007")) {
+                  if (m_curLoginUserId.getGroupCode().equals("00005")) {
+                      if (m_takeOverGroupCode.equals("00007")) {
                           str1 = "3";
-                      } else if (StockManagerActivity.this.m_takeOverGroupCode.equals("00003")) {
+                      } else if (m_takeOverGroupCode.equals("00003")) {
                           str1 = "4";
                       } else {
                           Toast.makeText((Context)StockManagerActivity.this, "非配送工或调拨车账户，请更换！", Toast.LENGTH_LONG).show();
                       }
-                  } else if (StockManagerActivity.this.m_curLoginUserId.getGroupCode().equals("00006")) {
+                  } else if (m_curLoginUserId.getGroupCode().equals("00006")) {
                       str1 = "3";
                   } else {
                       Toast.makeText((Context)StockManagerActivity.this, "非充气站或门店账户，请退出！", Toast.LENGTH_LONG).show();
                   }
-                  StockManagerActivity.this.bottleTakeOverUnit(str, StockManagerActivity.this.m_curLoginUserId.getUsername(), StockManagerActivity.this.m_takerOverUserId, str1, StockManagerActivity.this.m_curLoginUserId.getDepartmentName() + "|钢瓶出库", false, false);
+                  bottleTakeOverUnit(str, m_curLoginUserId.getUsername(), m_takerOverUserId, str1, m_curLoginUserId.getDepartmentName() + "|钢瓶出库", false, false);
               }
               break;
         } 
@@ -263,13 +263,13 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
         BleNfcDeviceService bleNfcDeviceService = ((BleNfcDeviceService.LocalBinder)param1IBinder).getService();
         bleNfcDevice =  bleNfcDeviceService.bleNfcDevice;
         mScanner = bleNfcDeviceService.scanner;
-        bleNfcDeviceService.setDeviceManagerCallback(StockManagerActivity.this.deviceManagerCallback);
-        bleNfcDeviceService.setScannerCallback(StockManagerActivity.this.scannerCallback);
-        StockManagerActivity.this.searchNearestBleDevice();
+        bleNfcDeviceService.setDeviceManagerCallback(deviceManagerCallback);
+        bleNfcDeviceService.setScannerCallback(scannerCallback);
+        searchNearestBleDevice();
       }
       
       public void onServiceDisconnected(ComponentName param1ComponentName) {
-        StockManagerActivity.this.mBleNfcDeviceService = null;
+        mBleNfcDeviceService = null;
       }
     };
   
@@ -325,7 +325,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
   
   private ProgressDialog readWriteDialog = null;
   
-//  private scalerSDK scale;
+  private scalerSDK scale;
   
   private ScannerCallback scannerCallback = new ScannerCallback() {
       public void onReceiveScanDevice(BluetoothDevice param1BluetoothDevice, int param1Int, byte[] param1ArrayOfbyte) {
@@ -333,26 +333,26 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
         if (Build.VERSION.SDK_INT >= 21)
           System.out.println("Activity搜到设备：" + param1BluetoothDevice.getName() + " 信号强度：" + param1Int + " scanRecord：" + StringTool.byteHexToSting(param1ArrayOfbyte)); 
         if (param1ArrayOfbyte != null && StringTool.byteHexToSting(param1ArrayOfbyte).contains("017f5450") && param1Int >= -55) {
-          StockManagerActivity.this.handler.sendEmptyMessage(0);
-          if (StockManagerActivity.this.mNearestBle != null) {
-            if (param1Int > StockManagerActivity.this.lastRssi) {
-              StockManagerActivity.this.mNearestBleLock.lock();
+          handler.sendEmptyMessage(0);
+          if (mNearestBle != null) {
+            if (param1Int > lastRssi) {
+              mNearestBleLock.lock();
               try {
                   mNearestBle = param1BluetoothDevice;
                 return;
               } finally {
-                StockManagerActivity.this.mNearestBleLock.unlock();
+                mNearestBleLock.unlock();
               } 
             } 
             return;
           } 
-          StockManagerActivity.this.mNearestBleLock.lock();
+          mNearestBleLock.lock();
           try {
               mNearestBle = param1BluetoothDevice;
-            StockManagerActivity.this.mNearestBleLock.unlock();
+            mNearestBleLock.unlock();
             return;
           } finally {
-            StockManagerActivity.this.mNearestBleLock.unlock();
+            mNearestBleLock.unlock();
           } 
         } 
       }
@@ -366,23 +366,25 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
   
   private Runnable task = new Runnable() {
       public void run() {
-        StockManagerActivity.this.handler_weightScale.postDelayed(this, 150L);
-//        if (StockManagerActivity.this.scale.bleIsEnabled()) {
-//          StockManagerActivity.this.scale.Scan(true);
-//          StockManagerActivity.this.scale.updatelist();
-//          if (StockManagerActivity.this.scale.getDevicelist().isEmpty() != true) {
-//            if (StockManagerActivity.this.scale.getDevicelist().size() != 1) {
-//              StockManagerActivity.this.msgText_weightDevice.setText("多台蓝牙秤冲突！");
-//              return;
-//            }
-//            StockManagerActivity.this.msgText_weightDevice.setText("连接正常！");
-//            float f = ((ScaleDevice)StockManagerActivity.this.scale.getDevicelist().get(0)).scalevalue;
-//            if (StockManagerActivity.this.layout_inputWeight != null)
-//              ((TextView)StockManagerActivity.this.layout_inputWeight.findViewById(2131230836)).setText(String.format("%4.1f", new Object[] { Float.valueOf(f) }));
-//            return;
-//          }
-//          StockManagerActivity.this.msgText_weightDevice.setText("未连接！");
-//        }
+        handler_weightScale.postDelayed(this, 150L);
+        if (scale.bleIsEnabled()) {
+          scale.Scan(true);
+          scale.updatelist();
+          if (scale.getDevicelist().isEmpty() != true) {
+            if (scale.getDevicelist().size() != 1) {
+              msgText_weightDevice.setText("多台蓝牙秤冲突！");
+              return;
+            }
+            msgText_weightDevice.setText("连接正常！");
+            float f = ((ScaleDevice)scale.getDevicelist().get(0)).scalevalue;
+            if (layout_inputWeight != null){
+                TextView tv = layout_inputWeight.findViewById(R.id.input_bottleWeight);
+                tv.setText(String.format("%4.1f", new Object[] { Float.valueOf(f) }));
+            }
+             return;
+          }
+          msgText_weightDevice.setText("未连接！");
+        }
       }
     };
   
@@ -397,8 +399,8 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     int i = 0;
     while (true) {
       boolean bool1 = bool;
-      if (i < this.m_BottlesListZP.size())
-        if (((String)this.m_BottlesListZP.get(i)).equals(paramString)) {
+      if (i < m_BottlesListZP.size())
+        if (((String)m_BottlesListZP.get(i)).equals(paramString)) {
           bool1 = true;
         } else {
           i++;
@@ -406,35 +408,35 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
         }  
       if (!bool1) {
         showToast(paramString);
-        this.m_BottlesListZP.add(paramString);
+        m_BottlesListZP.add(paramString);
         refleshBottlesListZP();
         i = paramString.length();
         if (i >= 3) {
           paramString = paramString.substring(i - 3, i);
-          this.tts.speak(toChinese(paramString), 0, null);
+          tts.speak(toChinese(paramString), 0, null);
           return;
         } 
       } else {
         return;
       } 
-      this.tts.speak(toChinese(paramString), 0, null);
+      tts.speak(toChinese(paramString), 0, null);
       return;
     } 
   }
   
   private void blueDeviceInitial() {
-    this.msgText = (TextView)findViewById(R.id.msgText);
-    this.m_imageViewSearchBlue = (ImageView)findViewById(R.id.imageView_search);
-    this.m_imageViewSearchBlue.setOnClickListener(new StartSearchButtonListener());
-    this.msgBuffer = new StringBuffer();
-    bindService(new Intent((Context)this, BleNfcDeviceService.class), this.mServiceConnection, Context.BIND_AUTO_CREATE);
+    msgText = (TextView)findViewById(R.id.msgText);
+    m_imageViewSearchBlue = (ImageView)findViewById(R.id.imageView_search);
+    m_imageViewSearchBlue.setOnClickListener(new StartSearchButtonListener());
+    msgBuffer = new StringBuffer();
+    bindService(new Intent((Context)this, BleNfcDeviceService.class), mServiceConnection, Context.BIND_AUTO_CREATE);
   }
   
   private void cleanAll() {
-    this.m_takerOverUserId = null;
-    this.m_BottlesListZP.clear();
+    m_takerOverUserId = null;
+    m_BottlesListZP.clear();
     refleshBottlesListZP();
-    this.m_editTextTakeOverUserId.setText("");
+    m_editTextTakeOverUserId.setText("");
   }
   
   private String getResponseMessage(HttpResponse paramHttpResponse) {
@@ -446,8 +448,8 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     SharedPreferencesHelper.put("password", "");
     NetRequestConstant netRequestConstant = new NetRequestConstant();
     netRequestConstant.setType(HttpRequestType.GET);
-    String str = this.m_curLoginUserId.getUsername();
-    this.m_curLoginUserId.getPassword();
+    String str = m_curLoginUserId.getUsername();
+    m_curLoginUserId.getPassword();
     netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/sysusers/logout/" + str;
     netRequestConstant.context = (Context)this;
     netRequestConstant.setParams(new HashMap<Object, Object>());
@@ -457,9 +459,9 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                 HttpResponse response = (HttpResponse) param1Object;
               if (param1Object != null) {
                 if (response.getStatusLine().getStatusCode() == 200) {
-                  param1Object = new Intent(StockManagerActivity.this.getApplicationContext(), LoginActivity.class);
-                  StockManagerActivity.this.startActivity((Intent)param1Object);
-                  StockManagerActivity.this.finish();
+                  param1Object = new Intent(getApplicationContext(), LoginActivity.class);
+                  startActivity((Intent)param1Object);
+                  finish();
                   return;
                 } 
                 Toast.makeText((Context)StockManagerActivity.this, "退出登录失败", Toast.LENGTH_LONG).show();
@@ -510,20 +512,20 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                           } 
                         } 
                         if (bool1) {
-                          StockManagerActivity.this.showBottleInfo(bottleCode, "斤", (String)param1Object, nextStatus);
+                          showBottleInfo(bottleCode, "斤", (String)param1Object, nextStatus);
                           return;
                         } 
-                        StockManagerActivity.this.showToast("信息查询失败");
+                        showToast("信息查询失败");
                         return;
                       } 
                     } 
                     stockManagerActivity = StockManagerActivity.this;
                     String str3 = bottleCode;
-                    String str4 = StockManagerActivity.this.m_takerOverUserId;
-                    String str2 = StockManagerActivity.this.m_curLoginUserId.getUsername();
+                    String str4 = m_takerOverUserId;
+                    String str2 = m_curLoginUserId.getUsername();
                     String str5 = nextStatus;
                       StringBuilder stringBuilder = new StringBuilder();
-                      stockManagerActivity.bottleTakeOverUnit(str3, str4, str2, str5, stringBuilder.append(StockManagerActivity.this.m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
+                      stockManagerActivity.bottleTakeOverUnit(str3, str4, str2, str5, stringBuilder.append(m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
                   } catch (IOException iOException) {
                     Toast.makeText((Context)StockManagerActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
                   } catch (JSONException jSONException) {
@@ -532,8 +534,8 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                   return;
                 } 
                 if (httpResponse.getStatusLine().getStatusCode() == 404) {
-                  StockManagerActivity.this.showToast("未找到销售行为");
-                  StockManagerActivity.this.bottleTakeOverUnit(bottleCode, StockManagerActivity.this.m_takerOverUserId, StockManagerActivity.this.m_curLoginUserId.getUsername(), nextStatus, StockManagerActivity.this.m_curLoginUserId.getDepartmentName() + "|钢瓶入库", false, true);
+                  showToast("未找到销售行为");
+                  bottleTakeOverUnit(bottleCode, m_takerOverUserId, m_curLoginUserId.getUsername(), nextStatus, m_curLoginUserId.getDepartmentName() + "|钢瓶入库", false, true);
                 } 
                 return;
               } 
@@ -552,7 +554,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
       case 6:
         break;
     } 
-//    Ntag21x ntag21x = (Ntag21x)this.bleNfcDevice.getCard();
+//    Ntag21x ntag21x = (Ntag21x)bleNfcDevice.getCard();
 //    if (ntag21x != null) {
 //      boolean bool;
 //      try {
@@ -560,7 +562,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
 //        Message message = new Message();
 //        message.obj = str;
 //        message.what = 136;
-//        this.handler.sendMessage(message);
+//        handler.sendMessage(message);
 //      } catch (CardNoResponseException cardNoResponseException) {
 //        cardNoResponseException.printStackTrace();
 //        bool = false;
@@ -571,23 +573,23 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
   }
   
   private void refleshBottlesListZP() {
-    this.m_textViewTotalCountZP.setText(Integer.toString(this.m_BottlesListZP.size()));
+    m_textViewTotalCountZP.setText(Integer.toString(m_BottlesListZP.size()));
     ArrayList arrayList = new ArrayList();
-    for (byte b = 0; b < this.m_BottlesListZP.size(); b++) {
+    for (byte b = 0; b < m_BottlesListZP.size(); b++) {
       HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-      hashMap.put("bottleCode", this.m_BottlesListZP.get(b));
+      hashMap.put("bottleCode", m_BottlesListZP.get(b));
       arrayList.add(hashMap);
     } //下面这个布局先写上 不确定
     SimpleAdapter simpleAdapter = new SimpleAdapter((Context)this, arrayList, R.layout.bottle_list_items, new String[] { "bottleCode" }, new int[] { R.id.items_spec });
-    this.m_listView_zp.setAdapter((ListAdapter)simpleAdapter);
-    setListViewHeightBasedOnChildren(this.m_listView_zp);
+    m_listView_zp.setAdapter((ListAdapter)simpleAdapter);
+    setListViewHeightBasedOnChildren(m_listView_zp);
   }
   
   private void searchNearestBleDevice() {
-    this.msgBuffer.delete(0, this.msgBuffer.length());
-    this.msgBuffer.append("正在搜索设备...");
-    this.handler.sendEmptyMessage(0);
-    if (!this.mScanner.isScanning() && this.bleNfcDevice.isConnection() == 0)
+    msgBuffer.delete(0, msgBuffer.length());
+    msgBuffer.append("正在搜索设备...");
+    handler.sendEmptyMessage(0);
+    if (!mScanner.isScanning() && bleNfcDevice.isConnection() == 0)
       (new Thread(new Runnable() {
             public void run() {
 
@@ -614,7 +616,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
   
   private void showBottleInfo(final String bottleCode, String paramString2, String paramString3, final String nextStatus) {
     final View layout = getLayoutInflater().inflate(R.layout.show_bottle_info, null);
-//    this.layout_inputWeight = view;
+    layout_inputWeight = layout;
     TextView textView1 = (TextView)layout.findViewById(R.id.textView_bottleCode);
     TextView textView2 = (TextView)layout.findViewById(R.id.textView_checkDetail);
     TextView textView3 = (TextView)layout.findViewById(R.id.input_bottleWeight);
@@ -630,8 +632,8 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
             TextView textView1 = (TextView)layout.findViewById(R.id.input_bottleWeight);//不确定
             String str2 = textView2.getText().toString();
             String str1 = textView1.getText().toString();
-            StockManagerActivity.this.uploadWeightWarning(bottleCode, StockManagerActivity.this.m_takerOverUserId, StockManagerActivity.this.m_curLoginUserId.getUsername(), str1, str2, "6", nextStatus);
-            StockManagerActivity.this.bottleTakeOverUnit(bottleCode, StockManagerActivity.this.m_takerOverUserId, StockManagerActivity.this.m_curLoginUserId.getUsername(), nextStatus, StockManagerActivity.this.m_curLoginUserId.getDepartmentName() + "|钢瓶入库", false, true);
+            uploadWeightWarning(bottleCode, m_takerOverUserId, m_curLoginUserId.getUsername(), str1, str2, "6", nextStatus);
+            bottleTakeOverUnit(bottleCode, m_takerOverUserId, m_curLoginUserId.getUsername(), nextStatus, m_curLoginUserId.getDepartmentName() + "|钢瓶入库", false, true);
           }
         });
     builder.setCancelable(false);
@@ -650,12 +652,12 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
             } 
             double d = Double.parseDouble(str2);
             if (Math.abs(Double.parseDouble(str1) - d) < 0.5D) {
-              StockManagerActivity.this.bottleTakeOverUnit(bottleCode, StockManagerActivity.this.m_takerOverUserId, StockManagerActivity.this.m_curLoginUserId.getUsername(), nextStatus, StockManagerActivity.this.m_curLoginUserId.getDepartmentName() + "|钢瓶入库", false, true);
+              bottleTakeOverUnit(bottleCode, m_takerOverUserId, m_curLoginUserId.getUsername(), nextStatus, m_curLoginUserId.getDepartmentName() + "|钢瓶入库", false, true);
               dialog.cancel();
               return;
             } 
             MediaPlayer.create((Context)StockManagerActivity.this, R.raw.alarm).start();
-            Toast.makeText(StockManagerActivity.this.getApplicationContext(), "残气重量报警,误差过大！", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "残气重量报警,误差过大！", Toast.LENGTH_LONG).show();
           }
         });
   }
@@ -665,12 +667,12 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     message.what = 4;
     message.arg1 = paramInt;
     message.obj = paramString;
-    this.handler.sendMessage(message);
+    handler.sendMessage(message);
   }
   
   private void showScrapBottleInfo(String paramString1, String paramString2) {
     View view = getLayoutInflater().inflate(R.layout.show_scrap_bottle_info, null);
-    this.layout_inputWeight = view;
+    layout_inputWeight = view;
     TextView textView1 = (TextView)view.findViewById(R.id.textView_bottleCode);
     TextView textView2 = (TextView)view.findViewById(R.id.textView_scrapDate);
     textView1.setText(paramString1);
@@ -683,35 +685,35 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
   }
   
   private void showToast(String paramString) {
-    if (this.toast == null) {
-      this.toast = Toast.makeText((Context)this, null, Toast.LENGTH_SHORT);
-      this.toast.setGravity(17, 0, 0);
-      LinearLayout linearLayout = (LinearLayout)this.toast.getView();
+    if (toast == null) {
+      toast = Toast.makeText((Context)this, null, Toast.LENGTH_SHORT);
+      toast.setGravity(17, 0, 0);
+      LinearLayout linearLayout = (LinearLayout)toast.getView();
       WindowManager windowManager = (WindowManager)getSystemService(Service.WINDOW_SERVICE);
       DisplayMetrics displayMetrics = new DisplayMetrics();
       windowManager.getDefaultDisplay().getMetrics(displayMetrics);
-      this.tv = new TextView((Context)this);
+      tv = new TextView((Context)this);
       linearLayout.getBackground().setAlpha(0);
-      this.tv.setTextSize(40.0F);
-      this.tv.setTextColor(getResources().getColor(R.color.blue));
+      tv.setTextSize(40.0F);
+      tv.setTextColor(getResources().getColor(R.color.blue));
       linearLayout.setGravity(17);
       LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-2, -2);
       layoutParams.setMargins(0, 0, 0, 180);
-      this.tv.setLayoutParams((ViewGroup.LayoutParams)layoutParams);
-      this.toast.setView((View)linearLayout);
-      linearLayout.addView((View)this.tv);
+      tv.setLayoutParams((ViewGroup.LayoutParams)layoutParams);
+      toast.setView((View)linearLayout);
+      linearLayout.addView((View)tv);
     } 
-    this.tv.setText(paramString);
-    this.toast.show();
+    tv.setText(paramString);
+    toast.show();
   }
   
   private boolean startAutoSearchCard() throws DeviceNoResponseException {
     for (byte b = 0;; b++) {
-      boolean bool = this.bleNfcDevice.startAutoSearchCard((byte)20, (byte)2);
+      boolean bool = bleNfcDevice.startAutoSearchCard((byte)20, (byte)2);
       if (bool || b >= 10) {
         if (!bool) {
-          this.msgBuffer.append("不支持自动寻卡！\r\n");
-          this.handler.sendEmptyMessage(0);
+          msgBuffer.append("不支持自动寻卡！\r\n");
+          handler.sendEmptyMessage(0);
         } 
         return bool;
       } 
@@ -747,14 +749,14 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
 //                    StockManagerActivity.access$502(StockManagerActivity.this, str3);
                     if (str3.equals("00007")) {
 //                      StockManagerActivity.access$602(StockManagerActivity.this, (String)param1Object);
-                      textView = StockManagerActivity.this.m_editTextTakeOverUserId;
+                      textView = m_editTextTakeOverUserId;
                       StringBuilder stringBuilder = new StringBuilder();
                       textView.setText(stringBuilder.append((String)param1Object).append(" (姓名:").append(str1).append(" | 工作组:").append(str2).append(")").toString());
                       return;
                     } 
-                    if (StockManagerActivity.this.m_editTextTakeOverUserId.equals("00003")) {
+                    if (m_editTextTakeOverUserId.equals("00003")) {
 //                      StockManagerActivity.access$602(StockManagerActivity.this, (String)param1Object);
-                      TextView textView1 = StockManagerActivity.this.m_editTextTakeOverUserId;
+                      TextView textView1 = m_editTextTakeOverUserId;
                       StringBuilder stringBuilder = new StringBuilder();
                       textView1.setText(stringBuilder.append((String)param1Object).append(" (姓名:").append(str1).append(" | 工作组:").append(str2).append(")").toString());
                       return;
@@ -762,14 +764,14 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                     Toast.makeText((Context)StockManagerActivity.this, "非配送工或调拨车账户，请更换！", Toast.LENGTH_LONG).show();
                   } catch (IOException iOException) {
                     Toast.makeText((Context)StockManagerActivity.this, "无效账户！", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(StockManagerActivity.this.getApplicationContext(), LoginActivity.class);
-                    StockManagerActivity.this.startActivity(intent);
-                    StockManagerActivity.this.finish();
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                    finish();
                   } catch (JSONException jSONException) {
                     Toast.makeText((Context)StockManagerActivity.this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(StockManagerActivity.this.getApplicationContext(), LoginActivity.class);
-                    StockManagerActivity.this.startActivity(intent);
-                    StockManagerActivity.this.finish();
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                    finish();
                   } 
                   return;
                 } 
@@ -777,15 +779,15 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                 return;
               } 
               Toast.makeText((Context)StockManagerActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
-              param1Object = new Intent(StockManagerActivity.this.getApplicationContext(), LoginActivity.class);
-              StockManagerActivity.this.startActivity((Intent)param1Object);
-              StockManagerActivity.this.finish();
+              param1Object = new Intent(getApplicationContext(), LoginActivity.class);
+              startActivity((Intent)param1Object);
+              finish();
               return;
             } 
             Toast.makeText((Context)StockManagerActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
-            param1Object = new Intent(StockManagerActivity.this.getApplicationContext(), LoginActivity.class);
-            StockManagerActivity.this.startActivity((Intent)param1Object);
-            StockManagerActivity.this.finish();
+            param1Object = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity((Intent)param1Object);
+            finish();
           }
         },netRequestConstant);
   }
@@ -828,7 +830,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
   }
   
   public void bottleTakeOverUnit(final String bottleCode, final String srcUserId, final String targetUserId, final String serviceStatus, final String note, boolean paramBoolean1, final boolean isRuKu) {
-    if (this.m_takerOverUserId == null) {
+    if (m_takerOverUserId == null) {
       showToast("请扫码获取交接人信息！");
       return;
     } 
@@ -836,8 +838,8 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     byte b = 0;
     while (true) {
       boolean bool1 = bool;
-      if (b < this.m_BottlesListZP.size())
-        if (((String)this.m_BottlesListZP.get(b)).equals(bottleCode)) {
+      if (b < m_BottlesListZP.size())
+        if (((String)m_BottlesListZP.get(b)).equals(bottleCode)) {
           bool1 = true;
         } else {
           b++;
@@ -864,22 +866,22 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                   HttpResponse response = (HttpResponse) param1Object;
                 if (param1Object != null) {
                   if (response.getStatusLine().getStatusCode() == 200) {
-                    StockManagerActivity.this.addZP(bottleCode);
+                    addZP(bottleCode);
                     return;
                   } 
                   MediaPlayer.create((Context)StockManagerActivity.this, R.raw.alarm).start();
                   if (response.getStatusLine().getStatusCode() == 409) {
-                    (new AlertDialog.Builder((Context)StockManagerActivity.this)).setTitle("钢瓶异常流转！").setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + StockManagerActivity.this.getResponseMessage((HttpResponse)param1Object) + "\r\n确认强制交接吗？").setIcon(R.drawable.icon_bottle).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    (new AlertDialog.Builder((Context)StockManagerActivity.this)).setTitle("钢瓶异常流转！").setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + getResponseMessage((HttpResponse)param1Object) + "\r\n确认强制交接吗？").setIcon(R.drawable.icon_bottle).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                           public void onClick(DialogInterface param2DialogInterface, int param2Int) {
                             if (Tools.isFastClick())
-                              StockManagerActivity.this.bottleTakeOverUnit(bottleCode, srcUserId, targetUserId, serviceStatus, note, true, isRuKu); 
+                              bottleTakeOverUnit(bottleCode, srcUserId, targetUserId, serviceStatus, note, true, isRuKu); 
                           }
                         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
                           public void onClick(DialogInterface param2DialogInterface, int param2Int) {}
                         }).show();
                     return;
                   } 
-                  (new AlertDialog.Builder((Context)StockManagerActivity.this)).setTitle("钢瓶异常流转！").setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + StockManagerActivity.this.getResponseMessage((HttpResponse)param1Object)).setIcon(R.drawable.icon_logo).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                  (new AlertDialog.Builder((Context)StockManagerActivity.this)).setTitle("钢瓶异常流转！").setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + getResponseMessage((HttpResponse)param1Object)).setIcon(R.drawable.icon_logo).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface param2DialogInterface, int param2Int) {}
                       }).show();
                   return;
@@ -902,9 +904,9 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface param1DialogInterface, int param1Int) {
             new HashMap<Object, Object>();
-            String str = (String)((Map)StockManagerActivity.this.m_listView_zp.getItemAtPosition(position)).get("bottleCode");
-            StockManagerActivity.this.m_BottlesListZP.remove(str);
-            StockManagerActivity.this.refleshBottlesListZP();
+            String str = (String)((Map)m_listView_zp.getItemAtPosition(position)).get("bottleCode");
+            m_BottlesListZP.remove(str);
+            refleshBottlesListZP();
           }
         });
     builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -921,7 +923,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
             }
           }).setNegativeButton("退出登录", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface param1DialogInterface, int param1Int) {
-              StockManagerActivity.this.loginOut();
+              loginOut();
             }
           }).show();
       return false;
@@ -930,49 +932,49 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
   }
   
   void init() {
-    this.tts = new TextToSpeech((Context)this, this);
+    tts = new TextToSpeech((Context)this, this);
     setContentView(R.layout.activity_stock_manage);
-    this.m_buttonNext = (Button)findViewById(R.id.button_next);
-    this.m_listView_zp = (ListView)findViewById(R.id.listview_zp);
-    this.radioGroup_nfc = (RadioGroup)findViewById(R.id.radioGroup_nfc_id);
-    this.radioButton_kp = (RadioButton)findViewById(R.id.radioButton_kp_id);
-    this.radioButton_zp = (RadioButton)findViewById(R.id.radioButton_zp_id);
-    this.m_bottleIdZPEditText = (EditText)findViewById(R.id.input_bottleIdZP);
-    this.m_imageAddZPManual = (ImageView)findViewById(R.id.imageView_addZPManual);
-    this.m_imageViewScan = (ImageView)findViewById(R.id.imageView_Scan);
-    this.m_textViewTotalCountZP = (TextView)findViewById(R.id.items_totalCountZP);
-    this.msgText_weightDevice = (TextView)findViewById(R.id.msgText_weightDevice);
-    this.m_imageAddZPManual.setOnClickListener(this);
-    this.m_imageViewScan.setOnClickListener(this);
-    this.m_spinnerGPHead = (Spinner)findViewById(R.id.spinner_gp_head);
-    this.m_buttonNext.setOnClickListener(this);
-    this.radioGroup_nfc.setOnCheckedChangeListener(this.listen);
-    this.radioGroup_nfc.check(this.radioButton_kp.getId());
-    this.m_BottlesListZP = new ArrayList<String>();
-    this.m_editTextTakeOverUserId = (TextView)findViewById(R.id.input_TakeOverUserId);
-    this.m_textView_Department = (TextView)findViewById(R.id.textView_Department);
-    this.appContext = (AppContext)getApplicationContext();
-    this.m_curLoginUserId = this.appContext.getUser();
-    if (this.m_curLoginUserId == null) {
+    m_buttonNext = (Button)findViewById(R.id.button_next);
+    m_listView_zp = (ListView)findViewById(R.id.listview_zp);
+    radioGroup_nfc = (RadioGroup)findViewById(R.id.radioGroup_nfc_id);
+    radioButton_kp = (RadioButton)findViewById(R.id.radioButton_kp_id);
+    radioButton_zp = (RadioButton)findViewById(R.id.radioButton_zp_id);
+    m_bottleIdZPEditText = (EditText)findViewById(R.id.input_bottleIdZP);
+    m_imageAddZPManual = (ImageView)findViewById(R.id.imageView_addZPManual);
+    m_imageViewScan = (ImageView)findViewById(R.id.imageView_Scan);
+    m_textViewTotalCountZP = (TextView)findViewById(R.id.items_totalCountZP);
+    msgText_weightDevice = (TextView)findViewById(R.id.msgText_weightDevice);
+    m_imageAddZPManual.setOnClickListener(this);
+    m_imageViewScan.setOnClickListener(this);
+    m_spinnerGPHead = (Spinner)findViewById(R.id.spinner_gp_head);
+    m_buttonNext.setOnClickListener(this);
+    radioGroup_nfc.setOnCheckedChangeListener(listen);
+    radioGroup_nfc.check(radioButton_kp.getId());
+    m_BottlesListZP = new ArrayList<String>();
+    m_editTextTakeOverUserId = (TextView)findViewById(R.id.input_TakeOverUserId);
+    m_textView_Department = (TextView)findViewById(R.id.textView_Department);
+    appContext = (AppContext)getApplicationContext();
+    m_curLoginUserId = appContext.getUser();
+    if (m_curLoginUserId == null) {
       Toast.makeText((Context)this, "登陆会话失效", Toast.LENGTH_LONG).show();
       startActivity(new Intent((Context)this, LoginActivity.class));
       finish();
     } 
-    this.m_listView_zp.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+    m_listView_zp.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
           public boolean onItemLongClick(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
             return true;
           }
         });
-    this.m_takerOverUserId = null;
-    String str = this.m_curLoginUserId.getUsername();
-    this.m_textView_Department.setText(str + "(" + this.m_curLoginUserId.getGroupName() + "|" + this.m_curLoginUserId.getDepartmentName() + ")");
+    m_takerOverUserId = null;
+    String str = m_curLoginUserId.getUsername();
+    m_textView_Department.setText(str + "(" + m_curLoginUserId.getGroupName() + "|" + m_curLoginUserId.getDepartmentName() + ")");
     blueDeviceInitial();
-//    this.scale = new scalerSDK((Context)this);
-    this.handler_weightScale.post(this.task);
-    this.layout_inputWeight = null;
-    this.m_imageView_search_weightDevice = (ImageView)findViewById(R.id.imageView_search_weightDevice);
-    this.m_imageView_search_weightDevice.setOnClickListener(this);
-    this.m_spinnerGPHead.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+    scale = new scalerSDK((Context)this);
+    handler_weightScale.post(task);
+    layout_inputWeight = null;
+    m_imageView_search_weightDevice = (ImageView)findViewById(R.id.imageView_search_weightDevice);
+    m_imageView_search_weightDevice.setOnClickListener(this);
+    m_spinnerGPHead.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
           public void onItemSelected(AdapterView<?> param1AdapterView, View param1View, int param1Int, long param1Long) {
               String[] strs = new String[8];
               strs[0] = "KMA2B";
@@ -998,7 +1000,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
       builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface param1DialogInterface, int param1Int) {
               Intent intent = new Intent("android.settings.LOCATION_SOURCE_SETTINGS");
-              StockManagerActivity.this.startActivityForResult(intent, 0);
+              startActivityForResult(intent, 0);
             }
           });
       builder.show();
@@ -1028,7 +1030,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                     Date date1 = new Date();
                     param1Object = items.getJSONObject("serviceStatus");
                     if (date1.after(date2)) {
-                      View view = StockManagerActivity.this.getLayoutInflater().inflate(R.layout.show_scrap_bottle_info, null);
+                      View view = getLayoutInflater().inflate(R.layout.show_scrap_bottle_info, null);
 //                      StockManagerActivity.access$3102(StockManagerActivity.this, view);
                       TextView textView1 = (TextView)view.findViewById(R.id.textView_bottleCode);
                       TextView textView2 = (TextView)view.findViewById(R.id.textView_scrapDate);
@@ -1041,16 +1043,16 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                             if (Tools.isFastClick())
                               try {
 //                                if (serviceStatusJson.getInt("index") == 6 && nextStatus.equals("2")) {
-//                                  StockManagerActivity.this.queryBottleInfo(bottleCode, nextStatus);
+//                                  queryBottleInfo(bottleCode, nextStatus);
 //                                  return;
 //                                }
                                 StockManagerActivity stockManagerActivity = StockManagerActivity.this;
                                 String str1 = bottleCode;
-                                String str2 = StockManagerActivity.this.m_takerOverUserId;
-                                String str3 = StockManagerActivity.this.m_curLoginUserId.getUsername();
+                                String str2 = m_takerOverUserId;
+                                String str3 = m_curLoginUserId.getUsername();
                                 String str4 = nextStatus;
                                 StringBuilder stringBuilder = new StringBuilder();
-                                stockManagerActivity.bottleTakeOverUnit(str1, str2, str3, str4, stringBuilder.append(StockManagerActivity.this.m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
+                                stockManagerActivity.bottleTakeOverUnit(str1, str2, str3, str4, stringBuilder.append(m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
                               } catch (Exception jSONException) {
                                 Toast.makeText((Context)StockManagerActivity.this, "查询钢瓶信息异常！", Toast.LENGTH_LONG).show();
                               }
@@ -1065,16 +1067,16 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                       return;
                     }
 //                    if (param1Object.getInt("index") == 6 && nextStatus.equals("2")) {
-//                      StockManagerActivity.this.queryBottleInfo(bottleCode, nextStatus);
+//                      queryBottleInfo(bottleCode, nextStatus);
 //                      return;
 //                    }
                     StockManagerActivity stockManagerActivity = StockManagerActivity.this;
                     String str4 = bottleCode;
-                    String str2 = StockManagerActivity.this.m_takerOverUserId;
-                    String str3 = StockManagerActivity.this.m_curLoginUserId.getUsername();
+                    String str2 = m_takerOverUserId;
+                    String str3 = m_curLoginUserId.getUsername();
                     String str5 = nextStatus;
                     param1Object = new StringBuilder();
-//                    stockManagerActivity.bottleTakeOverUnit(str4, str2, str3, str5, param1Object.append(StockManagerActivity.this.m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
+//                    stockManagerActivity.bottleTakeOverUnit(str4, str2, str3, str5, param1Object.append(m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
                   } catch (IOException iOException) {
                     Toast.makeText((Context)StockManagerActivity.this, "查询钢瓶信息异常！", Toast.LENGTH_LONG).show();
                   } catch (JSONException jSONException) {
@@ -1111,45 +1113,45 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
       default:
         return;
       case 2131230819:
-//        if (this.scale != null && this.scale.getDevicelist().size() == 1)
-//          this.scale.bleSend(this.scale.getDevicelist().get(0), (byte)1);
+//        if (scale != null && scale.getDevicelist().size() == 1)
+//          scale.bleSend(scale.getDevicelist().get(0), (byte)1);
       case R.id.button_next:
         cleanAll();
         break;
       case 2131230811:
-        if (this.m_takerOverUserId == null)
+        if (m_takerOverUserId == null)
           showToast("请扫码获取交接人信息！"); 
-        str = this.m_gp_code_head + this.m_bottleIdZPEditText.getText().toString();
+        str = m_gp_code_head + m_bottleIdZPEditText.getText().toString();
         new String();
-        if (this.m_selected_nfc_model == 0) {
+        if (m_selected_nfc_model == 0) {
           String str1;
-          if (this.m_curLoginUserId.getGroupCode().equals("00005")) {
+          if (m_curLoginUserId.getGroupCode().equals("00005")) {
             str1 = "2";
-          } else if (this.m_curLoginUserId.getGroupCode().equals("00006")) {
+          } else if (m_curLoginUserId.getGroupCode().equals("00006")) {
             str1 = "1";
           } else {
             Toast.makeText((Context)this, "非充气站或门店账户，请退出！", Toast.LENGTH_LONG).show();
           } 
 //          judgeBottleScrap(str, str1);
-          this.m_bottleIdZPEditText.setText("");
+          m_bottleIdZPEditText.setText("");
         } 
-        if (this.m_selected_nfc_model == 1) {
+        if (m_selected_nfc_model == 1) {
           String str1 = "";
-          if (this.m_curLoginUserId.getGroupCode().equals("00005")) {
-            if (this.m_takeOverGroupCode.equals("00007")) {
+          if (m_curLoginUserId.getGroupCode().equals("00005")) {
+            if (m_takeOverGroupCode.equals("00007")) {
               str1 = "3";
-            } else if (this.m_takeOverGroupCode.equals("00003")) {
+            } else if (m_takeOverGroupCode.equals("00003")) {
               str1 = "4";
             } else {
               Toast.makeText((Context)this, "非配送工或调拨车账户，请更换！", Toast.LENGTH_LONG).show();
             } 
-          } else if (this.m_curLoginUserId.getGroupCode().equals("00006")) {
+          } else if (m_curLoginUserId.getGroupCode().equals("00006")) {
             str1 = "3";
           } else {
             Toast.makeText((Context)this, "非充气站或门店账户，请退出！", Toast.LENGTH_LONG).show();
           } 
-          bottleTakeOverUnit(str, this.m_curLoginUserId.getUsername(), this.m_takerOverUserId, str1, this.m_curLoginUserId.getDepartmentName() + "|钢瓶出库", false, false);
-          this.m_bottleIdZPEditText.setText("");
+          bottleTakeOverUnit(str, m_curLoginUserId.getUsername(), m_takerOverUserId, str1, m_curLoginUserId.getDepartmentName() + "|钢瓶出库", false, false);
+          m_bottleIdZPEditText.setText("");
         } 
       case 2131230808:
         break;
@@ -1163,24 +1165,24 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
   
   public void onDestroy() {
     super.onDestroy();
-    if (this.readWriteDialog != null)
-      this.readWriteDialog.dismiss(); 
-    unbindService(this.mServiceConnection);
+    if (readWriteDialog != null)
+      readWriteDialog.dismiss(); 
+    unbindService(mServiceConnection);
   }
   
   public void onInit(int paramInt) {
     if (paramInt == 0) {
-      paramInt = this.tts.setLanguage(Locale.CHINESE);
+      paramInt = tts.setLanguage(Locale.CHINESE);
       if (paramInt != -1 && paramInt != -2)
-        this.tts.setLanguage(Locale.US); 
+        tts.setLanguage(Locale.US); 
     } 
   }
   
   protected void onResume() {
     super.onResume();
-    if (this.mBleNfcDeviceService != null) {
-      this.mBleNfcDeviceService.setScannerCallback(this.scannerCallback);
-      this.mBleNfcDeviceService.setDeviceManagerCallback(this.deviceManagerCallback);
+    if (mBleNfcDeviceService != null) {
+      mBleNfcDeviceService.setScannerCallback(scannerCallback);
+      mBleNfcDeviceService.setDeviceManagerCallback(deviceManagerCallback);
     } 
   }
   
@@ -1216,11 +1218,11 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     private StartSearchButtonListener() {}
     
     public void onClick(View param1View) {
-      if (StockManagerActivity.this.bleNfcDevice.isConnection() == 2) {
-        StockManagerActivity.this.bleNfcDevice.requestDisConnectDevice();
+      if (bleNfcDevice.isConnection() == 2) {
+        bleNfcDevice.requestDisConnectDevice();
         return;
       } 
-      StockManagerActivity.this.searchNearestBleDevice();
+      searchNearestBleDevice();
     }
   }
 }

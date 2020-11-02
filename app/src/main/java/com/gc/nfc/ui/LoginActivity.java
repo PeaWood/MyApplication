@@ -137,8 +137,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     Intent starter = new Intent(LoginActivity.this, StockManagerActivity.class);
                     startActivity(starter);
                     LoginActivity.this.finish();
-                    //StockManagerActivity
-//                    Toast.makeText(LoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
                     return;
                 }
                 if (user.getGroupCode().equals("00003")) {

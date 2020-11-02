@@ -482,7 +482,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
                      return;
                   }
                   if (response.getStatusLine().getStatusCode() == 404) {
-                    Toast.makeText((Context)MendDetailActivity.this, "报修处理失败", 1).show();
+                    Toast.makeText((Context)MendDetailActivity.this, "报修处理失败", Toast.LENGTH_LONG).show();
                     return;
                   }
                   if (response.getStatusLine().getStatusCode() == 401) {
