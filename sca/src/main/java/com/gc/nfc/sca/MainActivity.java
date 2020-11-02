@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.example.weightscaler.R;
+
 public class MainActivity extends Activity implements OnItemClickListener,
 InterClick {
 	
