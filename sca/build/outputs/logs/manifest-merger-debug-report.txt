@@ -1,59 +1,59 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
+ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:2:1-20:12
 	package
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:3:5-39
-		INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
-		INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:3:5-39
+		INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
+		INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
 	android:versionName
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:5:5-30
-		INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
-		INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:5:5-30
+		INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
+		INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:2:11-69
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:2:11-69
 	android:versionCode
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:4:5-28
-		INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
-		INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:4:5-28
+		INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
+		INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
 uses-permission#android.permission.BLUETOOTH
-ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:7:5-67
+ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:7:5-67
 	android:name
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:7:22-65
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:7:22-65
 uses-permission#android.permission.BLUETOOTH_ADMIN
-ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:8:5-73
+ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:8:5-73
 	android:name
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:8:22-71
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:8:22-71
 application
-ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:10:5-18:19
+ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:10:5-18:19
 	android:label
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:12:9-41
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:12:9-41
 	android:allowBackup
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:11:9-35
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:11:9-35
 	android:theme
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:13:9-65
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:13:9-65
 activity#com.gc.nfc.sca.MainActivity
-ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:14:9-17:20
+ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:14:9-17:20
 	android:label
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:16:13-45
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:16:13-45
 	android:name
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml:15:13-55
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml:15:13-55
 uses-sdk
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
-INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
+INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
 	android:targetSdkVersion
-		INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
-		INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
+		INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
+		INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
-		ADDED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
-		INJECTED from D:\Android\MyApplication\sca\src\main\AndroidManifest.xml
+		INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
+		ADDED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
+		INJECTED from F:\newApp\MyApplication\sca\src\main\AndroidManifest.xml
