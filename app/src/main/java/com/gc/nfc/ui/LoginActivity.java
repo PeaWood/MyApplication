@@ -3,7 +3,6 @@ package com.gc.nfc.ui;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -42,9 +41,7 @@ import okhttp3.Response;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
     private TextView mBtnLogin;
-    private float mHeight;
     private View mInputLayout;
-    private float mWidth;
     private ObjectAnimator m_animator;
     private EditText et_pin;
     private EditText et_name;
@@ -52,7 +49,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private String name;
     private String password;
 
-    private void inputAnimator(View paramView, float paramFloat1, float paramFloat2) {
+    private void inputAnimator() {
         this.progress.setVisibility(View.VISIBLE);
         progressAnimator(this.progress);
         this.mInputLayout.setVisibility(View.INVISIBLE);
@@ -72,7 +69,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         // get请求
         NetRequestConstant nrc = new NetRequestConstant();
         nrc.setType(HttpRequestType.GET);
-
         nrc.requestUrl = NetUrlConstant.LOGINURL;
         nrc.context = this;
         Map<String, Object> params = new HashMap<String, Object>();
@@ -85,40 +81,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     HttpResponse response=(HttpResponse)res;
                     if(response!=null){
                         if(response.getStatusLine().getStatusCode()==200){
-                            try {
-                                //设置登录会话的cookies
-                                NetUtil.setLoginCookies();
-                                JSONObject userJson = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
-                                JSONObject groupJson = userJson.getJSONObject("userGroup");
-                                JSONObject departmentJson =  userJson.getJSONObject("department");
-                                String groupCode = groupJson.optString("code");
-                                String groupName = groupJson.optString("name");
-                                String departmentCode = departmentJson.optString("code");
-                                String departmentName = departmentJson.optString("name");
-                                Intent data = new Intent();
-                                data.putExtra("userId", name);
-                                AppContext appContext = (AppContext) getApplicationContext();
-                                User user = new User();
-                                user.setUsername(name);
-                                user.setPassword(password);
-                                user.setDepartmentCode(departmentCode);
-                                user.setDepartmentName(departmentName);
-                                user.setGroupCode(groupCode);
-                                user.setGroupName(groupName);
-                                appContext.setUser(user);
-                                setResult(12, data);
-                                SharedPreferencesHelper.put("username", name);
-                                SharedPreferencesHelper.put("password", password);
-                                MediaPlayer music = MediaPlayer.create(LoginActivity.this, R.raw.start_working);
-                                music.start();
-                            }catch (IOException e){
-                                Toast.makeText(LoginActivity.this, "未知错误，异常！",
-                                        Toast.LENGTH_LONG).show();
-                            }catch (JSONException e) {
-                                Toast.makeText(LoginActivity.this, "未知错误，异常！",
-                                        Toast.LENGTH_LONG).show();
-                            }
-
+                            //设置登录会话的cookies
+                            NetUtil.setLoginCookies();
+                            SharedPreferencesHelper.put("username", name);
+                            SharedPreferencesHelper.put("password", password);
                         }else{
                             Toast.makeText(LoginActivity.this, "账号或密码不正确", Toast.LENGTH_LONG).show();
                         }
@@ -168,8 +134,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 appContext.setUser(user);
                 MediaPlayer.create(LoginActivity.this, R.raw.start_working).start();
                 if (user.getGroupCode().equals("00005") || user.getGroupCode().equals("00006")) {
-                    //StockManagerActivity
-                    Toast.makeText(LoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
+                    Intent starter = new Intent(LoginActivity.this, StockManagerActivity.class);
+                    startActivity(starter);
+                    LoginActivity.this.finish();
                     return;
                 }
                 if (user.getGroupCode().equals("00003")) {
@@ -180,8 +147,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     return;
                 }
                 if (user.getGroupCode().equals("00007")) {
-                    //DiaoBoActivity
-                    Toast.makeText(LoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
+                    //调拨员
+                    Intent starter = new Intent(LoginActivity.this, DiaoBoActivity.class);
+                    startActivity(starter);
+                    LoginActivity.this.finish();
+                    return;
                 }
             }
         });
@@ -214,19 +184,17 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         requestWindowFeature(1);
         ((AppContext) getApplication()).setPreferences(getPreferences(MODE_PRIVATE));
         setContentView(R.layout.activity_login);
-        SharedPreferencesHelper.initial((Context)this);
-        this.mBtnLogin = (TextView) findViewById(R.id.main_btn_login);
+        SharedPreferencesHelper.initial(this);
+        this.mBtnLogin = findViewById(R.id.main_btn_login);
         this.progress = findViewById(R.id.layout_progress);
         this.mInputLayout = findViewById(R.id.input_layout);
-        this.et_name = (EditText) findViewById(R.id.input_userId);
-        this.et_pin = (EditText) findViewById(R.id.input_password);
+        this.et_name = findViewById(R.id.input_userId);
+        this.et_pin = findViewById(R.id.input_password);
         this.mBtnLogin.setOnClickListener(this);
     }
 
     public void onClick(View paramView) {
-        this.mWidth = this.mBtnLogin.getMeasuredWidth();
-        this.mHeight = this.mBtnLogin.getMeasuredHeight();
-        inputAnimator(this.mInputLayout, this.mWidth, this.mHeight);
+        inputAnimator();
     }
 
     protected void onCreate(Bundle paramBundle) {

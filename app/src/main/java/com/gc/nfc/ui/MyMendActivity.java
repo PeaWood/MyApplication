@@ -30,9 +30,8 @@ import java.util.Map;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MyMendActivity extends BaseActivity implements View.OnClickListener, AbsListView.OnScrollListener {
+public class MyMendActivity extends BaseActivity implements View.OnClickListener {
     public static JSONArray m_checkOrderListJson;
-
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
     private ImageView image;
@@ -83,16 +82,6 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
         refleshMends(false);
     }
 
-    public void onScroll(AbsListView paramAbsListView, int paramInt1, int paramInt2, int paramInt3) {
-    }
-
-    public void onScrollStateChanged(AbsListView paramAbsListView, int paramInt) {
-    }
-
-    protected void onStart() {
-        super.onStart();
-    }
-
     public void refleshMends(boolean isrefresh) {
         User user = ((AppContext) getApplicationContext()).getUser();
         if (user == null) {
@@ -129,7 +118,7 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
             }
 
             private void setData(Data_Mend data_mend) {
-                Gson gson  = new Gson();
+                Gson gson = new Gson();
                 try {
                     JSONArray array = new JSONArray(gson.toJson(data_mend.getItems()));
                     m_checkOrderListJson = array;
@@ -153,7 +142,7 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
                     stringBuilder1 = new StringBuilder();
                     hashMap.put("userPhone", stringBuilder1.append("电话：").append(bean.getRecvPhone()).toString());
                     hashMap.put("orderStatus", "待处理");
-                    hashMap.put("userIcon", R.mipmap.ic_menu_user_on);
+                    hashMap.put("userIcon", R.drawable.alert);
                     list.add(hashMap);
                 }
                 SimpleAdapter simpleAdapter = new SimpleAdapter(MyMendActivity.this,
@@ -165,6 +154,7 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
             }
         });
     }
+
     private View.OnClickListener backOnClickListener = new View.OnClickListener() {
 
         @Override

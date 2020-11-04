@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -29,7 +28,7 @@ import java.util.Map;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class ValidOrdersActivity extends BaseActivity implements AbsListView.OnScrollListener {
+public class ValidOrdersActivity extends BaseActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private Data_TaskOrders data_taskOrders;
@@ -57,12 +56,6 @@ public class ValidOrdersActivity extends BaseActivity implements AbsListView.OnS
     protected void onResume() {
         super.onResume();
         refreshVaildOrders(false);
-    }
-
-    public void onScroll(AbsListView paramAbsListView, int paramInt1, int paramInt2, int paramInt3) {
-    }
-
-    public void onScrollStateChanged(AbsListView paramAbsListView, int paramInt) {
     }
 
     /**

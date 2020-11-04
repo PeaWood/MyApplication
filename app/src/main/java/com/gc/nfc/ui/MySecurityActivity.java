@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
-import com.gc.nfc.domain.Data_Mend;
 import com.gc.nfc.domain.Data_MySecurity;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
@@ -26,13 +25,12 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MySecurityActivity extends BaseActivity implements View.OnClickListener, AbsListView.OnScrollListener {
+public class MySecurityActivity extends BaseActivity {
     public static JSONArray m_checkOrderListJson;
 
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -40,16 +38,16 @@ public class MySecurityActivity extends BaseActivity implements View.OnClickList
     private ImageView imageView;
 
     private void switchActivity(int paramInt) {
-        //    try {
-        //      Intent intent = new Intent();
-        //      Bundle bundle = new Bundle();
-        //      bundle.putString("check", m_checkOrderListJson.getJSONObject(paramInt).toString());
-        //      intent.setClass((Context)this, SecurityDetailActivity.class);
-        //      intent.putExtras(bundle);
-        //      startActivity(intent);
-        //    } catch (JSONException jSONException) {
-        //      Toast.makeText((Context)this, "异常" + jSONException.toString(), 1).show();
-        //    }
+        try {
+            Intent intent = new Intent();
+            Bundle bundle = new Bundle();
+            bundle.putString("check", m_checkOrderListJson.getJSONObject(paramInt).toString());
+            intent.setClass(this, SecurityDetailActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        } catch (JSONException jSONException) {
+            Toast.makeText(this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
+        }
     }
 
     void init() {
@@ -77,9 +75,6 @@ public class MySecurityActivity extends BaseActivity implements View.OnClickList
         });
     }
 
-    public void onClick(View paramView) {
-    }
-
     protected void onCreate(Bundle paramBundle) {
         super.onCreate(paramBundle);
     }
@@ -88,12 +83,6 @@ public class MySecurityActivity extends BaseActivity implements View.OnClickList
     protected void onResume() {
         super.onResume();
         refleshVaildChecks(false);
-    }
-
-    public void onScroll(AbsListView paramAbsListView, int paramInt1, int paramInt2, int paramInt3) {
-    }
-
-    public void onScrollStateChanged(AbsListView paramAbsListView, int paramInt) {
     }
 
     public void refleshVaildChecks(boolean isrefresh) {
@@ -154,7 +143,7 @@ public class MySecurityActivity extends BaseActivity implements View.OnClickList
                     stringBuilder1 = new StringBuilder();
                     hashMap.put("userPhone", stringBuilder1.append("电话：").append(itemsBean.getRecvPhone()).toString());
                     hashMap.put("orderStatus", "待处理");
-                    hashMap.put("userIcon", R.mipmap.ic_menu_user_on);
+                    hashMap.put("userIcon", R.drawable.alert);
                     list.add(hashMap);
                 }
                 SimpleAdapter simpleAdapter = new SimpleAdapter(MySecurityActivity.this,

@@ -1,11 +1,14 @@
 package com.gc.nfc.ui;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +19,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,25 +42,32 @@ import com.dk.bleNfc.Tool.StringTool;
 import com.dk.bleNfc.card.Ntag21x;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
+import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.domain.User;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-//import com.amap.api.maps.model.LatLng;
-//import com.amap.api.maps.model.Poi;
-//import com.amap.api.navi.AMapNavi;
-//import com.amap.api.navi.AmapNaviPage;
-//import com.amap.api.navi.AmapNaviParams;
-//import com.amap.api.navi.AmapNaviType;
-//import com.amap.api.navi.INaviInfoCallback;
-//import com.amap.api.navi.model.AMapNaviLocation;
-//INaviInfoCallback
-public class MendDetailActivity extends BaseActivity implements View.OnClickListener{
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Poi;
+import com.amap.api.navi.AMapNavi;
+import com.amap.api.navi.AmapNaviPage;
+import com.amap.api.navi.AmapNaviParams;
+import com.amap.api.navi.AmapNaviType;
+import com.amap.api.navi.INaviInfoCallback;
+import com.amap.api.navi.model.AMapNaviLocation;
+import com.gc.nfc.http.Logger;
+import com.gc.nfc.interfaces.Netcallback;
+
+public class MendDetailActivity extends BaseActivity implements View.OnClickListener, INaviInfoCallback{
     private AppContext appContext;
   
     private BleNfcDevice bleNfcDevice;
@@ -299,6 +310,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   private TextView msgText = null;
   
   private ProgressDialog readWriteDialog = null;
+  private ImageView imageView;
   
   private ScannerCallback scannerCallback = new ScannerCallback() {
     @Override
@@ -350,50 +362,49 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   TextView tv;
   
   private void GetUserCard() {
-//    if (this.m_currentCustomerId == null) {
-//      showToast("客户资料被删除！");
-//      return;
-//    }
-//    NetRequestConstant netRequestConstant = new NetRequestConstant();
-//    netRequestConstant.setType(HttpRequestType.GET);
-//    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/UserCard";
-//    netRequestConstant.context = (Context)this;
-//    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-//    hashMap.put("userId", this.m_currentCustomerId);
-//    hashMap.put("status", Integer.valueOf(1));
-//    netRequestConstant.setParams(hashMap);
-//    getServer(new Netcallback() {
-//          public void preccess(Object param1Object, boolean param1Boolean) {
-//            if (param1Boolean) {
-//              param1Object = param1Object;
-//              if (param1Object != null) {
-//                if (param1Object.getStatusLine().getStatusCode() == 200) {
-//                  try {
-//                    JSONObject jSONObject = new JSONObject();
-//                    this(EntityUtils.toString(param1Object.getEntity(), "UTF-8"));
-//                    param1Object = jSONObject.getJSONArray("items");
-//                    if (param1Object.length() == 1) {
-//                      MendDetailActivity.access$1502(MendDetailActivity.this, param1Object.getJSONObject(0).getString("number"));
-//                      return;
-//                    }
-//                    MendDetailActivity.access$1502(MendDetailActivity.this, (String)null);
-//                    MendDetailActivity.this.showToast("该用户未绑定用户卡");
-//                  } catch (JSONException jSONException) {
-//                    Toast.makeText((Context)MendDetailActivity.this, "异常" + jSONException.toString(), 1).show();
-//                  } catch (IOException iOException) {
-//                    Toast.makeText((Context)MendDetailActivity.this, "异常" + iOException.toString(), 1).show();
-//                  }
-//                  return;
-//                }
-//                Toast.makeText((Context)MendDetailActivity.this, "用户卡查询失败", 1).show();
-//                return;
-//              }
-//              Toast.makeText((Context)MendDetailActivity.this, "请求超时，请检查网络", 1).show();
-//              return;
-//            }
-//            Toast.makeText((Context)MendDetailActivity.this, "网络未连接！", 1).show();
-//          }
-//        }netRequestConstant);
+    if (this.m_currentCustomerId == null) {
+      showToast("客户资料被删除！");
+      return;
+    }
+    NetRequestConstant netRequestConstant = new NetRequestConstant();
+    netRequestConstant.setType(HttpRequestType.GET);
+    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/UserCard";
+    netRequestConstant.context = (Context)this;
+    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
+    hashMap.put("userId", this.m_currentCustomerId);
+    hashMap.put("status", Integer.valueOf(1));
+    netRequestConstant.setParams(hashMap);
+    getServer(new Netcallback() {
+          public void preccess(Object param1Object, boolean param1Boolean) {
+            if (param1Boolean) {
+                HttpResponse response = (HttpResponse) param1Object;
+              if (param1Object != null) {
+                if (response.getStatusLine().getStatusCode() == 200) {
+                  try {
+                    JSONObject jSONObject = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
+                      JSONArray items = jSONObject.getJSONArray("items");
+                      if (items.length() == 1) {
+                      m_handedUserCard = items.getJSONObject(0).getString("number");
+                      return;
+                    }
+                      m_handedUserCard = (String)null;
+                    MendDetailActivity.this.showToast("该用户未绑定用户卡");
+                  } catch (JSONException jSONException) {
+                    Toast.makeText((Context)MendDetailActivity.this, "异常" + jSONException.toString(), Toast.LENGTH_LONG).show();
+                  } catch (IOException iOException) {
+                    Toast.makeText((Context)MendDetailActivity.this, "异常" + iOException.toString(), Toast.LENGTH_LONG).show();
+                  }
+                    return;
+                }
+                Toast.makeText((Context)MendDetailActivity.this, "用户卡查询失败", Toast.LENGTH_LONG).show();
+                return;
+              }
+              Toast.makeText((Context)MendDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+              return;
+            }
+            Toast.makeText((Context)MendDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+          }
+        },netRequestConstant);
   }
   
   private void blueDeviceInitial() {
@@ -424,72 +435,72 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   
   private void orderServiceQualityShow() {
     GetUserCard();
-//    AlertDialog.Builder builder = new AlertDialog.Builder((Context)this);
-//    View view = View.inflate((Context)this, 2131361920, null);
-//    builder.setIcon(2131165405);
-//    builder.setTitle("用户卡评价(" + this.m_handedUserCard + ")");
-//    AlertDialog alertDialog = builder.create();
-//    alertDialog.setView(view);
-//    alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//          public void onDismiss(DialogInterface param1DialogInterface) {
-//            MendDetailActivity.access$1702(MendDetailActivity.this, false);
-//          }
-//        });
-//    alertDialog.show();
-//    Window window = alertDialog.getWindow();
-//    window.setGravity(17);
-//    window.setLayout(-1, -2);
-//    this.m_orderServiceQualityShowFlag = true;
+    AlertDialog.Builder builder = new AlertDialog.Builder((Context)this);
+    View view = View.inflate((Context)this, R.layout.user_evaluate, null);
+    builder.setIcon(R.drawable.icon_logo);
+    builder.setTitle("用户卡评价(" + this.m_handedUserCard + ")");
+    AlertDialog alertDialog = builder.create();
+    alertDialog.setView(view);
+    alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+          public void onDismiss(DialogInterface param1DialogInterface) {
+            m_orderServiceQualityShowFlag = false;
+          }
+        });
+    alertDialog.show();
+    Window window = alertDialog.getWindow();
+    window.setGravity(17);
+    window.setLayout(-1, -2);
+    this.m_orderServiceQualityShowFlag = true;
   }
   
   private void orderServiceQualityUpload(boolean paramBoolean) {
-//    NetRequestConstant netRequestConstant = new NetRequestConstant();
-//    netRequestConstant.setType(HttpRequestType.PUT);
-//    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Mend/" + this.m_businessKey;
-//    netRequestConstant.context = (Context)this;
-//    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-//    if (paramBoolean) {
-//      hashMap.put("processStatus", "PTSolved");
-//      hashMap.put("resloveInfo", this.m_editTextPs.getText().toString());
-//      netRequestConstant.setBody(hashMap);
-//      getServer(new Netcallback() {
-//            public void preccess(Object param1Object, boolean param1Boolean) {
-//              if (param1Boolean) {
-//                param1Object = param1Object;
-//                if (param1Object != null) {
-//                  if (param1Object.getStatusLine().getStatusCode() == 200) {
-//                    param1Object = Toast.makeText((Context)MendDetailActivity.this, "处理成功！", 1);
-//                    param1Object.setGravity(17, 0, 0);
-//                    param1Object.show();
-//                    MediaPlayer.create((Context)MendDetailActivity.this, 2131558403).start();
-//                    param1Object = new Intent(MendDetailActivity.this.getApplicationContext(), MainlyActivity.class);
-//                    Bundle bundle = new Bundle();
-//                    bundle.putInt("switchTab", 2);
-//                    param1Object.putExtras(bundle);
-//                    MendDetailActivity.this.startActivity((Intent)param1Object);
-//                    MendDetailActivity.this.finish();
-//                    return;
-//                  }
-//                  if (param1Object.getStatusLine().getStatusCode() == 404) {
-//                    Toast.makeText((Context)MendDetailActivity.this, "报修处理失败", 1).show();
-//                    return;
-//                  }
-//                  if (param1Object.getStatusLine().getStatusCode() == 401) {
-//                    Toast.makeText((Context)MendDetailActivity.this, "鉴权失败，请重新登录" + param1Object.getStatusLine().getStatusCode(), 1).show();
-//                    return;
-//                  }
-//                  Toast.makeText((Context)MendDetailActivity.this, "报修处理失败" + param1Object.getStatusLine().getStatusCode(), 1).show();
-//                  return;
-//                }
-//                Toast.makeText((Context)MendDetailActivity.this, "请求超时，请检查网络", 1).show();
-//                return;
-//              }
-//              Toast.makeText((Context)MendDetailActivity.this, "网络未连接！", 1).show();
-//            }
-//          }netRequestConstant);
-//      return;
-//    }
-//    showToast("客户不同意！");
+    NetRequestConstant netRequestConstant = new NetRequestConstant();
+    netRequestConstant.setType(HttpRequestType.PUT);
+    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Mend/" + this.m_businessKey;
+    netRequestConstant.context = (Context)this;
+    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
+    if (paramBoolean) {
+      hashMap.put("processStatus", "PTSolved");
+      hashMap.put("resloveInfo", this.m_editTextPs.getText().toString());
+      netRequestConstant.setBody(hashMap);
+      getServer(new Netcallback() {
+            public void preccess(Object param1Object, boolean param1Boolean) {
+              if (param1Boolean) {
+                  HttpResponse response = (HttpResponse) param1Object;
+                if (param1Object != null) {
+                  if (response.getStatusLine().getStatusCode() == 200) {
+                      Toast toast = Toast.makeText((Context)MendDetailActivity.this, "处理成功！", Toast.LENGTH_LONG);
+                      toast.setGravity(17, 0, 0);
+                      toast.show();
+                      MediaPlayer.create(MendDetailActivity.this, R.raw.finish_order).start();
+                      Intent intent = new Intent(MendDetailActivity.this.getApplicationContext(), MainlyActivity.class);
+                      Bundle bundle = new Bundle();
+                      bundle.putInt("switchTab", 2);
+                      intent.putExtras(bundle);
+                      MendDetailActivity.this.startActivity(intent);
+                      MendDetailActivity.this.finish();
+                     return;
+                  }
+                  if (response.getStatusLine().getStatusCode() == 404) {
+                    Toast.makeText((Context)MendDetailActivity.this, "报修处理失败", Toast.LENGTH_LONG).show();
+                    return;
+                  }
+                  if (response.getStatusLine().getStatusCode() == 401) {
+                    Toast.makeText((Context)MendDetailActivity.this, "鉴权失败，请重新登录" + response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                    return;
+                  }
+                  Toast.makeText((Context)MendDetailActivity.this, "报修处理失败" + response.getStatusLine().getStatusCode(), Toast.LENGTH_LONG).show();
+                  return;
+                }
+                Toast.makeText((Context)MendDetailActivity.this, "请求超时，请检查网络", Toast.LENGTH_LONG).show();
+                return;
+              }
+              Toast.makeText((Context)MendDetailActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+            }
+          },netRequestConstant);
+      return;
+    }
+    showToast("客户不同意！");
   }
   
   private boolean readWriteCardDemo(int paramInt) {
@@ -604,6 +615,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   private void setOrderHeadInfo() {
     try {
       JSONObject jSONObject1 = this.m_CheckJson;
+        Logger.e("jSONObject报修详情 = "+jSONObject1);
       this.m_businessKey = this.m_CheckJson.get("mendSn").toString();
       StringBuilder stringBuilder2 = new StringBuilder();
       String str3 = stringBuilder2.append("报修单号：").append(jSONObject1.get("mendSn").toString()).toString();
@@ -613,7 +625,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
       this.m_textViewCreateTime.setText(str2);
       this.m_textViewCheckType.setText(jSONObject1.getJSONObject("mendType").getString("name"));
       this.m_textview_checkDetail.setText(jSONObject1.getString("detail"));
-      this.m_textviewReserveTime.setText(jSONObject1.get("reserveTime").toString());
+      this.m_textviewReserveTime.setText(jSONObject1.get("updateTime").toString());
       JSONObject jSONObject2 = jSONObject1.getJSONObject("customer");
       String str4 = jSONObject1.get("recvName").toString();
       StringBuilder stringBuilder4 = new StringBuilder();
@@ -685,11 +697,11 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   }
   
   private void switchNavBar() {
-//    AppContext appContext = (AppContext)getApplicationContext();
-//    LatLng latLng2 = appContext.getLocation();
-//    LatLng latLng1 = appContext.getLocation();
-//    AmapNaviPage.getInstance().showRouteActivity(getApplicationContext(), new AmapNaviParams(new Poi("当前位置", latLng2, ""), null, new Poi(this.m_recvAddr, latLng1, ""), AmapNaviType.DRIVER), this);
-//    AMapNavi.getInstance((Context)this).setUseInnerVoice(true);
+    AppContext appContext = (AppContext)getApplicationContext();
+    LatLng latLng2 = appContext.getLocation();
+    LatLng latLng1 = appContext.getLocation();
+    AmapNaviPage.getInstance().showRouteActivity(getApplicationContext(), new AmapNaviParams(new Poi("当前位置", latLng2, ""), null, new Poi(this.m_recvAddr, latLng1, ""), AmapNaviType.DRIVER), this);
+    AMapNavi.getInstance((Context)this).setUseInnerVoice(true);
   }
   
   public void callPhone(String paramString) {
@@ -723,26 +735,32 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
         return;
       } 
       String str = getIntent().getExtras().getString("check");
-      JSONObject jSONObject = new JSONObject();
+      JSONObject jSONObject = new JSONObject(str);
       this.m_CheckJson = jSONObject;
-//      this.m_buttonNext = (Button)findViewById(2131230765);
-//      this.m_textViewOrderSn = (TextView)findViewById(2131230871);
-//      this.m_textViewUserId = (TextView)findViewById(2131230889);
-//      this.m_textViewUserPhone = (TextView)findViewById(2131230890);
-//      this.m_textViewCreateTime = (TextView)findViewById(2131230858);
-//      this.m_textviewReserveTime = (TextView)findViewById(2131231107);
-//      this.m_textViewAddress = (TextView)findViewById(2131230852);
-//      this.m_imageViewNav = (ImageView)findViewById(2131230816);
-//      this.m_imageViewCall = (ImageView)findViewById(2131230812);
-//      this.m_imageViewPic = (ImageView)findViewById(2131230817);
-//      this.m_textViewAddress = (TextView)findViewById(2131230852);
-//      this.m_editTextPs = (EditText)findViewById(2131230846);
-//      this.m_textViewCheckType = (TextView)findViewById(2131231096);
-//      this.m_textview_checkDetail = (TextView)findViewById(2131231095);
-      //this.m_buttonNext.setOnClickListener(this);
-      //this.m_imageViewNav.setOnClickListener(this);
-      //this.m_imageViewCall.setOnClickListener(this);
-      //this.m_imageViewPic.setOnClickListener(this);
+      this.m_buttonNext = (Button)findViewById(R.id.button_next);
+      this.m_textViewOrderSn = (TextView)findViewById(R.id.items_orderSn);
+      this.m_textViewUserId = (TextView)findViewById(R.id.items_userId);
+      this.m_textViewUserPhone = (TextView)findViewById(R.id.items_userPhone);
+      this.m_textViewCreateTime = (TextView)findViewById(R.id.items_creatTime);
+      this.m_textviewReserveTime = (TextView)findViewById(R.id.textview_reserveTime);
+      this.m_textViewAddress = (TextView)findViewById(R.id.items_address);
+      this.m_imageViewNav = (ImageView)findViewById(R.id.imageView_nav);
+      this.m_imageViewCall = (ImageView)findViewById(R.id.imageView_call);
+      this.m_imageViewPic = (ImageView)findViewById(R.id.imageView_pic);
+      this.m_editTextPs = (EditText)findViewById(R.id.input_note);
+      this.m_textViewCheckType = (TextView)findViewById(R.id.textview_checkType);
+      this.m_textview_checkDetail = (TextView)findViewById(R.id.textview_checkDetail);
+        imageView = (ImageView) findViewById(R.id.img_back);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+      this.m_buttonNext.setOnClickListener(this);
+      this.m_imageViewNav.setOnClickListener(this);
+      this.m_imageViewCall.setOnClickListener(this);
+      this.m_imageViewPic.setOnClickListener(this);
       setOrderHeadInfo();
       blueDeviceInitial();
       this.m_orderServiceQualityShowFlag = false;
@@ -757,31 +775,34 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   public void onCalculateRouteFailure(int paramInt) {}
   
   public void onCalculateRouteSuccess(int[] paramArrayOfint) {}
-  
-  public void onClick(View paramView) {
-    switch (paramView.getId()) {
-      default:
-        return;
-      case 2131230765:
-        if (this.m_editTextPs.getText().toString().length() > 0 && this.m_orderStatus == 1)
-          getOrderOps(); 
-        Toast.makeText((Context)this, "请填写处理结果！", Toast.LENGTH_LONG).show();
-      case 2131230816:
-        switchNavBar();
-      case 2131230812:
-        callPhone(this.m_customerPhone);
-      case 2131230817:
-        break;
-    } 
-//    Intent intent = new Intent();
-//    Bundle bundle = new Bundle();
-//    bundle.putString("fileFolder", "mend");
-//    bundle.putString("fileNameHeader", this.m_businessKey);
-//    bundle.putInt("MaxPicCount", 4);
-//    intent.setClass((Context)this, PicSelActivity.class);
-//    intent.putExtras(bundle);
-//    startActivity(intent);
-  }
+
+    public void onClick(View paramView) {
+        switch (paramView.getId()) {
+            case R.id.button_next:
+                if (m_editTextPs.getText().toString().length() > 0 && m_orderStatus == 1){
+                    getOrderOps();
+                }else{
+                    Toast.makeText(this, "请填写处理结果！", Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.imageView_nav:
+                switchNavBar();
+                break;
+            case R.id.imageView_call:
+                callPhone(m_customerPhone);
+                break;
+            case R.id.imageView_pic:
+                Intent intent = new Intent();
+                Bundle bundle = new Bundle();
+                bundle.putString("fileFolder", "mend");
+                bundle.putString("fileNameHeader", m_businessKey);
+                bundle.putInt("MaxPicCount", 4);
+                intent.setClass((Context) this, PicSelActivity.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
+                break;
+        }
+    }
   
   protected void onCreate(Bundle paramBundle) {
     super.onCreate(paramBundle);
@@ -795,10 +816,65 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   }
   
   public void onExitPage(int paramInt) {}
-  
-  public void onGetNavigationText(String paramString) {}
-  
-  public void onInitNaviFailure() {}
+
+    @Override
+    public void onStrategyChanged(int i) {
+
+    }
+
+    @Override
+    public View getCustomNaviBottomView() {
+        return null;
+    }
+
+    @Override
+    public View getCustomNaviView() {
+        return null;
+    }
+
+    @Override
+    public void onArrivedWayPoint(int i) {
+
+    }
+
+    @Override
+    public void onMapTypeChanged(int i) {
+
+    }
+
+    @Override
+    public View getCustomMiddleView() {
+        return null;
+    }
+
+    @Override
+    public void onNaviDirectionChanged(int i) {
+
+    }
+
+    @Override
+    public void onDayAndNightModeChanged(int i) {
+
+    }
+
+    @Override
+    public void onBroadcastModeChanged(int i) {
+
+    }
+
+    @Override
+    public void onScaleAutoChanged(boolean b) {
+
+    }
+
+    public void onGetNavigationText(String paramString) {}
+
+    @Override
+    public void onLocationChange(AMapNaviLocation aMapNaviLocation) {
+
+    }
+
+    public void onInitNaviFailure() {}
   
 //  public void onLocationChange(AMapNaviLocation paramAMapNaviLocation) {}
   

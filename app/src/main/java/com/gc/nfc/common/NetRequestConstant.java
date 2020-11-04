@@ -30,7 +30,4 @@ public class NetRequestConstant {
 	public  void setParams(Map params){
 		this.params = params;
 	}
-
-	
-
 }

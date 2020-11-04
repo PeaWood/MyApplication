@@ -123,14 +123,6 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
 
     public void onClick(View paramView) {
         switch (paramView.getId()) {
-            case R.id.lL_myHistoryOrders:
-                //历史订单
-                startActivity(new Intent(this, HistoryOrdersActivity.class));
-                break;
-            case R.id.lL_myHistoryChecks:
-                //历史巡检
-                startActivity(new Intent(this, HistoryCheckActivity.class));
-                break;
             case R.id.lL_myBottle:
                 //我的气瓶
                 Intent intent = new Intent(this, MybottlesActivity.class);
@@ -147,6 +139,22 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
                 //我的安检
                 startActivity(new Intent(this, MySecurityActivity.class));
                 break;
+            case R.id.lL_myHistoryOrders:
+                //历史订单
+                startActivity(new Intent(this, HistoryOrdersActivity.class));
+                break;
+            case R.id.lL_myHistoryChecks:
+                //历史巡检
+                startActivity(new Intent(this, HistoryCheckActivity.class));
+                break;
+            case R.id.lL_recycle:
+                //退换货
+                startActivity(new Intent(this, BottleRecycleActivity.class));
+                break;
+            case R.id.lL_mapView:
+                //查看地图
+                startActivity(new Intent(this, MapViewActivity.class));
+                break;
             case R.id.lL_mySetting:
                 //系统版本
                 startActivity(new Intent(this, AboutActivity.class));
@@ -158,14 +166,6 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
             case R.id.imageView_userQRcode:
                 //二维码
                 showIdentification();
-                break;
-            case R.id.lL_recycle:
-                //退换货
-//                startActivity(new Intent(this, BottleRecycleActivity.class));
-                break;
-            case R.id.lL_mapView:
-                //查看地图
-                startActivity(new Intent(this, MapViewActivity.class));
                 break;
         }
     }
@@ -181,6 +181,12 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
             return;
         }
         showUserInfo();
+    }
+
+    protected void onRestart() {
+        super.onRestart();
+        refleshVaildMends();
+        refleshVaildSecuritys();
     }
 
     /**

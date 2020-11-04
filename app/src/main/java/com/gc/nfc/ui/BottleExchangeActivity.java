@@ -64,6 +64,8 @@ import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
 import com.gc.nfc.interfaces.Netcallback;
+import com.gc.nfc.sca.ScaleDevice;
+import com.gc.nfc.sca.scalerSDK;
 import com.gc.nfc.utils.SharedPreferencesHelper;
 import com.gc.nfc.utils.Tools;
 import com.google.gson.Gson;
@@ -86,10 +88,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import okhttp3.Request;
 import okhttp3.Response;
 
-//import com.alibaba.fastjson.JSON;
-//import com.dk.weightScale.ScaleDevice;
-//import com.dk.weightScale.scalerSDK;
-//import com.gc.nfc.utils.Tools;
 
 public class BottleExchangeActivity extends BaseActivity implements View.OnClickListener, TextToSpeech.OnInitListener {
     private AppContext appContext;
@@ -365,7 +363,8 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     private RadioButton radioButton_zp;
     private RadioGroup radioGroup_nfc = null;
     private ProgressDialog readWriteDialog = null;
-    //  private scalerSDK scale;
+    private scalerSDK scale;
+    private ImageView imageView;
 
     private ScannerCallback scannerCallback = new ScannerCallback() {
         @Override
@@ -416,23 +415,25 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
 
     private Runnable task = new Runnable() {
         public void run() {
-            //            handler_weightScale.postDelayed(this, 150L);
-            //            if (scale.bleIsEnabled()) {
-            //              scale.Scan(true);
-            //              scale.updatelist();
-            //              if (scale.getDevicelist().isEmpty() != true) {
-            //                if (scale.getDevicelist().size() != 1) {
-            //                  msgText_weightDevice.setText("多台蓝牙秤冲突！");
-            //                  return;
-            //                }
-            //                msgText_weightDevice.setText("连接正常！");
-            //                float f = ((ScaleDevice)scale.getDevicelist().get(0)).scalevalue;
-            //                if (layout_inputWeight != null)
-            //                  ((EditText)layout_inputWeight.findViewById(2131230836)).setText(String.format("%4.1f", new Object[] { Float.valueOf(f) }));
-            //                return;
-            //              }
-            //              msgText_weightDevice.setText("未连接！");
-            //            }
+            handler_weightScale.postDelayed(this, 150L);
+            if (scale.bleIsEnabled()) {
+              scale.Scan(true);
+              scale.updatelist();
+              if (scale.getDevicelist().isEmpty() != true) {
+                if (scale.getDevicelist().size() != 1) {
+                  msgText_weightDevice.setText("多台蓝牙秤冲突！");
+                  return;
+                }
+                msgText_weightDevice.setText("连接正常！");
+                float f = ((ScaleDevice)scale.getDevicelist().get(0)).scalevalue;
+                if (layout_inputWeight != null) {
+                    EditText et = layout_inputWeight.findViewById(R.id.input_bottleWeight2);
+                    et.setText(String.format("%4.1f", new Object[] { Float.valueOf(f) }));
+                }
+                return;
+              }
+              msgText_weightDevice.setText("未连接！");
+            }
         }
     };
 
@@ -869,14 +870,9 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             intent.setClass(this, OrderDealActivity.class);
         }
         JSONArray jSONArray = createElectDepDetails();
-        this.m_bundle.putString("YJD_YS", this.m_yjp_ys_total);
-        this.m_bundle.putString("YJD_SS", this.m_yjp_ss_total);
-        this.m_bundle.putString("KPCode", JSON.toJSONString(this.m_BottlesMapKP));
-        this.m_bundle.putString("ZPCode", JSON.toJSONString(this.m_BottlesMapZP));
         String str = "";
         if (jSONArray != null)
             str = String.valueOf(jSONArray);
-        this.m_bundle.putString("ElectDepDetails", str);
         ArrayList<HashMap<Object, Object>> arrayList = new ArrayList();
         if (this.m_yjp_quantity_5kg != 0) {
             HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
@@ -941,6 +937,12 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             hashMap.put("price", String.valueOf(this.m_bfp_price_50kg));
             arrayList.add(hashMap);
         }
+        this.m_bundle.putString("order", m_OrderJson.toString());
+        this.m_bundle.putString("ElectDepDetails", str);
+        this.m_bundle.putString("YJD_YS", this.m_yjp_ys_total);
+        this.m_bundle.putString("YJD_SS", this.m_yjp_ss_total);
+        this.m_bundle.putString("KPCode", JSON.toJSONString(this.m_BottlesMapKP));
+        this.m_bundle.putString("ZPCode", JSON.toJSONString(this.m_BottlesMapZP));
         this.m_bundle.putSerializable("MapList", arrayList);
         this.m_bundle.putString("SpecMap", new JSONObject(this.m_BottlesSpecMap).toString());
         intent.putExtras(this.m_bundle);
@@ -1580,6 +1582,13 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             m_imageAddZPManual = (ImageView) findViewById(R.id.imageView_addZPManual);
             msgText_weightDevice = (TextView) findViewById(R.id.msgText_weightDevice);
             m_imageView_search_weightDevice = (ImageView) findViewById(R.id.imageView_search_weightDevice);
+            imageView = (ImageView) findViewById(R.id.img_back);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
             m_imageView_search_weightDevice.setOnClickListener(this);
             m_imageViewZPEye.setOnClickListener(this);
             m_imageViewKPEye.setOnClickListener(this);
@@ -1673,9 +1682,8 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 }
             };
             spinner1.setOnItemSelectedListener(onItemSelectedListener2);
-            // scalerSDK scalerSDK1 = new scalerSDK();
-            // this((Context)this);
-            // this.scale = scalerSDK1;
+            scalerSDK scalerSDK1 = new scalerSDK(this);
+            this.scale = scalerSDK1;
             this.handler_weightScale.post(this.task);
             this.layout_inputWeight = null;
             this.m_orderServiceQualityShowFlag = false;
