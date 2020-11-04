@@ -119,7 +119,7 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
         if (paramKeyEvent.getKeyCode() == 4 && paramKeyEvent.getRepeatCount() == 0 && paramKeyEvent.getAction() == 0) {
             (new AlertDialog.Builder((Context) this)).setTitle("提示").setMessage("确认退出吗？").setIcon(R.drawable.icon_logo).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface param1DialogInterface, int param1Int) {
-                    DiaoBoActivity.this.stopService(DiaoBoActivity.this.m_IntentAmapServeice);
+//                    DiaoBoActivity.this.stopService(DiaoBoActivity.this.m_IntentAmapServeice);
                     Process.killProcess(Process.myPid());
                 }
             }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -212,7 +212,7 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
     }
 
     public void onDestroy() {
-        stopService(this.m_IntentAmapServeice);
+//        stopService(this.m_IntentAmapServeice);
         super.onDestroy();
     }
 
