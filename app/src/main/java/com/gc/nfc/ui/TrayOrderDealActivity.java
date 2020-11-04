@@ -217,9 +217,17 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
     }
 
     private void OrderCalculate() {
-        JSONArray bodyarray = new JSONArray();
-        HashMap<Object, Object> body = new HashMap<Object, Object>();
+        JSONArray bodyarray= new JSONArray();;
+        HashMap<Object, Object> hashMap;
+        NetRequestConstant netRequestConstant = new NetRequestConstant();
         try {
+            netRequestConstant.setType(BaseActivity.HttpRequestType.PUT);
+            StringBuilder stringBuilder = new StringBuilder();
+            netRequestConstant.requestUrl = stringBuilder.append("http://www.gasmart.com.cn/api/Orders/Caculate/").append(this.m_orderId).toString();
+            netRequestConstant.context = (Context)this;
+            HashMap<Object, Object> hashMap1 = new HashMap<Object, Object>();
+            hashMap1.put("customerId", this.m_curUserId);
+            netRequestConstant.setParams(hashMap1);
             Iterator<Map.Entry<String, RefoundDetail>> iterator = this.m_BottlesMapKP.entrySet().iterator();
             while (iterator.hasNext()) {
                 RefoundDetail refoundDetail = (RefoundDetail) ((Map.Entry) iterator.next()).getValue();
@@ -248,14 +256,11 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
             Toast.makeText(this, "订单残气请求构建失败！" + jSONException.getMessage(), Toast.LENGTH_LONG).show();
             return;
         }
-        body.put("jsonArray", bodyarray);
-        NetRequestConstant netRequestConstant = new NetRequestConstant();
-        netRequestConstant.setType(BaseActivity.HttpRequestType.PUT);
-        StringBuilder stringBuilder = new StringBuilder();
-        netRequestConstant.requestUrl = stringBuilder.append("http://www.gasmart.com.cn/api/Orders/Caculate/").append(this.m_orderId).toString()+"?customerId="+this.m_curUserId;
-        netRequestConstant.context = this;
-        netRequestConstant.setBody(body);
+        hashMap = new HashMap<Object, Object>();
+        hashMap.put("jsonArray", bodyarray);
+        netRequestConstant.setBody(hashMap);
         netRequestConstant.isBodyJsonArray = true;
+        Logger.d(netRequestConstant);
         getServer(new Netcallback() {
             public void preccess(Object param1Object, boolean param1Boolean) {
                 if (param1Boolean) {
