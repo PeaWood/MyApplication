@@ -339,8 +339,9 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
         hashMap.put("operId", m_deliveryUser.getUsername());
         hashMap.put("actualAmount", m_yjss);
         hashMap.put("electDepositDetails", detail);
+        Logger.e("detail : "+ detail.toString());
         netRequestConstant.setBody(hashMap);
-        netRequestConstant.isBodyJsonArray = true;
+        netRequestConstant.isBodyJsonArray = false;
         getServer(new Netcallback() {
             public void preccess(Object param1Object, boolean param1Boolean) {
                 if (param1Boolean) {
@@ -560,7 +561,6 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
         Logger.e("setOrderDetailsInfo");
         try {
             JSONArray jSONArray = m_OrderJson.getJSONArray("orderDetailList");
-            detail = jSONArray;
             ArrayList arrayList = new ArrayList();
             for (byte b = 0; b < jSONArray.length(); b++) {
                 JSONObject jSONObject1 = jSONArray.getJSONObject(b);
@@ -783,7 +783,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             list_map = (List<Map<String, String>>) bundle.getSerializable("MapList");
             String str3 = bundle.getString("ElectDepDetails");
             if (str3 != null && str3.length() != 0) {
-                JSONArray jSONArray = new JSONArray();
+                JSONArray jSONArray = new JSONArray(str3);
                 detail = jSONArray;
             }
             TypeReference<HashMap<String, String>> typeReference2 = new TypeReference<HashMap<String, String>>() {

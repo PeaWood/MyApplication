@@ -85,11 +85,11 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
                 return;
             }
             if (chongzhuang == null || chongzhuang.length() == 0) {
-                Toast.makeText(TrayOrderDealActivity.this, "钢瓶未填写重量！无法支付", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TrayOrderDealActivity.this, "钢瓶未填写重量！无法支付", Toast.LENGTH_SHORT).show();
                 m_buttonNext.setText("下一步");
                 m_buttonNext.setBackgroundColor(getResources().getColor(R.color.textgray));//d到时在改
                 m_buttonNext.setEnabled(true);
-                return;
+//                return;
             }
             if (!picResult) {
                 Toast.makeText(TrayOrderDealActivity.this, "客户未签名！", Toast.LENGTH_SHORT).show();
@@ -260,7 +260,6 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         }
         hashMap = new HashMap<Object, Object>();
         hashMap.put("jsonArray", bodyarray);
-        netRequestConstant.setBody(hashMap);
         netRequestConstant.setBody(hashMap);
         netRequestConstant.isBodyJsonArray = true;
         Logger.d(netRequestConstant);
@@ -447,7 +446,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
                             Bundle bundle = new Bundle();
                             bundle.putInt("switchTab", 1);
                             intent.putExtras(bundle);
-                            startActivity((Intent) param1Object);
+                            startActivity(intent);
                             finish();
                             return;
                         }

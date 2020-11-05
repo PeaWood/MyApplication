@@ -947,6 +947,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         this.m_bundle.putString("SpecMap", new JSONObject(this.m_BottlesSpecMap).toString());
         intent.putExtras(this.m_bundle);
         startActivity(intent);
+        finish();
     }
 
     private void orderServiceQualityShow() {
