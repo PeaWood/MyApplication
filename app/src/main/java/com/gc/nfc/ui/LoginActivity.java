@@ -61,8 +61,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private void login() {
         name = et_name.getText().toString();
         password = et_pin.getText().toString();
-        name = "psy";
-        password = "111111";
+//        name = "psy";
+//        password = "111111";
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(password)) {
             Toast.makeText(LoginActivity.this, "请检查账号和密码", Toast.LENGTH_LONG).show();
         }
@@ -111,7 +111,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             @Override
             public void onResponse(Response response) throws IOException {
                 if (response.code() != 200) {
-                    Toast.makeText(LoginActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "账号或密码不正确！", Toast.LENGTH_LONG).show();
                     return;
                 }
                 String string = response.body().string();
@@ -151,7 +151,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     Intent starter = new Intent(LoginActivity.this, DiaoBoActivity.class);
                     startActivity(starter);
                     LoginActivity.this.finish();
-                    return;
                 }
             }
         });

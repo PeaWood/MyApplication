@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.gc.nfc.R;
+import com.journeyapps.barcodescanner.CaptureManager;
+import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -17,71 +19,71 @@ import butterknife.OnClick;
 /**
  * Created by lenovo on 2020/11/1
  */
-//public class CustomScanActivity extends AppCompatActivity implements DecoratedBarcodeView.TorchListener {
-//  private CaptureManager captureManager;
-//
-//  private boolean isLightOn = false;
-//
-//  @BindView(R.id.dbv_custom)
-//  DecoratedBarcodeView mDBV;
-//
-//  @BindView(R.id.btn_switch)
-//  Button swichLight;
-//
-//  private boolean hasFlash() {
-//    return getApplicationContext().getPackageManager().hasSystemFeature("android.hardware.camera.flash");
-//  }
-//
-//  protected void onCreate(Bundle paramBundle) {
-//    super.onCreate(paramBundle);
-//    setContentView(R.layout.activity_custom_scan);
-//    ButterKnife.bind((Activity)this);
-//    this.mDBV.setTorchListener(this);
-//    if (!hasFlash())
-//      this.swichLight.setVisibility(View.GONE);
-//    this.captureManager = new CaptureManager((Activity)this, this.mDBV);
-//    this.captureManager.initializeFromIntent(getIntent(), paramBundle);
-//    this.captureManager.decode();
-//  }
-//
-//  protected void onDestroy() {
-//    super.onDestroy();
-//    this.captureManager.onDestroy();
-//  }
-//
-//  public boolean onKeyDown(int paramInt, KeyEvent paramKeyEvent) {
-//    return (this.mDBV.onKeyDown(paramInt, paramKeyEvent) || super.onKeyDown(paramInt, paramKeyEvent));
-//  }
-//
-//  protected void onPause() {
-//    super.onPause();
-//    this.captureManager.onPause();
-//  }
-//
-//  protected void onResume() {
-//    super.onResume();
-//    this.captureManager.onResume();
-//  }
-//
-//  public void onSaveInstanceState(Bundle paramBundle, PersistableBundle paramPersistableBundle) {
-//    super.onSaveInstanceState(paramBundle, paramPersistableBundle);
-//    this.captureManager.onSaveInstanceState(paramBundle);
-//  }
-//
-//  public void onTorchOff() {
-//    this.isLightOn = false;
-//  }
-//
-//  public void onTorchOn() {
-//    this.isLightOn = true;
-//  }
-//
-//  @OnClick({2131230762})
-//  public void swichLight() {
-//    if (this.isLightOn) {
-//      this.mDBV.setTorchOff();
-//      return;
-//    }
-//    this.mDBV.setTorchOn();
-//  }
-//}
+public class CustomScanActivity extends AppCompatActivity implements DecoratedBarcodeView.TorchListener {
+  private CaptureManager captureManager;
+
+  private boolean isLightOn = false;
+
+  @BindView(R.id.dbv_custom)
+  DecoratedBarcodeView mDBV;
+
+  @BindView(R.id.btn_switch)
+  Button swichLight;
+
+  private boolean hasFlash() {
+    return getApplicationContext().getPackageManager().hasSystemFeature("android.hardware.camera.flash");
+  }
+
+  protected void onCreate(Bundle paramBundle) {
+    super.onCreate(paramBundle);
+    setContentView(R.layout.activity_custom_scan);
+    ButterKnife.bind((Activity)this);
+    this.mDBV.setTorchListener(this);
+    if (!hasFlash())
+      this.swichLight.setVisibility(View.GONE);
+    this.captureManager = new CaptureManager((Activity)this, this.mDBV);
+    this.captureManager.initializeFromIntent(getIntent(), paramBundle);
+    this.captureManager.decode();
+  }
+
+  protected void onDestroy() {
+    super.onDestroy();
+    this.captureManager.onDestroy();
+  }
+
+  public boolean onKeyDown(int paramInt, KeyEvent paramKeyEvent) {
+    return (this.mDBV.onKeyDown(paramInt, paramKeyEvent) || super.onKeyDown(paramInt, paramKeyEvent));
+  }
+
+  protected void onPause() {
+    super.onPause();
+    this.captureManager.onPause();
+  }
+
+  protected void onResume() {
+    super.onResume();
+    this.captureManager.onResume();
+  }
+
+  public void onSaveInstanceState(Bundle paramBundle, PersistableBundle paramPersistableBundle) {
+    super.onSaveInstanceState(paramBundle, paramPersistableBundle);
+    this.captureManager.onSaveInstanceState(paramBundle);
+  }
+
+  public void onTorchOff() {
+    this.isLightOn = false;
+  }
+
+  public void onTorchOn() {
+    this.isLightOn = true;
+  }
+
+  @OnClick({R.id.btn_switch})
+  public void swichLight() {
+    if (this.isLightOn) {
+      this.mDBV.setTorchOff();
+      return;
+    }
+    this.mDBV.setTorchOn();
+  }
+}
