@@ -261,6 +261,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         hashMap = new HashMap<Object, Object>();
         hashMap.put("jsonArray", bodyarray);
         netRequestConstant.setBody(hashMap);
+        netRequestConstant.setBody(hashMap);
         netRequestConstant.isBodyJsonArray = true;
         Logger.d(netRequestConstant);
         getServer(new Netcallback() {
