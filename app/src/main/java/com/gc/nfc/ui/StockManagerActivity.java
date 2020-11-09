@@ -52,6 +52,7 @@ import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.domain.User;
+import com.gc.nfc.http.Logger;
 import com.gc.nfc.interfaces.Netcallback;
 import com.gc.nfc.sca.ScaleDevice;
 import com.gc.nfc.sca.scalerSDK;
@@ -1109,6 +1110,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     protected void onActivityResult(int paramInt1, int paramInt2, Intent paramIntent) {
             IntentResult intentResult = IntentIntegrator.parseActivityResult(paramInt1, paramInt2, paramIntent);
             if (intentResult != null) {
+                Logger.e("扫描"+intentResult.getContents());
               if (intentResult.getContents() == null) {
                 Toast.makeText(this, "内容为空", Toast.LENGTH_LONG).show();
                 return;
