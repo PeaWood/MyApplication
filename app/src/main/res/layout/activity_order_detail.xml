@@ -437,6 +437,7 @@
                 n1:background="@color/textgray" />
 
             <LinearLayout
+                n1:id="@+id/lin_num"
                 n1:layout_width="fill_parent"
                 n1:layout_height="fill_parent"
                 n1:layout_marginTop="10.0dip"

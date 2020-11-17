@@ -301,6 +301,12 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
             }
             String str1 = objectBean.getCallInPhone();
             m_textViewCallNumber.setText(str1);
+            findViewById(R.id.lin_num).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    m_imageViewCall.callOnClick();
+                }
+            });
         } catch (Exception jSONException) {
             jSONException.printStackTrace();
             Toast.makeText(OrderDetailActivity.this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();

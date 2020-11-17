@@ -92,7 +92,7 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
         AlertDialog.Builder builder = new AlertDialog.Builder((Context) this);
         View view = View.inflate((Context) this, R.layout.pay_on_scan, null);
         ImageView imageView = (ImageView) view.findViewById(R.id.items_imageViewScanCode);
-        String str = "http://www.gasmart.com.cn/api/pay/QRCode?text=" + "psy";
+        String str = "http://www.gasmart.com.cn/api/pay/QRCode?text=" + user.getUsername();
         try {
             URL uRL = new URL(str);
             imageView.setImageBitmap(BitmapFactory.decodeStream(uRL.openStream()));

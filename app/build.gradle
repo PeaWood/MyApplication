@@ -76,7 +76,7 @@ dependencies {
     //    implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
     //    implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation project(':nfc')
-    implementation project(':sca')
+//    implementation project(':sca')
     implementation (name:'alicloud-android-accs-4.0.0-emas', ext: 'aar')
     implementation (name:'alicloud-android-agoo-4.0.0-emas', ext: 'aar')
     implementation (name:'alicloud-android-push-3.2.2', ext: 'aar')
