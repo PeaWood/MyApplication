@@ -39,6 +39,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dk.bleNfc.BleManager.BleManager;
 import com.dk.bleNfc.BleManager.Scanner;
 import com.dk.bleNfc.BleManager.ScannerCallback;
 import com.dk.bleNfc.BleNfcDeviceService;
@@ -178,6 +179,8 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
             if (bleNfcDevice.isConnection() == 2 || bleNfcDevice.isConnection() == 1)
                 ;
             switch (param1Message.what) {
+                default:
+                    return;
                 case 3:
                     (new Thread(new Runnable() {
                         public void run() {
@@ -200,10 +203,11 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                             }
                         }
                     })).start();
+                    break;
                 case 136:
                     if (m_takerOverUserId == null)
                         showToast("请扫码获取交接人信息！");
-                    String str = param1Message.obj.toString();
+                    String str = param1Message.obj!=null?param1Message.obj.toString():null;
                     if (str == null)
                         showToast("空标签！");
                     if (m_selected_nfc_model == 0) {
@@ -252,6 +256,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
             switch (param1RadioGroup.getCheckedRadioButtonId()) {
                 case R.id.radioButton_kp_id:
                     m_selected_nfc_model = 0;
+                    break;
                 case R.id.radioButton_zp_id:
                     m_selected_nfc_model = 1;
                     break;
@@ -270,11 +275,11 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName param1ComponentName, IBinder param1IBinder) {
-            BleNfcDeviceService bleNfcDeviceService = ((BleNfcDeviceService.LocalBinder) param1IBinder).getService();
-            bleNfcDevice = bleNfcDeviceService.bleNfcDevice;
-            mScanner = bleNfcDeviceService.scanner;
-            bleNfcDeviceService.setDeviceManagerCallback(deviceManagerCallback);
-            bleNfcDeviceService.setScannerCallback(scannerCallback);
+            BleNfcDeviceService mBleNfcDeviceService = ((BleNfcDeviceService.LocalBinder) param1IBinder).getService();
+            bleNfcDevice = mBleNfcDeviceService.bleNfcDevice;
+            mScanner = mBleNfcDeviceService.scanner;
+            mBleNfcDeviceService.setDeviceManagerCallback(deviceManagerCallback);
+            mBleNfcDeviceService.setScannerCallback(scannerCallback);
             searchNearestBleDevice();
         }
 
@@ -338,31 +343,39 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     private scalerSDK scale;
 
     private ScannerCallback scannerCallback = new ScannerCallback() {
-        public void onReceiveScanDevice(BluetoothDevice param1BluetoothDevice, int param1Int, byte[] param1ArrayOfbyte) {
-            super.onReceiveScanDevice(param1BluetoothDevice, param1Int, param1ArrayOfbyte);
-            if (Build.VERSION.SDK_INT >= 21)
-                System.out.println("Activity搜到设备：" + param1BluetoothDevice.getName() + " 信号强度：" + param1Int + " scanRecord：" + StringTool.byteHexToSting(param1ArrayOfbyte));
-            if (param1ArrayOfbyte != null && StringTool.byteHexToSting(param1ArrayOfbyte).contains("017f5450") && param1Int >= -55) {
+        public void onReceiveScanDevice(BluetoothDevice device, int rssi, byte[] scanRecord) {
+            super.onReceiveScanDevice(device, rssi, scanRecord);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //StringTool.byteHexToSting(scanRecord.getBytes())
+                System.out.println("Activity搜到设备：" + device.getName()
+                        + " 信号强度：" + rssi
+                        + " scanRecord：" + StringTool.byteHexToSting(scanRecord));
+            }
+
+            //搜索蓝牙设备并记录信号强度最强的设备
+            if ( (scanRecord != null) && (StringTool.byteHexToSting(scanRecord).contains("017f5450"))) {  //从广播数据中过滤掉其它蓝牙设备
+                if (rssi < -55) {
+                    return;
+                }
+                //msgBuffer.append("搜到设备：").append(device.getName()).append(" 信号强度：").append(rssi).append("\r\n");
                 handler.sendEmptyMessage(0);
                 if (mNearestBle != null) {
-                    if (param1Int > lastRssi) {
+                    if (rssi > lastRssi) {
                         mNearestBleLock.lock();
                         try {
-                            mNearestBle = param1BluetoothDevice;
-                            return;
-                        } finally {
+                            mNearestBle = device;
+                        }finally {
                             mNearestBleLock.unlock();
                         }
                     }
-                    return;
                 }
-                mNearestBleLock.lock();
-                try {
-                    mNearestBle = param1BluetoothDevice;
-                    mNearestBleLock.unlock();
-                    return;
-                } finally {
-                    mNearestBleLock.unlock();
+                else {
+                    mNearestBleLock.lock();
+                    try {
+                        mNearestBle = device;
+                    }finally {
+                        mNearestBleLock.unlock();
+                    }
+                    lastRssi = rssi;
                 }
             }
         }
@@ -435,11 +448,13 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void blueDeviceInitial() {
-        msgText = (TextView) findViewById(R.id.msgText);
-        m_imageViewSearchBlue = (ImageView) findViewById(R.id.imageView_search);
+        msgText = (TextView)findViewById(R.id.msgText);
+        m_imageViewSearchBlue= (ImageView) findViewById(R.id.imageView_search);
         m_imageViewSearchBlue.setOnClickListener(new StartSearchButtonListener());
         msgBuffer = new StringBuffer();
-        bindService(new Intent(this, BleNfcDeviceService.class), mServiceConnection, Context.BIND_AUTO_CREATE);
+        //ble_nfc服务初始化
+        Intent gattServiceIntent = new Intent(this, BleNfcDeviceService.class);
+        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
     private void cleanAll() {
@@ -562,24 +577,23 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
             default:
                 return true;
             case 6:
-                break;
+                boolean bool = true;
+                Ntag21x ntag21x = (Ntag21x)bleNfcDevice.getCard();
+                if (ntag21x != null) {
+                    try {
+                        String str = ntag21x.NdefTextRead();
+                        Message message = new Message();
+                        message.obj = str;
+                        message.what = 136;
+                        handler.sendMessage(message);
+                    } catch (CardNoResponseException cardNoResponseException){
+                        cardNoResponseException.printStackTrace();
+                        bool = false;
+                    }
+
+                }
+                return bool;
         }
-        //    Ntag21x ntag21x = (Ntag21x)bleNfcDevice.getCard();
-        //    if (ntag21x != null) {
-        //      boolean bool;
-        //      try {
-        //        String str = ntag21x.NdefTextRead();
-        //        Message message = new Message();
-        //        message.obj = str;
-        //        message.what = 136;
-        //        handler.sendMessage(message);
-        //      } catch (CardNoResponseException cardNoResponseException) {
-        //        cardNoResponseException.printStackTrace();
-        //        bool = false;
-        //      }
-        //      return bool;
-        //    }
-        return false;
     }
 
     private void refleshBottlesListZP() {
@@ -596,15 +610,66 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void searchNearestBleDevice() {
-        msgBuffer.delete(0, msgBuffer.length());
-        msgBuffer.append("正在搜索设备...");
-        handler.sendEmptyMessage(0);
-        if (!mScanner.isScanning() && bleNfcDevice.isConnection() == 0)
-            (new Thread(new Runnable() {
+        this.msgBuffer.delete(0, this.msgBuffer.length());
+        this.msgBuffer.append("正在搜索设备...");
+        this.handler.sendEmptyMessage(0);
+        if (!mScanner.isScanning() && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+            new Thread(new Runnable() {
+                @Override
                 public void run() {
+                    synchronized (this) {
+                        mScanner.startScan(0);
+                        mNearestBleLock.lock();
+                        try {
+                            mNearestBle = null;
+                        }finally {
+                            mNearestBleLock.unlock();
+                        }
+                        lastRssi = -100;
 
+                        int searchCnt = 0;
+                        while ((mNearestBle == null)
+                                && (searchCnt < 20000)
+                                && (mScanner.isScanning())
+                                && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+                            searchCnt++;
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (mScanner.isScanning() && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            mScanner.stopScan();
+                            mNearestBleLock.lock();
+                            try {
+                                if (mNearestBle != null) {
+                                    mScanner.stopScan();
+                                    msgBuffer.delete(0, msgBuffer.length());
+                                    msgBuffer.append("正在连接设备...");
+                                    handler.sendEmptyMessage(0);
+                                    bleNfcDevice.requestConnectBleDevice(mNearestBle.getAddress());
+                                } else {
+                                    msgBuffer.delete(0, msgBuffer.length());
+                                    msgBuffer.append("未找到设备！");
+                                    handler.sendEmptyMessage(0);
+                                }
+                            }finally {
+                                mNearestBleLock.unlock();
+                            }
+                        } else {
+                            mScanner.stopScan();
+                        }
+                    }
                 }
-            })).start();
+            }).start();
+        }
     }
 
     private void setListViewHeightBasedOnChildren(ListView paramListView) {
@@ -1234,7 +1299,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
         }
 
         public void onClick(View param1View) {
-            if (bleNfcDevice.isConnection() == 2) {
+            if ( (bleNfcDevice.isConnection() == BleManager.STATE_CONNECTED) ) {
                 bleNfcDevice.requestDisConnectDevice();
                 return;
             }
