@@ -113,10 +113,10 @@ public class MybottlesActivity extends BaseActivity implements View.OnClickListe
                     hashMap.put("spec", stringBuilder3.append("钢瓶规格：").append(bean.getSpec().getName()).toString());
                     StringBuilder stringBuilder1 = new StringBuilder();
                     hashMap.put("serviceStatus", stringBuilder1.append("钢瓶状态：").append(bean.getServiceStatus().getName()).toString());
-                    if(!bean.getServiceStatus().getName().equals("空瓶回收")){//优化
+//                    if(!bean.getServiceStatus().getName().equals("空瓶回收")){//优化
                         list.add(hashMap);
                         total = total+1;
-                    }
+//                    }
                 }
                 m_totalCountTextView.setText(total+"");
                 SimpleAdapter simpleAdapter = new SimpleAdapter(MybottlesActivity.this, list, R.layout.bottle_list_items, new String[]{"number", "spec", "serviceStatus"}, new int[]{R.id.items_number, R.id.items_spec, R.id.items_serviceStatus});

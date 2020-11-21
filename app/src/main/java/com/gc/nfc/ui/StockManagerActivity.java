@@ -229,7 +229,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                             } else if (m_takeOverGroupCode.equals("00003")) {
                                 str1 = "4";
                             } else {
-                                Toast.makeText(StockManagerActivity.this, "非配送工或调拨车账户，请更换！", Toast.LENGTH_LONG).show();
+                                Toast.makeText(StockManagerActivity.this, "非配送工或调拨车账户222，请更换！", Toast.LENGTH_LONG).show();
                             }
                         } else if (m_curLoginUserId.getGroupCode().equals("00006")) {
                             str1 = "3";
@@ -578,17 +578,36 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                 return true;
             case 6:
                 boolean bool = true;
-                Ntag21x ntag21x = (Ntag21x)bleNfcDevice.getCard();
+                boolean hasSecondField=false;
+                boolean hasFirstField=false;
+                Ntag21x ntag21x = (Ntag21x) this.bleNfcDevice.getCard();
                 if (ntag21x != null) {
                     try {
-                        String str = ntag21x.NdefTextRead();
+                        hasFirstField = ntag21x.HasFirstField();
+                        hasSecondField = ntag21x.HasSecondField();
+                    } catch (CardNoResponseException cardNoResponseException) {
+                        cardNoResponseException.printStackTrace();
+                        bool = false;
+                    }
+                    String str=null;
+                    if(hasSecondField) {
+                        try {
+                            str = ntag21x.NdefTextReadSec();
+                        } catch (CardNoResponseException cardNoResponseException) {
+                            cardNoResponseException.printStackTrace();
+                        }
+                    }else{
+                        try {
+                            str = ntag21x.NdefTextRead();
+                        } catch (CardNoResponseException cardNoResponseException) {
+                            cardNoResponseException.printStackTrace();
+                        }
+                    }
+                    if(str!=null) {
                         Message message = new Message();
                         message.obj = str;
                         message.what = 136;
-                        handler.sendMessage(message);
-                    } catch (CardNoResponseException cardNoResponseException){
-                        cardNoResponseException.printStackTrace();
-                        bool = false;
+                        this.handler.sendMessage(message);
                     }
 
                 }
@@ -830,7 +849,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                                     textView.setText(stringBuilder.append((String) param1Object).append(" (姓名:").append(str1).append(" | 工作组:").append(str2).append(")").toString());
                                     return;
                                 }
-                                if (m_editTextTakeOverUserId.equals("00003")) {
+                                if (str3.equals("00003")) {
                                     m_takerOverUserId = (String)param1Object;
                                     TextView textView1 = m_editTextTakeOverUserId;
                                     StringBuilder stringBuilder = new StringBuilder();
@@ -1135,6 +1154,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                                                     StringBuilder stringBuilder = new StringBuilder();
                                                     stockManagerActivity.bottleTakeOverUnit(str1, str2, str3, str4, stringBuilder.append(m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
                                                 } catch (Exception jSONException) {
+                                                    jSONException.printStackTrace();
                                                     Toast.makeText(StockManagerActivity.this, "查询钢瓶信息异常！", Toast.LENGTH_LONG).show();
                                                 }
                                         }
@@ -1158,10 +1178,13 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                                 StringBuilder stringBuilder = new StringBuilder();
                                 stockManagerActivity.bottleTakeOverUnit(str4, str2, str3, str5, stringBuilder.append(m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
                             } catch (IOException iOException) {
+                                iOException.printStackTrace();
                                 Toast.makeText(StockManagerActivity.this, "查询钢瓶信息异常！", Toast.LENGTH_LONG).show();
                             } catch (JSONException jSONException) {
+                                jSONException.printStackTrace();
                                 Toast.makeText(StockManagerActivity.this, "查询钢瓶信息异常！", Toast.LENGTH_LONG).show();
                             } catch (ParseException parseException) {
+                                parseException.printStackTrace();
                                 Toast.makeText(StockManagerActivity.this, "日期构造异常！", Toast.LENGTH_LONG).show();
                             }
                         return;
@@ -1222,7 +1245,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                         } else if (m_takeOverGroupCode.equals("00003")) {
                             str1 = "4";
                         } else {
-                            Toast.makeText(this, "非配送工或调拨车账户，请更换！", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "非配送工或调拨车账户111，请更换！", Toast.LENGTH_LONG).show();
                         }
                     } else if (m_curLoginUserId.getGroupCode().equals("00006")) {
                         str1 = "3";

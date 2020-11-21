@@ -16,7 +16,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -182,7 +184,6 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
                                     if (bleNfcDevice.androidFastParams(true))
                                         ;
                                     handler.sendEmptyMessage(0);
-                                    handler.sendEmptyMessage(0);
                                     startAutoSearchCard();
                                 } catch (DeviceNoResponseException deviceNoResponseException) {
                                     deviceNoResponseException.printStackTrace();
@@ -191,13 +192,19 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
                         })).start();
                         break;
                     case 136:
-                        if (m_curUserId == null)
+                        if (m_curUserId == null){
                             showToast("请先扫描用户卡");
+                            return;
+                        }
                         str2 = param1Message.obj!=null?param1Message.obj.toString():null;
-                        if (str2 == null)
+                        if (str2 == null){
                             showToast("空标签！");
-                        if ((str2.split(":")).length == 2)
+                            return;
+                        }
+                        if ((str2.split(":")).length == 2){
                             showToast("无效钢瓶码格式！");
+                            return;
+                        }
                         switch (m_selected_nfc_model) {
                             case 0:
                                 bottleTakeOverUnit(str2, m_curUserId, m_deliveryUser.getUsername(), "6", "退换货流程|空瓶回收", false, true, true, "空瓶回收");
@@ -711,11 +718,11 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
                     HttpResponse response = (HttpResponse) param1Object;
                     if (param1Object != null) {
                         if (response.getStatusLine().getStatusCode() == 200) {
-                            MediaPlayer.create(BottleRecycleActivity.this, 2131558407).start();
+                            MediaPlayer.create(BottleRecycleActivity.this, R.raw.zxing_beep).start();
                             addKP(bottleCode, takeReason);
                             return;
                         }
-                        MediaPlayer.create(BottleRecycleActivity.this, 2131558400).start();
+                        MediaPlayer.create(BottleRecycleActivity.this, R.raw.alarm).start();
                         if (response.getStatusLine().getStatusCode() == 409) {
                             (new AlertDialog.Builder(BottleRecycleActivity.this)).setTitle("钢瓶异常流转！").setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + getResponseMessage((HttpResponse) param1Object) + "\r\n确认强制交接吗？").setIcon(R.drawable.icon_logo).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface param2DialogInterface, int param2Int) {
@@ -821,24 +828,73 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
             public void onNothingSelected(AdapterView<?> param1AdapterView) {
             }
         });
+        m_listView_kp.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                deleteKP(position);
+            }
+        });
     }
 
     public void onClick(View paramView) {
+        Intent intent;
+        Bundle bundle;
         switch (paramView.getId()){
             case R.id.imageView_KPEYE:
-
+                searchCst();
                 break;
             case R.id.imageView_addKPManual:
-
+                if (m_curUserId == null){
+                    showToast("请先扫描用户卡");
+                    return;
+                }
+                if (Tools.isFastClick()) {
+                    if (TextUtils.isEmpty(this.m_gp_code_head_KP)) {
+                        this.m_gp_code_head_KP = "";
+                    }
+                    String s = this.m_gp_code_head_KP + this.m_bottleIdKPEditText.getText().toString();
+                    boolean isZpRecycle = false;
+                    String note = "";
+                    String reason = "";
+                    switch (radioGroup_nfc.getCheckedRadioButtonId()){
+                        case R.id.radioButton_kp_recyle:
+                            note = "退换货流程|空瓶回收";
+                            isZpRecycle = false;
+                            reason = "空瓶回收";
+                            break;
+                        case R.id.radioButton_zp_recyle:
+                            note = "退换货流程|重瓶回收";
+                            isZpRecycle = true;
+                            reason = "重瓶回收";
+                            break;
+                        case R.id.radioButton_zp_reput:
+                            note = "退换货流程|重瓶落户";
+                            isZpRecycle = false;
+                            reason = "重瓶落户";
+                            break;
+                    }
+                    bottleTakeOverUnit(s, this.m_curUserId, this.m_deliveryUser.getUsername(), "6", note, false, true, isZpRecycle,reason);
+                    this.m_bottleIdKPEditText.setText("");
+                }
                 break;
             case R.id.button_next:
-
+                finish();
+//                if (m_curUserId == null){
+//                    showToast("请先扫描用户卡");
+//                    return;
+//                }
+//                intent = new Intent();
+//                bundle = new Bundle();
+//                bundle.putString("userId", this.m_curUserId);
+//                intent.setClass(this, MybottlesActivity.class);
+//                intent.putExtras(bundle);
+//                startActivity(intent);
                 break;
             case R.id.imageView_Scan:
-
+                orderServiceQualityShow();
                 break;
             case R.id.RelativeLayout_san:
-
+                orderServiceQualityShow();
                 break;
         }
     }

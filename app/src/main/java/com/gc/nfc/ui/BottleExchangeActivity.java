@@ -24,6 +24,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -214,6 +215,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                         break;
                     case 136:
                         String str1 = param1Message.obj!=null?param1Message.obj.toString():null;
+                        Log.e("121111111111", "handleMessage: "+str1 );
                         if (str1 == null)
                             showToast("空标签！");
                         if (m_selected_nfc_model == 0)
@@ -837,7 +839,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             Integer integer2 = (Integer) hashMap.get(str);
             Integer integer1 = 0;
             for (String str1 : this.m_BottlesMapZP.keySet()) {
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new StringBuilder("0");
                 String str2 = getBottleSpec(str1);
                 if (str2 == null) {
                     updateBottleSpec(str1);
@@ -845,7 +847,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                     return false;
                 }
                 if (str2.equals(str))
-                    integer1 = Integer.parseInt(stringBuilder.toString()) + 1;
+                    integer1 = Integer.valueOf(stringBuilder.toString()) + 1;
             }
             if (!integer1.equals(integer2)) {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -1760,7 +1762,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                         this.m_gp_code_head_KP = "";
                     }
                     String s = this.m_gp_code_head_KP + this.m_bottleIdKPEditText.getText().toString();
-                    Logger.e(s);
                     bottleTakeOverUnit(s, this.m_curUserId, this.m_deliveryUser.getUsername(), "6", this.m_customerAddress + "空瓶回收", false, true);
                     this.m_bottleIdKPEditText.setText("");
                 }
@@ -1786,7 +1787,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         super.onDestroy();
         if (this.readWriteDialog != null)
             this.readWriteDialog.dismiss();
-        //        unbindService(this.mServiceConnection);
+        unbindService(this.mServiceConnection);
     }
 
     public void onInit(int paramInt) {
