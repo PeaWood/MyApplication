@@ -830,8 +830,8 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             TextView textView1 = m_textViewTotalFee;
             StringBuilder stringBuilder3 = new StringBuilder();
             textView1.setText(stringBuilder3.append("￥").append(m_totalFee).toString());
-            int i = Integer.parseInt(m_totalFee);
-            int j = Integer.parseInt(m_yjss);
+            double i = Double.valueOf(m_totalFee);
+            double j = Double.valueOf(m_yjss);
             TextView textView2 = (TextView) findViewById(R.id.textview_YJSSFee);//钢瓶其他费用（不太确定是不是这个id）
             StringBuilder stringBuilder1 = new StringBuilder();
             textView2.setText(stringBuilder1.append(i + j).append("元").toString());

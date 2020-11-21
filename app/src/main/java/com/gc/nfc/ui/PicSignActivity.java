@@ -232,10 +232,10 @@ public class PicSignActivity extends AppCompatActivity {
     this.m_textViewTotalQuantityGp.setText("X" + String.valueOf(i));
     this.m_textViewTotalMountDealGp.setText("￥" + String.valueOf(j));
     try {
-      k = Integer.parseInt(this.m_OrderJson.getString("orderAmount"));
+      double k1 = this.m_OrderJson.getDouble("orderAmount");
       TextView textView = this.m_textViewTotalAcount;
       StringBuilder stringBuilder = new StringBuilder();
-      textView.setText(stringBuilder.append("￥").append(k + j).toString());
+      textView.setText(stringBuilder.append("￥").append(k1 + j).toString());
     } catch (JSONException jSONException) {
       Toast.makeText((Context)this, "异常" + jSONException.toString(), Toast.LENGTH_SHORT).show();
     } 

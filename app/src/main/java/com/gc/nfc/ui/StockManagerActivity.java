@@ -1222,8 +1222,10 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                 cleanAll();
                 break;
             case R.id.imageView_addZPManual:
-                if (m_takerOverUserId == null)
+                if (m_takerOverUserId == null){
                     showToast("请扫码获取交接人信息！");
+                    return;
+                }
                 str = m_gp_code_head + m_bottleIdZPEditText.getText().toString();
                 if (m_selected_nfc_model == 0) {
                     String str1 = "";

@@ -161,9 +161,9 @@ public class Data_TaskOrders {
             private String orderSn;
             private String callInPhone;
             private CustomerBean customer;
-            private int originalAmount;
-            private int orderAmount;
-            private int refoundSum;
+            private double originalAmount;
+            private double orderAmount;
+            private double refoundSum;
             private Object payType;
             private Object couponCount;
             private int orderStatus;
@@ -232,27 +232,27 @@ public class Data_TaskOrders {
                 this.customer = customer;
             }
 
-            public int getOriginalAmount() {
+            public double getOriginalAmount() {
                 return originalAmount;
             }
 
-            public void setOriginalAmount(int originalAmount) {
+            public void setOriginalAmount(double originalAmount) {
                 this.originalAmount = originalAmount;
             }
 
-            public int getOrderAmount() {
+            public double getOrderAmount() {
                 return orderAmount;
             }
 
-            public void setOrderAmount(int orderAmount) {
+            public void setOrderAmount(double orderAmount) {
                 this.orderAmount = orderAmount;
             }
 
-            public int getRefoundSum() {
+            public double getRefoundSum() {
                 return refoundSum;
             }
 
-            public void setRefoundSum(int refoundSum) {
+            public void setRefoundSum(double refoundSum) {
                 this.refoundSum = refoundSum;
             }
 
