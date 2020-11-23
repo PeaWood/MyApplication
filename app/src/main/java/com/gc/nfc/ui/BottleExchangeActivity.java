@@ -225,15 +225,24 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                         break;
                     case 137:
                         String[] arrayOfString = param1Message.obj!=null?param1Message.obj.toString().split(":"):null;
+                        if(arrayOfString==null){
+                            showToast("用户卡无效！");
+                            return;
+                        }
                         if (arrayOfString.length != 2) {
                             showToast("无效卡格式！");
+                            return;
                         }
                         str1 = arrayOfString[0];
                         String str2 = arrayOfString[1];
-                        if (m_handedUserCard == null)
+                        if (m_handedUserCard == null){
                             showToast("该用户未绑定用户卡");
-                        if (!str2.equals(m_handedUserCard))
+                            return;
+                        }
+                        if (!str2.equals(m_handedUserCard)){
                             showToast("非本人卡号！");
+                            return;
+                        }
                         if (str1.equals("Y")) {
                             showToast("满意！");
                             orderServiceQualityUpload(true);

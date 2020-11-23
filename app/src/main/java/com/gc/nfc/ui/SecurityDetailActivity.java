@@ -39,6 +39,7 @@ import com.amap.api.navi.AmapNaviParams;
 import com.amap.api.navi.AmapNaviType;
 import com.amap.api.navi.INaviInfoCallback;
 import com.amap.api.navi.model.AMapNaviLocation;
+import com.dk.bleNfc.BleManager.BleManager;
 import com.dk.bleNfc.BleManager.Scanner;
 import com.dk.bleNfc.BleManager.ScannerCallback;
 import com.dk.bleNfc.BleNfcDeviceService;
@@ -186,20 +187,33 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
                             }
                         })).start();
                     case 137:
-                        String[] arrayOfString = param1Message.obj.toString().split(":");
-                        if (arrayOfString.length != 2)
+                        String[] arrayOfString = param1Message.obj!=null?param1Message.obj.toString().split(":"):null;
+                        if(arrayOfString==null){
+                            showToast("用户卡无效！");
+                            return;
+                        }
+                        if (arrayOfString.length != 2) {
                             showToast("无效卡格式！");
+                            return;
+                        }
                         String str1 = arrayOfString[0];
                         String str2 = arrayOfString[1];
-                        if (m_handedUserCard == null)
+                        if (m_handedUserCard == null){
                             showToast("该用户未绑定用户卡");
-                        if (!str2.equals(m_handedUserCard))
+                            return;
+                        }
+                        if (!str2.equals(m_handedUserCard)){
                             showToast("非本人卡号！");
-                        if (str1.equals("Y"))
+                            return;
+                        }
+                        if (str1.equals("Y")) {
+                            showToast("满意！");
                             orderServiceQualityUpload(true);
-                        if (str1.equals("N"))
+                        }
+                        if (str1.equals("N")) {
+                            showToast("不满意！");
                             orderServiceQualityUpload(false);
-                        showToast("无效卡格式！");
+                        }
                         break;
                 }
             }
@@ -285,35 +299,45 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
     private ImageView imageView;
 
     private ScannerCallback scannerCallback = new ScannerCallback() {
-        public void onReceiveScanDevice(BluetoothDevice param1BluetoothDevice, int param1Int, byte[] param1ArrayOfbyte) {
-            super.onReceiveScanDevice(param1BluetoothDevice, param1Int, param1ArrayOfbyte);
-            if (Build.VERSION.SDK_INT >= 21)
-                System.out.println("Activity搜到设备：" + param1BluetoothDevice.getName() + " 信号强度：" + param1Int + " scanRecord：" + StringTool.byteHexToSting(param1ArrayOfbyte));
-            if (param1ArrayOfbyte != null && StringTool.byteHexToSting(param1ArrayOfbyte).contains("017f5450") && param1Int >= -55) {
+        @Override
+        public void onReceiveScanDevice(BluetoothDevice device, int rssi, byte[] scanRecord) {
+            super.onReceiveScanDevice(device, rssi, scanRecord);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //StringTool.byteHexToSting(scanRecord.getBytes())
+                System.out.println("Activity搜到设备：" + device.getName()
+                        + " 信号强度：" + rssi
+                        + " scanRecord：" + StringTool.byteHexToSting(scanRecord));
+            }
+
+            //搜索蓝牙设备并记录信号强度最强的设备
+            if ( (scanRecord != null) && (StringTool.byteHexToSting(scanRecord).contains("017f5450"))) {  //从广播数据中过滤掉其它蓝牙设备
+                if (rssi < -55) {
+                    return;
+                }
+                //msgBuffer.append("搜到设备：").append(device.getName()).append(" 信号强度：").append(rssi).append("\r\n");
                 handlerBlue.sendEmptyMessage(0);
                 if (mNearestBle != null) {
-                    if (param1Int > lastRssi) {
+                    if (rssi > lastRssi) {
                         mNearestBleLock.lock();
                         try {
-                            mNearestBle = param1BluetoothDevice;
-                            return;
-                        } finally {
+                            mNearestBle = device;
+                        }finally {
                             mNearestBleLock.unlock();
                         }
                     }
-                    return;
                 }
-                mNearestBleLock.lock();
-                try {
-                    mNearestBle = param1BluetoothDevice;
-                    mNearestBleLock.unlock();
-                    return;
-                } finally {
-                    mNearestBleLock.unlock();
+                else {
+                    mNearestBleLock.lock();
+                    try {
+                        mNearestBle = device;
+                    }finally {
+                        mNearestBleLock.unlock();
+                    }
+                    lastRssi = rssi;
                 }
             }
         }
 
+        @Override
         public void onScanDeviceStopped() {
             super.onScanDeviceStopped();
         }
@@ -462,38 +486,112 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
 
     private boolean readWriteCardDemo(int paramInt) {
         switch (paramInt) {
+            default:
+                return true;
             case 6:
-                Ntag21x ntag21x = (Ntag21x) bleNfcDevice.getCard();
+                boolean bool = true;
+                boolean hasSecondField=false;
+                boolean hasFirstField=false;
+                Ntag21x ntag21x = (Ntag21x) this.bleNfcDevice.getCard();
                 if (ntag21x != null) {
                     try {
-                        String str = ntag21x.NdefTextRead();
+                        hasFirstField = ntag21x.HasFirstField();
+                        hasSecondField = ntag21x.HasSecondField();
+                    } catch (CardNoResponseException cardNoResponseException) {
+                        cardNoResponseException.printStackTrace();
+                        bool = false;
+                    }
+                    String str=null;
+                    if(hasSecondField) {
+                        try {
+                            str = ntag21x.NdefTextReadSec();
+                        } catch (CardNoResponseException cardNoResponseException) {
+                            cardNoResponseException.printStackTrace();
+                        }
+                    }else{
+                        try {
+                            str = ntag21x.NdefTextRead();
+                        } catch (CardNoResponseException cardNoResponseException) {
+                            cardNoResponseException.printStackTrace();
+                        }
+                    }
+                    if(str!=null) {
                         Message message = new Message();
                         message.obj = str;
-                        if (m_orderServiceQualityShowFlag) {
+                        if (this.m_orderServiceQualityShowFlag) {
                             message.what = 137;
                         } else {
                             message.what = 136;
                         }
-                        handlerBlue.sendMessage(message);
-                    } catch (CardNoResponseException cardNoResponseException) {
-                        return false;
+                        this.handlerBlue.sendMessage(message);
                     }
                 }
-                break;
+                return bool;
         }
-        return true;
     }
 
     private void searchNearestBleDevice() {
-        msgBuffer.delete(0, msgBuffer.length());
+        msgBuffer.delete(0, this.msgBuffer.length());
         msgBuffer.append("正在搜索设备...");
         handlerBlue.sendEmptyMessage(0);
-        if (!mScanner.isScanning() && bleNfcDevice.isConnection() == 0)
-            (new Thread(new Runnable() {
+        if (!mScanner.isScanning() && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)){
+            new Thread(new Runnable() {
+                @Override
                 public void run() {
+                    synchronized (this) {
+                        mScanner.startScan(0);
+                        mNearestBleLock.lock();
+                        try {
+                            mNearestBle = null;
+                        }finally {
+                            mNearestBleLock.unlock();
+                        }
+                        lastRssi = -100;
 
+                        int searchCnt = 0;
+                        while ((mNearestBle == null)
+                                && (searchCnt < 20000)
+                                && (mScanner.isScanning())
+                                && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+                            searchCnt++;
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (mScanner.isScanning() && (bleNfcDevice.isConnection() == BleManager.STATE_DISCONNECTED)) {
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            mScanner.stopScan();
+                            mNearestBleLock.lock();
+                            try {
+                                if (mNearestBle != null) {
+                                    mScanner.stopScan();
+                                    msgBuffer.delete(0, msgBuffer.length());
+                                    msgBuffer.append("正在连接设备...");
+                                    handlerBlue.sendEmptyMessage(0);
+                                    bleNfcDevice.requestConnectBleDevice(mNearestBle.getAddress());
+                                } else {
+                                    msgBuffer.delete(0, msgBuffer.length());
+                                    msgBuffer.append("未找到设备！");
+                                    handlerBlue.sendEmptyMessage(0);
+                                }
+                            }finally {
+                                mNearestBleLock.unlock();
+                            }
+                        } else {
+                            mScanner.stopScan();
+                        }
+                    }
                 }
-            })).start();
+            }).start();
+        }
+
     }
 
     private void setListViewHeightBasedOnChildren(ListView paramListView) {
