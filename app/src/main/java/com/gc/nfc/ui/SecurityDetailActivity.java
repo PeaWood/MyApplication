@@ -82,13 +82,13 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
                 System.out.println("Activity设备连接成功");
                 msgBuffer.delete(0, msgBuffer.length());
                 msgBuffer.append("设备连接成功!");
-                if (mNearestBle != null)
-                    ;
-                try {
-                    Thread.sleep(500L);
-                    handlerBlue.sendEmptyMessage(3);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
+                if (mNearestBle != null){
+                    try {
+                        Thread.sleep(500L);
+                        handlerBlue.sendEmptyMessage(3);
+                    } catch (InterruptedException interruptedException) {
+                        interruptedException.printStackTrace();
+                    }
                 }
             }
         }
@@ -186,12 +186,9 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
                                 }
                             }
                         })).start();
+                        break;
                     case 137:
                         String[] arrayOfString = param1Message.obj!=null?param1Message.obj.toString().split(":"):null;
-                        if(arrayOfString==null){
-                            showToast("用户卡无效！");
-                            return;
-                        }
                         if (arrayOfString.length != 2) {
                             showToast("无效卡格式！");
                             return;
@@ -669,7 +666,7 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
             tv = new TextView(this);
             linearLayout.getBackground().setAlpha(0);
             tv.setTextSize(40.0F);
-            tv.setTextColor(getResources().getColor(R.color.bar_grey));
+            tv.setTextColor(getResources().getColor(R.color.blue));
             linearLayout.setGravity(17);
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-2, -2);
             layoutParams.setMargins(0, 0, 0, 180);

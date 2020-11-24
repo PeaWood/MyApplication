@@ -1413,11 +1413,9 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                                 MediaPlayer.create( BottleExchangeActivity.this, R.raw.music).start();
                                 if (isKP) {
                                     addKP(bottleCode);
-                                    return;
+                                }else{
+                                    addZP(bottleCode);
                                 }
-                            } else {
-                                addZP(bottleCode);
-                                return;
                             }
                         }
                     }).setNegativeButton("取消", new DialogInterface.OnClickListener() {

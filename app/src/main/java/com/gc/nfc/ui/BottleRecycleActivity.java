@@ -52,6 +52,7 @@ import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.domain.User;
+import com.gc.nfc.http.Logger;
 import com.gc.nfc.interfaces.Netcallback;
 import com.gc.nfc.utils.SharedPreferencesHelper;
 import com.gc.nfc.utils.Tools;
@@ -213,7 +214,7 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
                                 bottleTakeOverUnit(str2, m_curUserId, m_deliveryUser.getUsername(), "6", "退换货流程|重瓶回收", false, true, false, "重瓶回收");
                                 break;
                             case 2:
-                                bottleTakeOverUnit(str2, m_deliveryUser.getUsername(), m_curUserId, "5", "退换货流程|重瓶落户", false, true, true, "重瓶落户");
+                                bottleTakeOverUnit(str2, m_curUserId, m_deliveryUser.getUsername(),"5", "退换货流程|重瓶落户", false, true, true, "重瓶落户");
                                 break;
                         }
                         break;
@@ -717,6 +718,7 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
                 if (param1Boolean) {
                     HttpResponse response = (HttpResponse) param1Object;
                     if (param1Object != null) {
+                        Logger.e("response.getStatusLine().getStatusCode() = "+response.getStatusLine().getStatusCode());
                         if (response.getStatusLine().getStatusCode() == 200) {
                             MediaPlayer.create(BottleRecycleActivity.this, R.raw.zxing_beep).start();
                             addKP(bottleCode, takeReason);

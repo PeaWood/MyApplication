@@ -218,6 +218,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                             str1 = "1";
                         } else {
                             Toast.makeText(StockManagerActivity.this, "非充气站或门店账户，请退出！", Toast.LENGTH_LONG).show();
+                            return;
                         }
                         judgeBottleScrap(str, str1);
                     }
@@ -711,12 +712,17 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     private void showBottleInfo(final String bottleCode, String paramString2, String paramString3, final String nextStatus) {
         final View layout = getLayoutInflater().inflate(R.layout.show_bottle_info, null);
         layout_inputWeight = layout;
-        TextView textView1 = (TextView) layout.findViewById(R.id.textView_bottleCode);
-        TextView textView2 = (TextView) layout.findViewById(R.id.textView_checkDetail);
-        TextView textView3 = (TextView) layout.findViewById(R.id.input_bottleWeight);
-        textView1.setText(bottleCode);
-        textView2.setText(paramString2);
-        textView3.setText(paramString3);
+        TextView textView_bottleCode = (TextView) layout.findViewById(R.id.textView_bottleCode);
+        TextView textView_checkDetail = (TextView) layout.findViewById(R.id.textView_checkDetail);
+        TextView textView_bottleWeight = (TextView) layout.findViewById(R.id.input_bottleWeight);
+        TextView textView_checkResult = (TextView) layout.findViewById(R.id.textView_checkResult);
+        textView_bottleCode.setText(bottleCode);
+        //结算类型
+        textView_checkResult.setText(paramString2);
+        //回收重量
+        textView_checkDetail.setText(paramString3);
+        //当前重量
+        textView_bottleWeight.setText("空瓶重量");
         AlertDialog.Builder builder = (new AlertDialog.Builder(this)).setTitle("返回结果").setIcon(R.drawable.icon_logo).setView(layout).setPositiveButton("确定", null).setNegativeButton("取消", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface param1DialogInterface, int param1Int) {
             }
@@ -735,7 +741,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
         final AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
-        dialog.getButton(-1).setOnClickListener(new View.OnClickListener() {
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             public void onClick(View param1View) {
                 TextView textView2 = (TextView) layout.findViewById(R.id.textView_checkDetail);//不确定
                 TextView textView1 = (TextView) layout.findViewById(R.id.input_bottleWeight);//不确定
@@ -1146,13 +1152,12 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                                                         queryBottleInfo(bottleCode, nextStatus);
                                                         return;
                                                     }
-                                                    StockManagerActivity stockManagerActivity = StockManagerActivity.this;
                                                     String str1 = bottleCode;
                                                     String str2 = m_takerOverUserId;
                                                     String str3 = m_curLoginUserId.getUsername();
                                                     String str4 = nextStatus;
                                                     StringBuilder stringBuilder = new StringBuilder();
-                                                    stockManagerActivity.bottleTakeOverUnit(str1, str2, str3, str4, stringBuilder.append(m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
+                                                    bottleTakeOverUnit(str1, str2, str3, str4, stringBuilder.append(m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
                                                 } catch (Exception jSONException) {
                                                     jSONException.printStackTrace();
                                                     Toast.makeText(StockManagerActivity.this, "查询钢瓶信息异常！", Toast.LENGTH_LONG).show();
@@ -1170,13 +1175,12 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                                     queryBottleInfo(bottleCode, nextStatus);
                                     return;
                                 }
-                                StockManagerActivity stockManagerActivity = StockManagerActivity.this;
                                 String str4 = bottleCode;
                                 String str2 = m_takerOverUserId;
                                 String str3 = m_curLoginUserId.getUsername();
                                 String str5 = nextStatus;
                                 StringBuilder stringBuilder = new StringBuilder();
-                                stockManagerActivity.bottleTakeOverUnit(str4, str2, str3, str5, stringBuilder.append(m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
+                                bottleTakeOverUnit(str4, str2, str3, str5, stringBuilder.append(m_curLoginUserId.getDepartmentName()).append("|钢瓶入库").toString(), false, true);
                             } catch (IOException iOException) {
                                 iOException.printStackTrace();
                                 Toast.makeText(StockManagerActivity.this, "查询钢瓶信息异常！", Toast.LENGTH_LONG).show();
