@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_Mend;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
@@ -67,7 +68,7 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
         AlertDialog.Builder builder = new AlertDialog.Builder((Context) this);
         View view = View.inflate(this, R.layout.pay_on_scan, null);
         ImageView imageView = view.findViewById(R.id.items_imageViewScanCode);
-        String str = "http://www.gasmart.com.cn/api/pay/QRCode?text=" + user.getUsername();
+        String str = NetUrlConstant.BASEURL+"/api/pay/QRCode?text=" + user.getUsername();
         try {
             URL uRL = new URL(str);
             imageView.setImageBitmap(BitmapFactory.decodeStream(uRL.openStream()));
@@ -196,7 +197,7 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
         String name = user.getUsername();
         String userInfo = name + "\n(" + user.getGroupName() + "|" + user.getDepartmentName() + ")";
         textview_username.setText(userInfo);
-        String str = "http://www.gasmart.com.cn/api/pay/QRCode?text=" + name;
+        String str = NetUrlConstant.BASEURL+"/api/pay/QRCode?text=" + name;
         try {
             URL uRL = new URL(str);
             Bitmap bitmap = BitmapFactory.decodeStream(uRL.openStream());

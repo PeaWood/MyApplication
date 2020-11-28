@@ -32,6 +32,7 @@ import com.amap.api.maps.model.LatLng;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.OkHttpUtil;
@@ -196,7 +197,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
     private void GetDepLeader() {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/sysusers/GetDepLeader";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/sysusers/GetDepLeader";
         netRequestConstant.context = this;
         HashMap hashMap = new HashMap<Object, Object>();
         hashMap.put("userId", m_deliveryUser.getUsername());
@@ -244,7 +245,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
         View view = View.inflate(this, R.layout.pay_on_scan, null);
         ImageView imageView = (ImageView) view.findViewById(R.id.items_imageViewScanCode);
         int i = (int) (Double.parseDouble(m_totalFee) * 100.0D);
-        String str = "http://www.gasmart.com.cn/api/pay/scan?totalFee=" + i + "&orderIndex=" + m_businessKey + "&userId=" + m_deliveryUser.getUsername();
+        String str = NetUrlConstant.BASEURL+"/api/pay/scan?totalFee=" + i + "&orderIndex=" + m_businessKey + "&userId=" + m_deliveryUser.getUsername();
         try {
             URL uRL = new URL(str);
             imageView.setImageBitmap(BitmapFactory.decodeStream(uRL.openStream()));
@@ -273,7 +274,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             NetRequestConstant netRequestConstant = new NetRequestConstant();
             netRequestConstant.setType(HttpRequestType.PUT);
             StringBuilder stringBuilder = new StringBuilder();
-            netRequestConstant.requestUrl = stringBuilder.append("http://www.gasmart.com.cn/api/Orders/").append(m_orderId).toString();
+            netRequestConstant.requestUrl = stringBuilder.append(NetUrlConstant.BASEURL+"/api/Orders/").append(m_orderId).toString();
             netRequestConstant.context = this;
             HashMap hashMap = new HashMap<Object, Object>();
             if (m_isCommonUser) {
@@ -332,7 +333,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
     private void createElectDep() {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.POST);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/ElectDeposit";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/ElectDeposit";
         netRequestConstant.context = this;
         HashMap hashMap = new HashMap<Object, Object>();
         hashMap.put("customerId", m_curUserId);
@@ -422,7 +423,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
     private boolean deliverOver() {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.PUT);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/TaskOrders/PsComplete/" + m_taskId;
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/TaskOrders/PsComplete/" + m_taskId;
         netRequestConstant.context = this;
         HashMap hashMap1 = new HashMap<Object, Object>();
         HashMap hashMap2 = new HashMap<Object, Object>();
@@ -603,7 +604,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             NetRequestConstant netRequestConstant = new NetRequestConstant();
             netRequestConstant.setType(HttpRequestType.PUT);
             StringBuilder stringBuilder = new StringBuilder();
-            netRequestConstant.requestUrl = stringBuilder.append("http://www.gasmart.com.cn/api/TicketOrders/").append(m_orderId).toString();
+            netRequestConstant.requestUrl = stringBuilder.append(NetUrlConstant.BASEURL+"/api/TicketOrders/").append(m_orderId).toString();
             netRequestConstant.context = this;
             HashMap hashMap1 = new HashMap<Object, Object>();
             HashMap hashMap2 = new HashMap<Object, Object>();
@@ -701,7 +702,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
     public void getCustomerCoupons() {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Coupon";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/Coupon";
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("customerUserId", m_curUserId);
@@ -735,7 +736,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
     public void getCustomerTickets() {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Ticket";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/Ticket";
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("customerUserId", m_curUserId);
@@ -996,7 +997,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
     public void refleshPayStatus() {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Orders";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/Orders";
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("orderSn", m_orderId);

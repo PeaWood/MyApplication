@@ -60,6 +60,7 @@ import com.example.weightscaler.scalerSDK;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_UpdateBottleSpec;
 import com.gc.nfc.domain.Data_UserBottles;
 import com.gc.nfc.domain.Data_UserCard;
@@ -960,7 +961,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         this.m_bundle.putString("SpecMap", new JSONObject(this.m_BottlesSpecMap).toString());
         intent.putExtras(this.m_bundle);
         startActivity(intent);
-        finish();
+//        finish();
     }
 
     private void orderServiceQualityShow() {
@@ -986,7 +987,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     private void orderServiceQualityUpload(boolean paramBoolean) {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(BaseActivity.HttpRequestType.PUT);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Orders/" + this.m_orderId;
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/Orders/" + this.m_orderId;
         netRequestConstant.context = (Context)this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         if (paramBoolean) {
@@ -1282,6 +1283,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 m_bfp_price_50kg = getEditTextToInt(view.findViewById(R.id.textView_bfp_50kg_ys));
                 m_yjp_ys_total = getTextViewToString(view.findViewById(R.id.textView_ys));
                 m_yjp_ss_total = getTextViewToString(view.findViewById(R.id.textView_ys));
+
                 if (m_deliveryUser.getScanType() == 2 || m_deliveryUser.getScanType() == 3) {
                     orderServiceQualityUpload(true);
                     return;

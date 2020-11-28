@@ -1,5 +1,6 @@
 package com.gc.nfc.ui;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
@@ -43,6 +44,7 @@ import com.dk.bleNfc.card.Ntag21x;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.User;
 
 import org.apache.http.HttpResponse;
@@ -74,163 +76,148 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
 
     //设备操作类回调
     private DeviceManagerCallback deviceManagerCallback = new DeviceManagerCallback() {
-        @Override
-        public void onReceiveConnectBtDevice(boolean blnIsConnectSuc) {
-            super.onReceiveConnectBtDevice(blnIsConnectSuc);
-            if (blnIsConnectSuc) {
+        public void onReceiveButtonEnter(byte param1Byte) {
+        }
+
+        public void onReceiveConnectBtDevice(boolean param1Boolean) {
+            super.onReceiveConnectBtDevice(param1Boolean);
+            if (param1Boolean) {
                 System.out.println("Activity设备连接成功");
                 msgBuffer.delete(0, msgBuffer.length());
                 msgBuffer.append("设备连接成功!");
-                if (mNearestBle != null) {
-                    //msgBuffer.append("设备名称：").append(bleNfcDevice.getDeviceName()).append("\r\n");
-                }
-                //msgBuffer.append("信号强度：").append(lastRssi).append("dB\r\n");
-                //msgBuffer.append("SDK版本：" + BleNfcDevice.SDK_VERSIONS + "\r\n");
-
-                //连接上后延时500ms后再开始发指令
+                if (mNearestBle != null)
+                    ;
                 try {
                     Thread.sleep(500L);
                     handler.sendEmptyMessage(3);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
                 }
             }
         }
 
-        @Override
-        public void onReceiveDisConnectDevice(boolean blnIsDisConnectDevice) {
-            super.onReceiveDisConnectDevice(blnIsDisConnectDevice);
+        public void onReceiveConnectionStatus(boolean param1Boolean) {
+            super.onReceiveConnectionStatus(param1Boolean);
+            System.out.println("Activity设备链接状态回调");
+        }
+
+        public void onReceiveDeviceAuth(byte[] param1ArrayOfbyte) {
+            super.onReceiveDeviceAuth(param1ArrayOfbyte);
+        }
+
+        public void onReceiveDisConnectDevice(boolean param1Boolean) {
+            super.onReceiveDisConnectDevice(param1Boolean);
             System.out.println("Activity设备断开链接");
             msgBuffer.delete(0, msgBuffer.length());
             msgBuffer.append("设备断开链接!");
             handler.sendEmptyMessage(0);
         }
 
-        @Override
-        public void onReceiveConnectionStatus(boolean blnIsConnection) {
-            super.onReceiveConnectionStatus(blnIsConnection);
-            System.out.println("Activity设备链接状态回调");
+        public void onReceiveInitCiphy(boolean param1Boolean) {
+            super.onReceiveInitCiphy(param1Boolean);
         }
 
-        @Override
-        public void onReceiveInitCiphy(boolean blnIsInitSuc) {
-            super.onReceiveInitCiphy(blnIsInitSuc);
+        public void onReceiveRfmClose(boolean param1Boolean) {
+            super.onReceiveRfmClose(param1Boolean);
         }
 
-        @Override
-        public void onReceiveDeviceAuth(byte[] authData) {
-            super.onReceiveDeviceAuth(authData);
+        public void onReceiveRfmSentApduCmd(byte[] param1ArrayOfbyte) {
+            super.onReceiveRfmSentApduCmd(param1ArrayOfbyte);
+            System.out.println("Activity接收到APDU回调：" + StringTool.byteHexToSting(param1ArrayOfbyte));
         }
 
-        @Override
-        //寻到卡片回调
-        public void onReceiveRfnSearchCard(boolean blnIsSus, int cardType, byte[] bytCardSn, byte[] bytCarATS) {
-            super.onReceiveRfnSearchCard(blnIsSus, cardType, bytCardSn, bytCarATS);
-            if (!blnIsSus || cardType == BleNfcDevice.CARD_TYPE_NO_DEFINE) {
-                return;
-            }
-            System.out.println("Activity接收到激活卡片回调：UID->" + StringTool.byteHexToSting(bytCardSn) + " ATS->" + StringTool.byteHexToSting(bytCarATS));
-
-            final int cardTypeTemp = cardType;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    boolean isReadWriteCardSuc;
-                    try {
-                        if (bleNfcDevice.isAutoSearchCard()) {
-                            //如果是自动寻卡的，寻到卡后，先关闭自动寻卡
-                            bleNfcDevice.stoptAutoSearchCard();
-                            isReadWriteCardSuc = readWriteCardDemo(cardTypeTemp);
-//                            isReadWriteCardSuc=true;
-                            //读卡结束，重新打开自动寻卡
-                            startAutoSearchCard();
+        public void onReceiveRfnSearchCard(boolean param1Boolean, final int cardTypeTemp, byte[] param1ArrayOfbyte1, byte[] param1ArrayOfbyte2) {
+            super.onReceiveRfnSearchCard(param1Boolean, cardTypeTemp, param1ArrayOfbyte1, param1ArrayOfbyte2);
+            if (param1Boolean && cardTypeTemp != 0) {
+                System.out.println("Activity接收到激活卡片回调：UID->" + StringTool.byteHexToSting(param1ArrayOfbyte1) + " ATS->" + StringTool.byteHexToSting(param1ArrayOfbyte2));
+                (new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            boolean bool;
+                            if (bleNfcDevice.isAutoSearchCard()) {
+                                bleNfcDevice.stoptAutoSearchCard();
+                                bool = readWriteCardDemo(cardTypeTemp);
+                                startAutoSearchCard();
+                            } else {
+                                bool = readWriteCardDemo(cardTypeTemp);
+                                bleNfcDevice.closeRf();
+                            }
+                            if (bool) {
+                                bleNfcDevice.openBeep(50, 50, 3);
+                                return;
+                            }
+                        } catch (DeviceNoResponseException deviceNoResponseException) {
+                            deviceNoResponseException.printStackTrace();
+                            return;
                         }
-                        else {
-                            isReadWriteCardSuc = readWriteCardDemo(cardTypeTemp);
-//                            isReadWriteCardSuc=true;
-                            //如果不是自动寻卡，读卡结束,关闭天线
-                            bleNfcDevice.closeRf();
+                        try {
+                            bleNfcDevice.openBeep(100, 100, 2);
+                        } catch (DeviceNoResponseException e) {
+                            e.printStackTrace();
                         }
-
-                        //打开蜂鸣器提示读卡完成
-                        if (isReadWriteCardSuc) {
-                            bleNfcDevice.openBeep(50, 50, 3);  //读写卡成功快响3声
-                        }
-                        else {
-                            bleNfcDevice.openBeep(100, 100, 2); //读写卡失败慢响2声
-                        }
-                    } catch (DeviceNoResponseException e) {
-                        e.printStackTrace();
                     }
-                }
-            }).start();
-        }
-
-        @Override
-        public void onReceiveRfmSentApduCmd(byte[] bytApduRtnData) {
-            super.onReceiveRfmSentApduCmd(bytApduRtnData);
-            System.out.println("Activity接收到APDU回调：" + StringTool.byteHexToSting(bytApduRtnData));
-        }
-
-        @Override
-        public void onReceiveRfmClose(boolean blnIsCloseSuc) {
-            super.onReceiveRfmClose(blnIsCloseSuc);
-        }
-        @Override
-        //按键返回回调
-        public void onReceiveButtonEnter(byte keyValue) {}
-    };
-  
-    private Handler handler = new Handler() {
-      public void handleMessage(Message param1Message) {
-        msgText.setText(msgBuffer);
-        //if (MendDetailActivity.this.bleNfcDevice.isConnection() == 2 || MendDetailActivity.this.bleNfcDevice.isConnection() == 1);
-        switch (param1Message.what) {
-          default:
-            return;
-          case 3:
-            (new Thread(new Runnable() {
-                  public void run() {
-                    try {
-                      MendDetailActivity.this.bleNfcDevice.getDeviceVersions();
-                      MendDetailActivity.this.handler.sendEmptyMessage(0);
-                      if (MendDetailActivity.this.bleNfcDevice.getDeviceBatteryVoltage() < 3.61D) {
-                        MendDetailActivity.this.msgBuffer.append("(电量低)");
-                      } else {
-                        MendDetailActivity.this.msgBuffer.append("(电量充足)");
-                      } 
-                      MendDetailActivity.this.handler.sendEmptyMessage(0);
-                      if (MendDetailActivity.this.bleNfcDevice.androidFastParams(true));
-                      MendDetailActivity.this.handler.sendEmptyMessage(0);
-                      MendDetailActivity.this.handler.sendEmptyMessage(0);
-                      MendDetailActivity.this.startAutoSearchCard();
-                    } catch (DeviceNoResponseException deviceNoResponseException) {
-                      deviceNoResponseException.printStackTrace();
-                    } 
-                  }
                 })).start();
-          case 137:
-            break;
+            }
         }
-        try {
-            String[] arrayOfString = param1Message.obj.toString().split(":");
-            if (arrayOfString.length != 2)
-                MendDetailActivity.this.showToast("无效卡格式！");
-            String str1 = arrayOfString[0];
-            String str2 = arrayOfString[1];
-            if (MendDetailActivity.this.m_handedUserCard == null)
-                MendDetailActivity.this.showToast("该用户未绑定用户卡");
-            if (!str2.equals(MendDetailActivity.this.m_handedUserCard))
-                MendDetailActivity.this.showToast("非本人卡号！");
-            if (str1.equals("Y"))
-                MendDetailActivity.this.orderServiceQualityUpload(true);
-            if (str1.equals("N"))
-                MendDetailActivity.this.orderServiceQualityUpload(false);
-            MendDetailActivity.this.showToast("无效卡格式！");
-        }catch (Exception e){
-            e.printStackTrace();
+    };
+
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler() {
+        public void handleMessage(Message param1Message) {
+            msgText.setText(msgBuffer);
+            if (bleNfcDevice.isConnection() == 2 || bleNfcDevice.isConnection() == 1) {
+                switch (param1Message.what) {
+                    case 3:
+                        (new Thread(new Runnable() {
+                            public void run() {
+                                try {
+                                    bleNfcDevice.getDeviceVersions();
+                                    handler.sendEmptyMessage(0);
+                                    if (bleNfcDevice.getDeviceBatteryVoltage() < 3.61D) {
+                                        msgBuffer.append("(电量低)");
+                                    } else {
+                                        msgBuffer.append("(电量充足)");
+                                    }
+                                    handler.sendEmptyMessage(0);
+                                    if (bleNfcDevice.androidFastParams(true))
+                                        ;
+                                    handler.sendEmptyMessage(0);
+                                    handler.sendEmptyMessage(0);
+                                    startAutoSearchCard();
+                                } catch (DeviceNoResponseException deviceNoResponseException) {
+                                    deviceNoResponseException.printStackTrace();
+                                }
+                            }
+                        })).start();
+                        break;
+                    case 137:
+                        String[] arrayOfString = param1Message.obj!=null?param1Message.obj.toString().split(":"):null;
+                        if (arrayOfString.length != 2) {
+                            showToast("无效卡格式！");
+                            return;
+                        }
+                        String str1 = arrayOfString[0];
+                        String str2 = arrayOfString[1];
+                        if (m_handedUserCard == null){
+                            showToast("该用户未绑定用户卡");
+                            return;
+                        }
+                        if (!str2.equals(m_handedUserCard)){
+                            showToast("非本人卡号！");
+                            return;
+                        }
+                        if (str1.equals("Y")) {
+                            showToast("满意！");
+                            orderServiceQualityUpload(true);
+                        }
+                        if (str1.equals("N")) {
+                            showToast("不满意！");
+                            orderServiceQualityUpload(false);
+                        }
+                        break;
+                }
+            }
         }
-      }
     };
   
   private int lastRssi = -100;
@@ -311,50 +298,50 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   
   private ProgressDialog readWriteDialog = null;
   private ImageView imageView;
-  
+
   private ScannerCallback scannerCallback = new ScannerCallback() {
-    @Override
-    public void onReceiveScanDevice(BluetoothDevice device, int rssi, byte[] scanRecord) {
-      super.onReceiveScanDevice(device, rssi, scanRecord);
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //StringTool.byteHexToSting(scanRecord.getBytes())
-        System.out.println("Activity搜到设备：" + device.getName()
-                + " 信号强度：" + rssi
-                + " scanRecord：" + StringTool.byteHexToSting(scanRecord));
-      }
-
-      //搜索蓝牙设备并记录信号强度最强的设备
-      if ( (scanRecord != null) && (StringTool.byteHexToSting(scanRecord).contains("017f5450"))) {  //从广播数据中过滤掉其它蓝牙设备
-        if (rssi < -55) {
-          return;
-        }
-        //msgBuffer.append("搜到设备：").append(device.getName()).append(" 信号强度：").append(rssi).append("\r\n");
-        handler.sendEmptyMessage(0);
-        if (mNearestBle != null) {
-          if (rssi > lastRssi) {
-            mNearestBleLock.lock();
-            try {
-              mNearestBle = device;
-            }finally {
-              mNearestBleLock.unlock();
+        @Override
+        public void onReceiveScanDevice(BluetoothDevice device, int rssi, byte[] scanRecord) {
+            super.onReceiveScanDevice(device, rssi, scanRecord);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //StringTool.byteHexToSting(scanRecord.getBytes())
+                System.out.println("Activity搜到设备：" + device.getName()
+                        + " 信号强度：" + rssi
+                        + " scanRecord：" + StringTool.byteHexToSting(scanRecord));
             }
-          }
-        }
-        else {
-          mNearestBleLock.lock();
-          try {
-            mNearestBle = device;
-          }finally {
-            mNearestBleLock.unlock();
-          }
-          lastRssi = rssi;
-        }
-      }
-    }
 
-    @Override
-    public void onScanDeviceStopped() {
-      super.onScanDeviceStopped();
-    }
+            //搜索蓝牙设备并记录信号强度最强的设备
+            if ( (scanRecord != null) && (StringTool.byteHexToSting(scanRecord).contains("017f5450"))) {  //从广播数据中过滤掉其它蓝牙设备
+                if (rssi < -55) {
+                    return;
+                }
+                //msgBuffer.append("搜到设备：").append(device.getName()).append(" 信号强度：").append(rssi).append("\r\n");
+                handler.sendEmptyMessage(0);
+                if (mNearestBle != null) {
+                    if (rssi > lastRssi) {
+                        mNearestBleLock.lock();
+                        try {
+                            mNearestBle = device;
+                        }finally {
+                            mNearestBleLock.unlock();
+                        }
+                    }
+                }
+                else {
+                    mNearestBleLock.lock();
+                    try {
+                        mNearestBle = device;
+                    }finally {
+                        mNearestBleLock.unlock();
+                    }
+                    lastRssi = rssi;
+                }
+            }
+        }
+
+        @Override
+        public void onScanDeviceStopped() {
+            super.onScanDeviceStopped();
+        }
     };
   
   private Toast toast = null;
@@ -368,7 +355,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
     }
     NetRequestConstant netRequestConstant = new NetRequestConstant();
     netRequestConstant.setType(HttpRequestType.GET);
-    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/UserCard";
+    netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/UserCard";
     netRequestConstant.context = (Context)this;
     HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
     hashMap.put("userId", this.m_currentCustomerId);
@@ -456,7 +443,7 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
   private void orderServiceQualityUpload(boolean paramBoolean) {
     NetRequestConstant netRequestConstant = new NetRequestConstant();
     netRequestConstant.setType(HttpRequestType.PUT);
-    netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Mend/" + this.m_businessKey;
+    netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/Mend/" + this.m_businessKey;
     netRequestConstant.context = (Context)this;
     HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
     if (paramBoolean) {
@@ -502,35 +489,52 @@ public class MendDetailActivity extends BaseActivity implements View.OnClickList
     }
     showToast("客户不同意！");
   }
-  
-  private boolean readWriteCardDemo(int paramInt) {
-    switch (paramInt) {
-      default:
-        return true;
-      case 6:
-        break;
-    } 
-    Ntag21x ntag21x = (Ntag21x)this.bleNfcDevice.getCard();
-    if (ntag21x != null) {
-      boolean bool = true;
-      try {
-        String str = ntag21x.NdefTextRead();
-        Message message = new Message();
-        message.obj = str;
-        if (this.m_orderServiceQualityShowFlag) {
-          message.what = 137;
-        } else {
-          message.what = 136;
-        } 
-        this.handler.sendMessage(message);
-      } catch (CardNoResponseException cardNoResponseException) {
-        cardNoResponseException.printStackTrace();
-        bool = false;
-      } 
-      return bool;
+
+    private boolean readWriteCardDemo(int paramInt) {
+        switch (paramInt) {
+            default:
+                return true;
+            case 6:
+                boolean bool = true;
+                boolean hasSecondField=false;
+                boolean hasFirstField=false;
+                Ntag21x ntag21x = (Ntag21x) this.bleNfcDevice.getCard();
+                if (ntag21x != null) {
+                    try {
+                        hasFirstField = ntag21x.HasFirstField();
+                        hasSecondField = ntag21x.HasSecondField();
+                    } catch (CardNoResponseException cardNoResponseException) {
+                        cardNoResponseException.printStackTrace();
+                        bool = false;
+                    }
+                    String str=null;
+                    if(hasSecondField) {
+                        try {
+                            str = ntag21x.NdefTextReadSec();
+                        } catch (CardNoResponseException cardNoResponseException) {
+                            cardNoResponseException.printStackTrace();
+                        }
+                    }else{
+                        try {
+                            str = ntag21x.NdefTextRead();
+                        } catch (CardNoResponseException cardNoResponseException) {
+                            cardNoResponseException.printStackTrace();
+                        }
+                    }
+                    if(str!=null) {
+                        Message message = new Message();
+                        message.obj = str;
+                        if (this.m_orderServiceQualityShowFlag) {
+                            message.what = 137;
+                        } else {
+                            message.what = 136;
+                        }
+                        this.handler.sendMessage(message);
+                    }
+                }
+                return bool;
+        }
     }
-    return true;
-  }
   
   private void searchNearestBleDevice() {
     this.msgBuffer.delete(0, this.msgBuffer.length());

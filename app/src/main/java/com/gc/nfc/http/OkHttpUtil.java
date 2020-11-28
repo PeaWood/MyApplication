@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.gc.nfc.common.NetUrlConstant;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,7 +37,7 @@ import okhttp3.Response;
  * 网络请求管理
  */
 public class OkHttpUtil {
-    public static final String URL = "http://www.gasmart.com.cn/api";
+    public static final String URL = NetUrlConstant.BASEURL+"/api";
     private volatile static OkHttpUtil okHttpUtil;//会被多线程使用，所以使用关键字volatile
     private static Context thiscontext;
     private OkHttpClient client;

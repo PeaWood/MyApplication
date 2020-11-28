@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.OkHttpUtil;
 import com.gc.nfc.interfaces.Netcallback;
@@ -92,7 +93,7 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
         AlertDialog.Builder builder = new AlertDialog.Builder((Context) this);
         View view = View.inflate((Context) this, R.layout.pay_on_scan, null);
         ImageView imageView = (ImageView) view.findViewById(R.id.items_imageViewScanCode);
-        String str = "http://www.gasmart.com.cn/api/pay/QRCode?text=" + user.getUsername();
+        String str = NetUrlConstant.BASEURL+"/api/pay/QRCode?text=" + user.getUsername();
         try {
             URL uRL = new URL(str);
             imageView.setImageBitmap(BitmapFactory.decodeStream(uRL.openStream()));
@@ -193,7 +194,7 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
         }
         String name = this.user.getUsername();
         this.textview_username.setText(name + "\n(" + this.user.getGroupName() + "|" + this.user.getDepartmentName() + ")");
-        String str = "http://www.gasmart.com.cn/api/pay/QRCode?text=" + name;
+        String str = NetUrlConstant.BASEURL+"/api/pay/QRCode?text=" + name;
         try {
             URL uRL = new URL(str);
             Bitmap bitmap = BitmapFactory.decodeStream(uRL.openStream());

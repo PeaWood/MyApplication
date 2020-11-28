@@ -121,7 +121,7 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
         intent.setClass(OrderDetailActivity.this, BottleExchangeActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
-        finish();
+//        finish();
     }
 
     private boolean getCustomerBottle() {

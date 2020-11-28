@@ -31,6 +31,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_Depleader;
 import com.gc.nfc.domain.Data_Order;
 import com.gc.nfc.domain.RefoundDetail;
@@ -225,7 +226,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         try {
             netRequestConstant.setType(BaseActivity.HttpRequestType.PUT);
             StringBuilder stringBuilder = new StringBuilder();
-            netRequestConstant.requestUrl = stringBuilder.append("http://www.gasmart.com.cn/api/Orders/Caculate/").append(this.m_orderId).toString();
+            netRequestConstant.requestUrl = stringBuilder.append(NetUrlConstant.BASEURL+"/api/Orders/Caculate/").append(this.m_orderId).toString();
             netRequestConstant.context = (Context)this;
             HashMap<Object, Object> hashMap1 = new HashMap<Object, Object>();
             hashMap1.put("customerId", this.m_curUserId);
@@ -338,7 +339,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         View view = View.inflate(this, R.layout.pay_on_scan, null);
         ImageView imageView = (ImageView) view.findViewById(R.id.items_imageViewScanCode);
         int i = (int) (Double.parseDouble(m_totalFee) * 100.0D);
-        String str = "http://www.gasmart.com.cn/api/pay/scan?totalFee=" + i + "&orderIndex=" + m_orderId + "&userId=" + m_deliveryUser.getUsername();
+        String str = NetUrlConstant.BASEURL+"/api/pay/scan?totalFee=" + i + "&orderIndex=" + m_orderId + "&userId=" + m_deliveryUser.getUsername();
         try {
             URL uRL = new URL(str);
             imageView.setImageBitmap(BitmapFactory.decodeStream(uRL.openStream()));
@@ -363,7 +364,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
     private boolean commonUserPay() {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.PUT);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Orders/" + m_orderId;
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/Orders/" + m_orderId;
         netRequestConstant.context = this;
         HashMap hashMap = new HashMap<Object, Object>();
         if (!m_isMonthDealUser) {
@@ -414,7 +415,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
     private boolean deliverOver() {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.PUT);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/TaskOrders/PsComplete/" + m_taskId;
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/TaskOrders/PsComplete/" + m_taskId;
         netRequestConstant.context = this;
         HashMap hashMap1 = new HashMap<Object, Object>();
         HashMap hashMap2 = new HashMap<Object, Object>();
@@ -527,7 +528,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
             hashMap.put("gas_price", "均气价:" + refoundDetail.gas_price);
             hashMap.put("canqi_price", "退残额:" + refoundDetail.canqi_price);
             if (refoundDetail.isOK) {
-                hashMap.put("icon", Integer.valueOf(R.drawable.warning));//到时替换图片
+                hashMap.put("icon", Integer.valueOf(R.drawable.icon_bottle));//到时替换图片
             } else {
                 hashMap.put("icon", Integer.valueOf(R.drawable.warning));
             }

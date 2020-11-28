@@ -51,6 +51,7 @@ import com.dk.bleNfc.card.Ntag21x;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.interfaces.Netcallback;
@@ -386,7 +387,7 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
     private void GetUserCardInfo(String paramString) {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/UserCard";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/UserCard";
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("number", paramString);
@@ -535,7 +536,7 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
         String str = m_cstCode.getText().toString();
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/customers/findByUserId";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/customers/findByUserId";
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("userId", str);
@@ -704,7 +705,7 @@ public class BottleRecycleActivity extends BaseActivity implements View.OnClickL
         }
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.PUT);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/GasCylinder/TakeOver/" + bottleCode;
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/GasCylinder/TakeOver/" + bottleCode;
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("srcUserId", srcUserId);

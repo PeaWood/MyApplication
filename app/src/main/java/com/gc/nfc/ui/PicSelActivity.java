@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gc.nfc.R;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.utils.FullyGridLayoutManager;
 import com.gc.nfc.utils.GridImageAdapter;
@@ -157,7 +158,7 @@ public class PicSelActivity extends AppCompatActivity implements View.OnClickLis
         String str = UUID.randomUUID().toString();
         try {
             StringBuilder stringBuilder4 = new StringBuilder();
-            URL uRL = new URL(stringBuilder4.append("http://www.gasmart.com.cn/api/Untils/file?fileFolder=").append(paramString1).append("&fileNameHeader=").append(paramString2).toString());
+            URL uRL = new URL(stringBuilder4.append(NetUrlConstant.BASEURL+"/api/Untils/file?fileFolder=").append(paramString1).append("&fileNameHeader=").append(paramString2).toString());
             HttpURLConnection httpURLConnection = (HttpURLConnection)uRL.openConnection();
             if (NetUtil.m_loginCookies != null) {
                 StringBuilder stringBuilder = new StringBuilder();

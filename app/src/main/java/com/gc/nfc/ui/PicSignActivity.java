@@ -31,6 +31,7 @@ import com.amap.api.maps.model.LatLng;
 import com.bumptech.glide.Glide;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.databinding.ActivitySignBinding;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.utils.NetUtil;
@@ -366,7 +367,7 @@ public class PicSignActivity extends AppCompatActivity {
     String str = UUID.randomUUID().toString();
     try {
       StringBuilder stringBuilder4 = new StringBuilder();
-      URL uRL = new URL(stringBuilder4.append("http://www.gasmart.com.cn/api/Untils/file?fileFolder=").append(paramString1).append("&fileNameHeader=").append(paramString2).toString());
+      URL uRL = new URL(stringBuilder4.append(NetUrlConstant.BASEURL+"/api/Untils/file?fileFolder=").append(paramString1).append("&fileNameHeader=").append(paramString2).toString());
       HttpURLConnection httpURLConnection = (HttpURLConnection)uRL.openConnection();
       if (NetUtil.m_loginCookies != null) {
         StringBuilder stringBuilder = new StringBuilder();

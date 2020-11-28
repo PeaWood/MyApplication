@@ -54,6 +54,7 @@ import com.example.weightscaler.scalerSDK;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.interfaces.Netcallback;
@@ -476,7 +477,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
         netRequestConstant.setType(HttpRequestType.GET);
         String str = m_curLoginUserId.getUsername();
         m_curLoginUserId.getPassword();
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/sysusers/logout/" + str;
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/sysusers/logout/" + str;
         netRequestConstant.context = this;
         netRequestConstant.setParams(new HashMap<Object, Object>());
         getServer(new Netcallback() {
@@ -504,7 +505,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     private void queryBottleInfo(final String bottleCode, final String nextStatus) {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Order/Refound/ByGasNumber";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/Order/Refound/ByGasNumber";
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("gasNumber", bottleCode);
@@ -530,6 +531,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                                         if (b < jSONArray.length()) {
                                             JSONObject jsonObject1 = jSONArray.getJSONObject(b);
                                             if (jsonObject1.getString("gasCynNumber").equals(bottleCode)) {
+                                                Logger.e(jsonObject1.toString());
                                                 param1Object = jsonObject1.getString("refoundWeight");
                                                 bool1 = true;
                                             } else {
@@ -722,7 +724,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
         //回收重量
         textView_checkDetail.setText(paramString3);
         //当前重量
-        textView_bottleWeight.setText("空瓶重量");
+        textView_bottleWeight.setText("");
         AlertDialog.Builder builder = (new AlertDialog.Builder(this)).setTitle("返回结果").setIcon(R.drawable.icon_logo).setView(layout).setPositiveButton("确定", null).setNegativeButton("取消", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface param1DialogInterface, int param1Int) {
             }
@@ -747,7 +749,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
                 TextView textView1 = (TextView) layout.findViewById(R.id.input_bottleWeight);//不确定
                 String str2 = textView2.getText().toString();
                 String str1 = textView1.getText().toString();
-                if (str2.length() == 0) {
+                if (str1.length() == 0) {
                     Toast.makeText(StockManagerActivity.this, "重量输入有误，请称重！", Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -828,7 +830,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     private void sysUserInfoQuery(String paramString) {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/sysusers/FindByUserId";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/sysusers/FindByUserId";
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("userId", paramString);
@@ -952,7 +954,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
             }
             NetRequestConstant netRequestConstant = new NetRequestConstant();
             netRequestConstant.setType(HttpRequestType.PUT);
-            netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/GasCylinder/TakeOver/" + bottleCode;
+            netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/GasCylinder/TakeOver/" + bottleCode;
             netRequestConstant.context = this;
             HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
             hashMap.put("srcUserId", srcUserId);
@@ -1116,7 +1118,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     public void judgeBottleScrap(final String bottleCode, final String nextStatus) {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/GasCylinder";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/GasCylinder";
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("number", bottleCode);
@@ -1298,7 +1300,7 @@ public class StockManagerActivity extends BaseActivity implements View.OnClickLi
     public void uploadWeightWarning(String paramString1, String paramString2, String paramString3, String paramString4, String paramString5, String paramString6, String paramString7) {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.POST);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/GasCylinder/ForceOpWeightWarn";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/GasCylinder/ForceOpWeightWarn";
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap1 = new HashMap<Object, Object>();
         HashMap<Object, Object> hashMap2 = new HashMap<Object, Object>();

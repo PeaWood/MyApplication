@@ -52,6 +52,7 @@ import com.dk.bleNfc.card.Ntag21x;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.interfaces.Netcallback;
@@ -350,7 +351,7 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
         }
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.GET);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/UserCard";
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/UserCard";
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         hashMap.put("userId", m_currentCustomerId);
@@ -434,7 +435,7 @@ public class SecurityDetailActivity extends BaseActivity implements View.OnClick
     private void orderServiceQualityUpload(boolean paramBoolean) {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         netRequestConstant.setType(HttpRequestType.PUT);
-        netRequestConstant.requestUrl = "http://www.gasmart.com.cn/api/Security/" + m_businessKey;
+        netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/Security/" + m_businessKey;
         netRequestConstant.context = this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
         if (paramBoolean) {
