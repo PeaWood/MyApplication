@@ -1283,7 +1283,9 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 m_bfp_price_50kg = getEditTextToInt(view.findViewById(R.id.textView_bfp_50kg_ys));
                 m_yjp_ys_total = getTextViewToString(view.findViewById(R.id.textView_ys));
                 m_yjp_ss_total = getTextViewToString(view.findViewById(R.id.textView_ys));
-
+                if(!judgeBottle()){
+                    return;
+                }
                 if (m_deliveryUser.getScanType() == 2 || m_deliveryUser.getScanType() == 3) {
                     orderServiceQualityUpload(true);
                     return;
@@ -1295,6 +1297,108 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         });
         builder.setCancelable(false);
         builder.show();
+    }
+
+    private boolean judgeBottle() {
+        try {
+            JSONArray jSONArray = m_OrderJson.getJSONArray("orderDetailList");
+            //订单内的瓶子数量
+            int length = jSONArray.length();
+            //用户添加的空瓶数量
+            int kpsize = m_BottlesMapKP.size();
+            int zpsize = m_BottlesMapZP.size();
+            //每一个类别的瓶子数量
+            int size5 = 0;
+            int size15 = 0;
+            int size50 = 0;
+            int zpsize5 = 0;
+            int zpsize15 = 0;
+            int zpsize50 = 0;
+            for (byte b = 0; b < jSONArray.length(); b++) {
+                JSONObject jSONObject = jSONArray.getJSONObject(b);
+                int weight = jSONObject.getJSONObject("goods").getInt("weight");
+                if(weight==5){
+                    size5++;
+                    zpsize5++;
+                }else if(weight==15){
+                    size15++;
+                    zpsize5++;
+                }else if(weight==50){
+                    size50++;
+                    zpsize5++;
+                }
+            }
+            Logger.e("每一个类别的瓶子数量: "+"5KG "+size5);
+            Logger.e("每一个类别的瓶子数量: "+"15KG "+size15);
+            Logger.e("每一个类别的瓶子数量: "+"50KG "+size50);
+            //没有回收的瓶子数量
+            Logger.e("处理空瓶回收》》》》");
+            for (Map.Entry<String, String> entry : m_BottlesMapKP.entrySet()) {
+                String bottleSpec = getBottleSpec(entry.getKey());
+                if(bottleSpec.equals("0001")){
+                    size5--;
+                }else if(bottleSpec.equals("0002")){
+                    size15--;
+                }else if(bottleSpec.equals("0003")){
+                    size50--;
+                }
+            }
+            Logger.e("每一个类别的瓶子数量: "+"5KG "+size5);
+            Logger.e("每一个类别的瓶子数量: "+"15KG "+size15);
+            Logger.e("每一个类别的瓶子数量: "+"50KG "+size50);
+            Logger.e("处理重瓶》》》》");
+            for (Map.Entry<String, String> entry : m_BottlesMapZP.entrySet()) {
+                String bottleSpec = getBottleSpec(entry.getKey());
+                if(bottleSpec.equals("0001")){
+                    zpsize5--;
+                }else if(bottleSpec.equals("0002")){
+                    zpsize15--;
+                }else if(bottleSpec.equals("0003")){
+                    zpsize50--;
+                }
+            }
+            Logger.e("重瓶误差: "+"5KG "+zpsize5);
+            Logger.e("重瓶误差: "+"15KG "+zpsize15);
+            Logger.e("重瓶误差: "+"50KG "+zpsize50);
+            if(zpsize5!=0||zpsize15!=0||zpsize50!=0){
+                showToast("重瓶数量与订单不符");
+                return false;
+            }
+            //判断空瓶
+            if(kpsize<length){
+                Logger.e("空瓶区钢瓶的规格和数量少于订单内的规格和数量");
+                if(size5+size15+size50 > 0){
+                    Logger.e("瓶子没有被回收");
+                    //瓶子没有被回收
+                    int page5 = m_ptp_quantity_5kg + m_qp_quantity_5kg + m_yjp_quantity_5kg;
+                    int page15 = m_ptp_quantity_15kg + m_qp_quantity_15kg + m_yjp_quantity_15kg;
+                    int page50 = m_ptp_quantity_50kg + m_qp_quantity_50kg + m_yjp_quantity_50kg;
+                    Logger.e("押金单填入的瓶子数: "+"5KG "+page5);
+                    Logger.e("押金单填入的瓶子数: "+"15KG "+page15);
+                    Logger.e("押金单填入的瓶子数: "+"50KG "+page50);
+                    //5KG瓶子校验
+                    if(page5 != size5){
+                        showToast("交接钢瓶与订单不符，请填写押金单");
+                        return false;
+                    }
+                    //15KG瓶子校验
+                    if(page15 != size15){
+                        showToast("交接钢瓶与订单不符，请填写押金单");
+                        return false;
+                    }
+                    //50KG瓶子校验
+                    if(page50 != size50){
+                        showToast("交接钢瓶与订单不符，请填写押金单");
+                        return false;
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            showToast("数据异常");
+            return false;
+        }
+        return true;
     }
 
     private boolean startAutoSearchCard() throws DeviceNoResponseException {
