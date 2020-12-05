@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
 import android.support.v4.content.ContextCompat;
+import android.view.textclassifier.TextClassification;
 
 import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.http.ThreadPool;
@@ -17,6 +18,9 @@ import com.gc.nfc.interfaces.Netcallback;
 import com.gc.nfc.utils.NetUtil;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
 
 /**
  * Created by lenovo on 2020/9/23
@@ -51,6 +55,9 @@ public abstract class BaseActivity extends Activity {
     public void requestPermissions() {
         String[] deniedPermissions = new String[]{Manifest.permission.INTERNET,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_LOCATION_EXTRA_COMMANDS,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE};
         if (ContextCompat.checkSelfPermission(this, deniedPermissions[0]) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(deniedPermissions, PERMISSION_REQUEST_CODE);
@@ -128,5 +135,13 @@ public abstract class BaseActivity extends Activity {
         Handler handler = new BaseHandler(callBack);
         RunnableTask task = new RunnableTask(nrc, handler);
         ThreadPool.getInstance().addTask(task);
+    }
+
+    public String getString(HttpResponse response){
+        try {
+            return EntityUtils.toString(response.getEntity(), "UTF-8");
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

@@ -29,28 +29,27 @@ import com.amap.api.navi.INaviInfoCallback;
 import com.amap.api.navi.model.AMapNaviLocation;
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
+import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_CustomerBottle;
 import com.gc.nfc.domain.Data_CustomerCredit;
 import com.gc.nfc.domain.Data_TaskOrders;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
+import com.gc.nfc.interfaces.Netcallback;
 import com.google.gson.Gson;
 
+import org.apache.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class OrderDetailActivity extends BaseActivity implements View.OnClickListener, INaviInfoCallback {
     private AppContext appContext;
@@ -125,68 +124,90 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
     }
 
     private boolean getCustomerBottle() {
-        Map<String, String> map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/CustomerBottle";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("userId", m_currentCustomerId);
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/CustomerBottle", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("getCustomerBottle: " + string);
+                            Gson gson = new Gson();
+                            Data_CustomerBottle customerBottle = gson.fromJson(string, Data_CustomerBottle.class);
+                            if (customerBottle.getItems().size() == 1) {
+                                Data_CustomerBottle.ItemsBean itemsBean = customerBottle.getItems().get(0);
+                                StringBuilder str = new StringBuilder();
+                                String s = str.append("5kg(个)：").append(itemsBean.getSAmount()).append("，15kg(个)：").append(itemsBean.getMAmount()).append("，50kg(个)：").append(itemsBean.getLAmount()).toString();
+                                m_textview_qp.setText(s);
+                                return;
+                            }
+                            m_textview_qp.setText("当前无欠瓶");
+                        }else{
+                            Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(OrderDetailActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(OrderDetailActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                String string = response.body().string();
-                Logger.e("getCustomerBottle: " + string);
-                Gson gson = new Gson();
-                Data_CustomerBottle customerBottle = gson.fromJson(string, Data_CustomerBottle.class);
-                if (customerBottle.getItems().size() == 1) {
-                    Data_CustomerBottle.ItemsBean itemsBean = customerBottle.getItems().get(0);
-                    StringBuilder str = new StringBuilder();
-                    String s = str.append("5kg(个)：").append(itemsBean.getSAmount()).append("，15kg(个)：").append(itemsBean.getMAmount()).append("，50kg(个)：").append(itemsBean.getLAmount()).toString();
-                    m_textview_qp.setText(s);
-                    return;
-                }
-                m_textview_qp.setText("当前无欠瓶");
             }
-        });
+        }, nrc);
         return true;
     }
 
     private boolean getCustomerCredit() {
-        Map<String, String> map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/CustomerCredit";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("userId", m_currentCustomerId);
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/CustomerCredit", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("getCustomerCredit: " + string);
+                            Gson gson = new Gson();
+                            Data_CustomerCredit customerCredit = gson.fromJson(string, Data_CustomerCredit.class);
+                            if (customerCredit.getItems().size() == 1) {
+                                Data_CustomerCredit.ItemsBean itemsBean = customerCredit.getItems().get(0);
+                                StringBuilder stringBuilder = new StringBuilder();
+                                String str = stringBuilder.append("欠款：￥").append(itemsBean.getAmount()).toString();
+                                m_textViewPayTypeInfo.setText(str);
+                                return;
+                            }
+                            m_textViewPayTypeInfo.setText("欠款：￥0");
+                        }else{
+                            Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(OrderDetailActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(OrderDetailActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                String string = response.body().string();
-                Logger.e("getCustomerCredit: " + string);
-                Gson gson = new Gson();
-                Data_CustomerCredit customerCredit = gson.fromJson(string, Data_CustomerCredit.class);
-                if (customerCredit.getItems().size() == 1) {
-                    Data_CustomerCredit.ItemsBean itemsBean = customerCredit.getItems().get(0);
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String str = stringBuilder.append("欠款：￥").append(itemsBean.getAmount()).toString();
-                    m_textViewPayTypeInfo.setText(str);
-                    return;
-                }
-                m_textViewPayTypeInfo.setText("欠款：￥0");
             }
-        });
+        }, nrc);
         return true;
     }
 
@@ -205,40 +226,86 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
             Toast.makeText(this, "未登录！", Toast.LENGTH_LONG).show();
             return;
         }
-        Map<String, String> map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/TaskOrders/Process/" + m_taskId;
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("businessKey", m_businessKey);
         map.put("candiUser", m_user.getUsername());
         map.put("orderStatus", String.valueOf(1));
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/TaskOrders/Process/" + m_taskId, map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    if (response.code() == 406) {
-                        Toast.makeText(OrderDetailActivity.this, "权限不足，您不能派送该订单！", Toast.LENGTH_LONG).show();
-                    } else if (response.code() == 403) {
-                        Toast.makeText(OrderDetailActivity.this, "抢单失败，您已被系统禁止订单！", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("getOrderOps-->" + string);
+                            Toast.makeText(OrderDetailActivity.this, "抢单成功！", Toast.LENGTH_LONG).show();
+                            MediaPlayer.create(OrderDetailActivity.this, R.raw.get_order).start();
+                            Intent intent = new Intent(getApplicationContext(), MainlyActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("switchTab", 1);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            if (response.getStatusLine().getStatusCode() == 406) {
+                                Toast.makeText(OrderDetailActivity.this, "权限不足，您不能派送该订单！", Toast.LENGTH_LONG).show();
+                            } else if (response.getStatusLine().getStatusCode() == 403) {
+                                Toast.makeText(OrderDetailActivity.this, "抢单失败，您已被系统禁止订单！", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }else {
+                        Toast.makeText(OrderDetailActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
                     }
-                    return;
+                } else {
+                    Toast.makeText(OrderDetailActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                Logger.e("getOrderOps-->" + response.body().string());
-                Toast.makeText(OrderDetailActivity.this, "抢单成功！", Toast.LENGTH_LONG).show();
-                MediaPlayer.create(OrderDetailActivity.this, R.raw.get_order).start();
-                Intent intent = new Intent(getApplicationContext(), MainlyActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putInt("switchTab", 1);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                finish();
             }
-        });
+        }, nrc);
+//        Map<String, String> map = new HashMap();
+//        map.put("businessKey", m_businessKey);
+//        map.put("candiUser", m_user.getUsername());
+//        map.put("orderStatus", String.valueOf(1));
+//        OkHttpUtil util = OkHttpUtil.getInstance(this);
+//        util.GET(NetUrlConstant.BASEURL+"/api" + "/TaskOrders/Process/" + m_taskId, map, new OkHttpUtil.ResultCallback() {
+//            @Override
+//            public void onError(Request request, Exception e) {
+//                Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onResponse(Response response) throws IOException {
+//                if (response.code() != 200) {
+//                    if (response.code() == 406) {
+//                        Toast.makeText(OrderDetailActivity.this, "权限不足，您不能派送该订单！", Toast.LENGTH_LONG).show();
+//                    } else if (response.code() == 403) {
+//                        Toast.makeText(OrderDetailActivity.this, "抢单失败，您已被系统禁止订单！", Toast.LENGTH_LONG).show();
+//                    } else {
+//                        Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+//                    }
+//                    return;
+//                }
+//                Logger.e("getOrderOps-->" + response.body().string());
+//                Toast.makeText(OrderDetailActivity.this, "抢单成功！", Toast.LENGTH_LONG).show();
+//                MediaPlayer.create(OrderDetailActivity.this, R.raw.get_order).start();
+//                Intent intent = new Intent(getApplicationContext(), MainlyActivity.class);
+//                Bundle bundle = new Bundle();
+//                bundle.putInt("switchTab", 1);
+//                intent.putExtras(bundle);
+//                startActivity(intent);
+//                finish();
+//            }
+//        });
     }
 
     private void getRecvLocation() {

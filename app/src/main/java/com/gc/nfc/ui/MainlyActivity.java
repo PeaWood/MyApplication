@@ -3,13 +3,13 @@ package com.gc.nfc.ui;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.app.job.JobScheduler;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Process;
 import android.os.StrictMode;
 import android.support.annotation.RequiresApi;
@@ -26,26 +26,25 @@ import android.widget.Toast;
 
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
+import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_TaskOrders;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
+import com.gc.nfc.http.ThreadPool;
+import com.gc.nfc.interfaces.Netcallback;
+import com.gc.nfc.utils.NetUtil;
 import com.google.gson.Gson;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import okhttp3.Request;
-import okhttp3.Response;
 import q.rorbin.badgeview.Badge;
 import q.rorbin.badgeview.QBadgeView;
-
-//import com.gc.nfc.common.NetRequestConstant;
-//import com.gc.nfc.domain.User;
-//import com.gc.nfc.utils.AmapLocationService;
-//import com.gc.nfc.utils.NetUtil;
-//import com.gc.nfc.utils.OnePixelReceiver;
 
 public class MainlyActivity extends TabActivity implements View.OnClickListener {
     private static final String PROCESS_NAME = "com.gc.nfc";
@@ -278,13 +277,6 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
                 this.host.setCurrentTabByTag("MYSELF_STRING");
             }
         }
-        //this.mOnepxReceiver = new OnePixelReceiver();
-        //IntentFilter intentFilter = new IntentFilter();
-        //intentFilter.addAction("android.intent.action.SCREEN_OFF");
-        //intentFilter.addAction("android.intent.action.SCREEN_ON");
-        //intentFilter.addAction("android.intent.action.USER_PRESENT");
-        //registerReceiver((BroadcastReceiver)this.mOnepxReceiver, intentFilter);
-        //startJobScheduler(this.m_userId);
         initialCloudPushService();
     }
 
@@ -305,112 +297,195 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
 
     public void orderRemind() {
         User user = ((AppContext) getApplicationContext()).getUser();
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        Map map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(BaseActivity.HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/TaskOrders/" + user.getUsername();
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("orderStatus", String.valueOf(1));
-        util.GET(OkHttpUtil.URL + "/TaskOrders/" + user.getUsername(), map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(MainlyActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(MainlyActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("orderRemind: " + string);
+                            Gson gson = new Gson();
+                            Data_TaskOrders dataTaskOrders = gson.fromJson(string, Data_TaskOrders.class);
+                            int size = dataTaskOrders.getItems().size();
+                            badgeOrder.setBadgeNumber(size);
+                            badgeOrder.setBadgeGravity(Gravity.END | Gravity.TOP);
+                            badgeOrder.setGravityOffset(0.0F, -2.0F, true);
+                        }else{
+                            Toast.makeText(MainlyActivity.this, "网络连接失败！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(MainlyActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(MainlyActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                String string = response.body().string();
-                Logger.e("orderRemind: " + string);
-                Gson gson = new Gson();
-                Data_TaskOrders dataTaskOrders = gson.fromJson(string, Data_TaskOrders.class);
-                int size = dataTaskOrders.getItems().size();
-                badgeOrder.setBadgeNumber(size);
-                badgeOrder.setBadgeGravity(Gravity.END | Gravity.TOP);
-                badgeOrder.setGravityOffset(0.0F, -2.0F, true);
             }
-        });
+        }, nrc);
     }
 
     public void repairRemind() {
         User user = ((AppContext) getApplicationContext()).getUser();
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        Map map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(BaseActivity.HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/Repair";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("dealedUserId", user.getUsername());
         map.put("processStatus", "PTSuspending");
-        util.GET(OkHttpUtil.URL + "/Repair", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(MainlyActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(MainlyActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("repairRemind: " + string);
+                            Gson gson = new Gson();
+                            Data_TaskOrders dataTaskOrders = gson.fromJson(string, Data_TaskOrders.class);
+                            int size = dataTaskOrders.getItems().size();
+                            badgeRepair.setBadgeNumber(size);
+                            badgeRepair.setBadgeGravity(Gravity.END | Gravity.TOP);
+                            badgeRepair.setGravityOffset(0.0F, -2.0F, true);
+                        }else{
+                            Toast.makeText(MainlyActivity.this, "网络连接失败！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(MainlyActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(MainlyActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                String string = response.body().string();
-                Logger.e("repairRemind: " + string);
-                Gson gson = new Gson();
-                Data_TaskOrders dataTaskOrders = gson.fromJson(string, Data_TaskOrders.class);
-                int size = dataTaskOrders.getItems().size();
-                badgeRepair.setBadgeNumber(size);
-                badgeRepair.setBadgeGravity(Gravity.END | Gravity.TOP);
-                badgeRepair.setGravityOffset(0.0F, -2.0F, true);
             }
-        });
+        }, nrc);
     }
 
     public void grabRemind() {
         User user = ((AppContext) getApplicationContext()).getUser();
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        Map map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(BaseActivity.HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/TaskOrders/" + user.getUsername();
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("orderStatus", String.valueOf(0));
-        util.GET(OkHttpUtil.URL + "/TaskOrders/" + user.getUsername(), map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(MainlyActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(MainlyActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("grabRemind: " + string);
+                            Gson gson = new Gson();
+                            Data_TaskOrders dataTaskOrders = gson.fromJson(string, Data_TaskOrders.class);
+                            int size = dataTaskOrders.getItems().size();
+                            badgeGrab.setBadgeNumber(size);
+                            badgeGrab.setBadgeGravity(Gravity.END | Gravity.TOP);
+                            badgeGrab.setGravityOffset(0.0F, -2.0F, true);
+                        }else{
+                            Toast.makeText(MainlyActivity.this, "网络连接失败！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(MainlyActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(MainlyActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                String string = response.body().string();
-                Logger.e("grabRemind: " + string);
-                Gson gson = new Gson();
-                Data_TaskOrders dataTaskOrders = gson.fromJson(string, Data_TaskOrders.class);
-                int size = dataTaskOrders.getItems().size();
-                badgeGrab.setBadgeNumber(size);
-                badgeGrab.setBadgeGravity(Gravity.END | Gravity.TOP);
-                badgeGrab.setGravityOffset(0.0F, -2.0F, true);
             }
-        });
+        }, nrc);
     }
 
-    @RequiresApi(21)
-    public void startJobScheduler(String paramString) {
-//        this.mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-//        this.mJobScheduler.cancel(55);
-//        JobInfo.Builder builder = new JobInfo.Builder(55, new ComponentName((Context) this, MyJobService.class));
-//        if (Build.VERSION.SDK_INT >= 21) {
-//            builder.setMinimumLatency(5000L);
-//            builder.setOverrideDeadline(6000L);
-//            builder.setBackoffCriteria(30000L, JobInfo.BACKOFF_POLICY_LINEAR);
-//        } else {
-//            builder.setPeriodic(30000L);
-//        }
-//        builder.setPersisted(true);
-//        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-//        builder.setRequiresCharging(true);
-//        PersistableBundle persistableBundle = new PersistableBundle();
-//            persistableBundle.putString("servicename", AmapLocationService.class.getName());
-//        persistableBundle.putString("userId", paramString);
-//        builder.setExtras(persistableBundle);
-//        JobInfo jobInfo = builder.build();
-//        this.mJobScheduler.schedule(jobInfo);
+    public static final int SUCCESS = 10001;
+    public static final int FAIL = 10002;
+    public static final int ERROR = 10003;
+    private int PERMISSION_REQUEST_CODE = 10000;
+    class RunnableTask implements Runnable{
+        private NetRequestConstant nrc;
+        private Handler handler;
+        public RunnableTask(NetRequestConstant nrc , Handler handler) {
+            this.nrc = nrc;
+            this.handler = handler;
+        }
+
+        public void run() {
+            HttpResponse res = null;
+            if(NetUtil.isCheckNet(getApplicationContext())){
+                if(nrc.getType()==BaseActivity.HttpRequestType.POST){//Post请求
+                    res = NetUtil.httpPost(nrc);
+                }else if(nrc.getType()==BaseActivity.HttpRequestType.GET){//get请求
+                    res = NetUtil.httpGet(nrc);
+                }else if(nrc.getType()==BaseActivity.HttpRequestType.PUT){//put请求
+                    res = NetUtil.httpPut(nrc);
+                }
+                Message message = Message.obtain();
+                message.obj = res;
+                message.what = SUCCESS;
+                handler.sendMessage(message);
+            }else{
+                Message message = Message.obtain();
+                message.what = ERROR;
+                handler.sendMessage(message);
+            }
+        }
+    }
+
+    class BaseHandler extends Handler{
+        private Netcallback callBack;
+
+        public BaseHandler(Netcallback callBack) {
+            this.callBack = callBack;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO Auto-generated method stub
+            switch (msg.what) {
+                case SUCCESS:// 网络请求成功后回调
+                    callBack.preccess(msg.obj, true);
+                    break;
+                case FAIL:// 网络请求失败后回调
+                case ERROR:
+                    callBack.preccess(msg.obj, false);
+                    break;
+                default:
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+    }
+
+    protected void getServer(Netcallback callBack ,NetRequestConstant nrc){
+        Handler handler = new BaseHandler(callBack);
+        RunnableTask task = new RunnableTask(nrc, handler);
+        ThreadPool.getInstance().addTask(task);
+    }
+
+    public String getString(HttpResponse response){
+        try {
+            return EntityUtils.toString(response.getEntity(), "UTF-8");
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

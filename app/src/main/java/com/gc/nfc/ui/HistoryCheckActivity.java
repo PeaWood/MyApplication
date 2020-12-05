@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -13,22 +12,21 @@ import android.widget.Toast;
 
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
+import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_Repair;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
+import com.gc.nfc.interfaces.Netcallback;
 import com.google.gson.Gson;
 
+import org.apache.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class HistoryCheckActivity extends BaseActivity {
     public static JSONArray m_checkOrderListJson;
@@ -93,76 +91,83 @@ public class HistoryCheckActivity extends BaseActivity {
             startActivity(new Intent(this, AutoLoginActivity.class));
             finish();
         }
-        Map<String, String> map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/Repair/";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("dealedUserId", user.getUsername());
         map.put("processStatus", "PTSolved");
         map.put("pageNo", "1");
         map.put("pageSize", "20");
         map.put("orderBy", "id desc");
-
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/Repair/", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
                 if (isrefresh) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
-                Toast.makeText(HistoryCheckActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (isrefresh) {
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-                if (response.code() != 200) {
-                    Toast.makeText(HistoryCheckActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                String string = response.body().string();
-                Logger.e("refleshVaildChecks: " + string);
-                Gson gson = new Gson();
-                data_repair = gson.fromJson(string, Data_Repair.class);
-                setData(data_repair);
-            }
-
-            private void setData(Data_Repair data_repair) {
-                Gson gson = new Gson();
-                try {
-                    JSONArray array = new JSONArray(gson.toJson(data_repair.getItems()));
-                    m_checkOrderListJson = array;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                ArrayList datalist = new ArrayList<>();
-                for (int j = 0; j < data_repair.getItems().size(); j++) {
-                    Data_Repair.ItemsBean itemsBean = data_repair.getItems().get(j);
-                    HashMap<Object, Object> hashMap = new HashMap();
-                    StringBuilder stringBuilder2 = new StringBuilder();
-                    hashMap.put("orderSn", stringBuilder2.append("巡检单号：").append(itemsBean.getRepairSn()).toString());
-                    stringBuilder2 = new StringBuilder();
-                    hashMap.put("createTime", stringBuilder2.append("下单时间：").append(itemsBean.getCreateTime()).toString());
-                    Data_Repair.ItemsBean.RecvAddrBean recvAddr = itemsBean.getRecvAddr();
-                    StringBuilder stringBuilder3 = new StringBuilder();
-                    hashMap.put("address", stringBuilder3.append(recvAddr.getCity()).append(recvAddr.getCounty()).append(recvAddr.getDetail()).toString());
-                    StringBuilder stringBuilder1 = new StringBuilder();
-                    hashMap.put("userId", stringBuilder1.append("联系人：").append(itemsBean.getRecvName()).toString());
-                    stringBuilder1 = new StringBuilder();
-                    hashMap.put("userPhone", stringBuilder1.append("电话：").append(itemsBean.getRecvPhone()).toString());
-                    hashMap.put("orderStatus", "已处理");
-                    Data_Repair.ItemsBean.RepairTypeBean repairType = itemsBean.getRepairType();
-                    if (repairType.getIndex() == 0) {
-                        hashMap.put("userIcon", R.mipmap.tray);
-                    } else if (repairType.getIndex() == 1) {
-                        hashMap.put("userIcon", R.mipmap.tray);
-                    } else {
-                        hashMap.put("userIcon", R.mipmap.tray);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("refleshVaildChecks: " + string);
+                            Gson gson = new Gson();
+                            data_repair = gson.fromJson(string, Data_Repair.class);
+                            setData(data_repair);
+                        }else{
+                            Toast.makeText(HistoryCheckActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(HistoryCheckActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
                     }
-                    datalist.add(hashMap);
+                } else {
+                    Toast.makeText(HistoryCheckActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                SimpleAdapter simpleAdapter = new SimpleAdapter(HistoryCheckActivity.this, datalist, R.layout.order_list_items, new String[]{"orderSn", "createTime", "userId", "userPhone", "userIcon", "address", "orderStatus", "urgent"}, new int[]{R.id.items_orderSn, R.id.items_creatTime, R.id.items_userId, R.id.items_userPhone, R.id.items_imageUserIcon, R.id.items_addressStatic, R.id.items_orderStatus, R.id.items_urgent});
-                listView.setAdapter(simpleAdapter);
             }
-        });
+        }, nrc);
+    }
+
+    private void setData(Data_Repair data_repair) {
+        Gson gson = new Gson();
+        try {
+            JSONArray array = new JSONArray(gson.toJson(data_repair.getItems()));
+            m_checkOrderListJson = array;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        ArrayList datalist = new ArrayList<>();
+        for (int j = 0; j < data_repair.getItems().size(); j++) {
+            Data_Repair.ItemsBean itemsBean = data_repair.getItems().get(j);
+            HashMap<Object, Object> hashMap = new HashMap();
+            StringBuilder stringBuilder2 = new StringBuilder();
+            hashMap.put("orderSn", stringBuilder2.append("巡检单号：").append(itemsBean.getRepairSn()).toString());
+            stringBuilder2 = new StringBuilder();
+            hashMap.put("createTime", stringBuilder2.append("下单时间：").append(itemsBean.getCreateTime()).toString());
+            Data_Repair.ItemsBean.RecvAddrBean recvAddr = itemsBean.getRecvAddr();
+            StringBuilder stringBuilder3 = new StringBuilder();
+            hashMap.put("address", stringBuilder3.append(recvAddr.getCity()).append(recvAddr.getCounty()).append(recvAddr.getDetail()).toString());
+            StringBuilder stringBuilder1 = new StringBuilder();
+            hashMap.put("userId", stringBuilder1.append("联系人：").append(itemsBean.getRecvName()).toString());
+            stringBuilder1 = new StringBuilder();
+            hashMap.put("userPhone", stringBuilder1.append("电话：").append(itemsBean.getRecvPhone()).toString());
+            hashMap.put("orderStatus", "已处理");
+            Data_Repair.ItemsBean.RepairTypeBean repairType = itemsBean.getRepairType();
+            if (repairType.getIndex() == 0) {
+                hashMap.put("userIcon", R.mipmap.tray);
+            } else if (repairType.getIndex() == 1) {
+                hashMap.put("userIcon", R.mipmap.tray);
+            } else {
+                hashMap.put("userIcon", R.mipmap.tray);
+            }
+            datalist.add(hashMap);
+        }
+        SimpleAdapter simpleAdapter = new SimpleAdapter(HistoryCheckActivity.this, datalist, R.layout.order_list_items, new String[]{"orderSn", "createTime", "userId", "userPhone", "userIcon", "address", "orderStatus", "urgent"}, new int[]{R.id.items_orderSn, R.id.items_creatTime, R.id.items_userId, R.id.items_userPhone, R.id.items_imageUserIcon, R.id.items_addressStatic, R.id.items_orderStatus, R.id.items_urgent});
+        listView.setAdapter(simpleAdapter);
     }
 }

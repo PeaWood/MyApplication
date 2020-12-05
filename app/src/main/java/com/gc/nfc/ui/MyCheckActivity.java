@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -12,24 +11,23 @@ import android.widget.Toast;
 
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
+import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_Repair;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
+import com.gc.nfc.interfaces.Netcallback;
 import com.google.gson.Gson;
 
+import org.apache.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class MyCheckActivity extends BaseActivity {
     public static JSONArray m_checkOrderListJson;
@@ -87,39 +85,47 @@ public class MyCheckActivity extends BaseActivity {
             startActivity(new Intent(this, AutoLoginActivity.class));
             finish();
         }
-        Map<String, String> map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/Repair/";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("dealedUserId", user.getUsername());
         map.put("processStatus", "PTSuspending");
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/Repair/", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
                 if (isRefresh) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
-                Toast.makeText(MyCheckActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("refleshMends: " + string);
+                            Gson gson = new Gson();
+                            data_repair = gson.fromJson(string, Data_Repair.class);
+                            try {
+                                setData();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }else{
+                            Toast.makeText(MyCheckActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(MyCheckActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(MyCheckActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
+                }
             }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (isRefresh) {
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-                if (response.code() != 200) {
-                    Toast.makeText(MyCheckActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                String string = response.body().string();
-                Logger.e("refleshMends: " + string);
-                Gson gson = new Gson();
-                data_repair = gson.fromJson(string, Data_Repair.class);
-                try {
-                    setData();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        }, nrc);
     }
 
     /**

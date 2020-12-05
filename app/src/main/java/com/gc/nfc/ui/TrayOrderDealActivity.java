@@ -37,7 +37,6 @@ import com.gc.nfc.domain.Data_Order;
 import com.gc.nfc.domain.RefoundDetail;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
 import com.gc.nfc.interfaces.Netcallback;
 import com.google.gson.Gson;
 
@@ -50,7 +49,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.RoundingMode;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -58,9 +56,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class TrayOrderDealActivity extends BaseActivity implements View.OnClickListener, AbsListView.OnScrollListener {
     public static String m_orderPayStatus;
@@ -184,39 +179,84 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
     }
 
     private void GetDepLeader() {
-        Map map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/sysusers/GetDepLeader/";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("userId", m_deliveryUser.getUsername());
         map.put("groupCode", "00005");
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/sysusers/GetDepLeader/", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(TrayOrderDealActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
-                }
-                String string = response.body().string();
-                Logger.e("GetDepLeader : " + string);
-                Gson gson = new Gson();
-                Data_Depleader depleader = gson.fromJson(string, Data_Depleader.class);
-                try {
-                    for (byte b = 0; b < depleader.getItems().size(); b++) {
-                        if (b == 0) {
-                            m_depLeader = depleader.getItems().get(b).getUserId();
-                        } else {
-                            StringBuilder stringBuilder = new StringBuilder();
-                            m_depLeader = stringBuilder.append(m_depLeader).append(",").append(depleader.getItems().get(b).getUserId()).toString();
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("GetDepLeader : " + string);
+                            Gson gson = new Gson();
+                            Data_Depleader depleader = gson.fromJson(string, Data_Depleader.class);
+                            try {
+                                for (byte b = 0; b < depleader.getItems().size(); b++) {
+                                    if (b == 0) {
+                                        m_depLeader = depleader.getItems().get(b).getUserId();
+                                    } else {
+                                        StringBuilder stringBuilder = new StringBuilder();
+                                        m_depLeader = stringBuilder.append(m_depLeader).append(",").append(depleader.getItems().get(b).getUserId()).toString();
+                                    }
+                                }
+                            } catch (Exception jSONException) {
+                                Toast.makeText(TrayOrderDealActivity.this, "异常" + jSONException.toString() + jSONException.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        }else{
+                            Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
+                    }else {
+                        Toast.makeText(TrayOrderDealActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
                     }
-                } catch (Exception jSONException) {
-                    Toast.makeText(TrayOrderDealActivity.this, "异常" + jSONException.toString() + jSONException.getMessage(), Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(TrayOrderDealActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        }, nrc);
+//        Map map = new HashMap();
+//        map.put("userId", m_deliveryUser.getUsername());
+//        map.put("groupCode", "00005");
+//        OkHttpUtil util = OkHttpUtil.getInstance(this);
+//        util.GET(NetUrlConstant.BASEURL+"/api" + "/sysusers/GetDepLeader/", map, new OkHttpUtil.ResultCallback() {
+//            @Override
+//            public void onError(Request request, Exception e) {
+//                Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onResponse(Response response) throws IOException {
+//                if (response.code() != 200) {
+//                    Toast.makeText(TrayOrderDealActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
+//                }
+//                String string = response.body().string();
+//                Logger.e("GetDepLeader : " + string);
+//                Gson gson = new Gson();
+//                Data_Depleader depleader = gson.fromJson(string, Data_Depleader.class);
+//                try {
+//                    for (byte b = 0; b < depleader.getItems().size(); b++) {
+//                        if (b == 0) {
+//                            m_depLeader = depleader.getItems().get(b).getUserId();
+//                        } else {
+//                            StringBuilder stringBuilder = new StringBuilder();
+//                            m_depLeader = stringBuilder.append(m_depLeader).append(",").append(depleader.getItems().get(b).getUserId()).toString();
+//                        }
+//                    }
+//                } catch (Exception jSONException) {
+//                    Toast.makeText(TrayOrderDealActivity.this, "异常" + jSONException.toString() + jSONException.getMessage(), Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        });
     }
 
     private void OrderCalculate() {
@@ -224,7 +264,7 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         HashMap<Object, Object> hashMap;
         NetRequestConstant netRequestConstant = new NetRequestConstant();
         try {
-            netRequestConstant.setType(BaseActivity.HttpRequestType.PUT);
+            netRequestConstant.setType(HttpRequestType.PUT);
             StringBuilder stringBuilder = new StringBuilder();
             netRequestConstant.requestUrl = stringBuilder.append(NetUrlConstant.BASEURL+"/api/Orders/Caculate/").append(this.m_orderId).toString();
             netRequestConstant.context = (Context)this;
@@ -783,32 +823,71 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
         if (swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(false);
         }
-        HashMap map = new HashMap<Object, Object>();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/Orders";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("orderSn", m_orderId);
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/Orders", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                }
-                String string = response.body().string();
-                Logger.e("refleshPayStatus: " + string);
-                Gson gson = new Gson();
-                Data_Order data_order = gson.fromJson(string, Data_Order.class);
-                if (data_order.getItems().size() == 1) {
-                    try {
-                        setOrderAppendInfo(new JSONObject(gson.toJson(data_order.getItems().get(0))));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("refleshPayStatus: " + string);
+                            Gson gson = new Gson();
+                            Data_Order data_order = gson.fromJson(string, Data_Order.class);
+                            if (data_order.getItems().size() == 1) {
+                                try {
+                                    setOrderAppendInfo(new JSONObject(gson.toJson(data_order.getItems().get(0))));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }else{
+                            Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(TrayOrderDealActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    Toast.makeText(TrayOrderDealActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        }, nrc);
+//        HashMap map = new HashMap<Object, Object>();
+//        map.put("orderSn", m_orderId);
+//        OkHttpUtil util = OkHttpUtil.getInstance(this);
+//        util.GET(NetUrlConstant.BASEURL+"/api" + "/Orders", map, new OkHttpUtil.ResultCallback() {
+//            @Override
+//            public void onError(Request request, Exception e) {
+//                Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onResponse(Response response) throws IOException {
+//                if (response.code() != 200) {
+//                    Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+//                }
+//                String string = response.body().string();
+//                Logger.e("refleshPayStatus: " + string);
+//                Gson gson = new Gson();
+//                Data_Order data_order = gson.fromJson(string, Data_Order.class);
+//                if (data_order.getItems().size() == 1) {
+//                    try {
+//                        setOrderAppendInfo(new JSONObject(gson.toJson(data_order.getItems().get(0))));
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
     }
 }

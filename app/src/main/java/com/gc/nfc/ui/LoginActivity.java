@@ -20,7 +20,6 @@ import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_User;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
 import com.gc.nfc.interfaces.Netcallback;
 import com.gc.nfc.utils.JellyInterpolator;
 import com.gc.nfc.utils.NetUtil;
@@ -28,16 +27,9 @@ import com.gc.nfc.utils.SharedPreferencesHelper;
 import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
     private TextView mBtnLogin;
@@ -77,14 +69,54 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         nrc.setParams(params);
         getServer(new Netcallback() {
             public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
                 if(flag){
                     HttpResponse response=(HttpResponse)res;
                     if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
                         if(response.getStatusLine().getStatusCode()==200){
                             //设置登录会话的cookies
                             NetUtil.setLoginCookies();
                             SharedPreferencesHelper.put("username", name);
                             SharedPreferencesHelper.put("password", password);
+                            String string = getString(response);
+                            Logger.e("login: " + string);
+                            Gson gson = new Gson();
+                            Data_User userdata = gson.fromJson(string, Data_User.class);
+                            User user = new User();
+                            user.setUsername(name);
+                            user.setPassword(password);
+                            user.setDepartmentCode(userdata.getDepartment().getCode());
+                            user.setDepartmentName(userdata.getDepartment().getName());
+                            user.setGroupCode(userdata.getUserGroup().getCode());
+                            user.setGroupName(userdata.getUserGroup().getName());
+                            if (userdata.getGasTakeOverStatus() != null) {
+                                user.setScanType(userdata.getGasTakeOverStatus().getIndex());
+                            } else {
+                                user.setScanType(0);
+                            }
+                            AppContext appContext = (AppContext) LoginActivity.this.getApplicationContext();
+                            appContext.setUser(user);
+                            MediaPlayer.create(LoginActivity.this, R.raw.start_working).start();
+                            if (user.getGroupCode().equals("00005") || user.getGroupCode().equals("00006")) {
+                                Intent starter = new Intent(LoginActivity.this, StockManagerActivity.class);
+                                startActivity(starter);
+                                LoginActivity.this.finish();
+                                return;
+                            }
+                            if (user.getGroupCode().equals("00003")) {
+                                //配送员
+                                Intent starter = new Intent(LoginActivity.this, MainlyActivity.class);
+                                startActivity(starter);
+                                LoginActivity.this.finish();
+                                return;
+                            }
+                            if (user.getGroupCode().equals("00007")) {
+                                //调拨员
+                                Intent starter = new Intent(LoginActivity.this, DiaoBoActivity.class);
+                                startActivity(starter);
+                                LoginActivity.this.finish();
+                            }
                         }else{
                             Toast.makeText(LoginActivity.this, "账号或密码不正确", Toast.LENGTH_LONG).show();
                         }
@@ -98,62 +130,62 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 }
             }
         }, nrc);
-        Map map = new HashMap();
-        map.put("userId", name);
-        map.put("password", password);
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/sysusers/login", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(LoginActivity.this, "网络连接错误！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(LoginActivity.this, "账号或密码不正确！", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                String string = response.body().string();
-                Logger.e("login: " + string);
-                Gson gson = new Gson();
-                Data_User userdata = gson.fromJson(string, Data_User.class);
-                User user = new User();
-                user.setUsername(name);
-                user.setPassword(password);
-                user.setDepartmentCode(userdata.getDepartment().getCode());
-                user.setDepartmentName(userdata.getDepartment().getName());
-                user.setGroupCode(userdata.getUserGroup().getCode());
-                user.setGroupName(userdata.getUserGroup().getName());
-                if (userdata.getGasTakeOverStatus() != null) {
-                    user.setScanType(userdata.getGasTakeOverStatus().getIndex());
-                } else {
-                    user.setScanType(0);
-                }
-                AppContext appContext = (AppContext) LoginActivity.this.getApplicationContext();
-                appContext.setUser(user);
-                MediaPlayer.create(LoginActivity.this, R.raw.start_working).start();
-                if (user.getGroupCode().equals("00005") || user.getGroupCode().equals("00006")) {
-                    Intent starter = new Intent(LoginActivity.this, StockManagerActivity.class);
-                    startActivity(starter);
-                    LoginActivity.this.finish();
-                    return;
-                }
-                if (user.getGroupCode().equals("00003")) {
-                    //配送员
-                    Intent starter = new Intent(LoginActivity.this, MainlyActivity.class);
-                    startActivity(starter);
-                    LoginActivity.this.finish();
-                    return;
-                }
-                if (user.getGroupCode().equals("00007")) {
-                    //调拨员
-                    Intent starter = new Intent(LoginActivity.this, DiaoBoActivity.class);
-                    startActivity(starter);
-                    LoginActivity.this.finish();
-                }
-            }
-        });
+//        Map map = new HashMap();
+//        map.put("userId", name);
+//        map.put("password", password);
+//        OkHttpUtil util = OkHttpUtil.getInstance(this);
+//        util.GET(NetUrlConstant.BASEURL+"/api" + "/sysusers/login", map, new OkHttpUtil.ResultCallback() {
+//            @Override
+//            public void onError(Request request, Exception e) {
+//                Toast.makeText(LoginActivity.this, "网络连接错误！", Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onResponse(Response response) throws IOException {
+//                if (response.code() != 200) {
+//                    Toast.makeText(LoginActivity.this, "账号或密码不正确！", Toast.LENGTH_LONG).show();
+//                    return;
+//                }
+//                String string = response.body().string();
+//                Logger.e("login: " + string);
+//                Gson gson = new Gson();
+//                Data_User userdata = gson.fromJson(string, Data_User.class);
+//                User user = new User();
+//                user.setUsername(name);
+//                user.setPassword(password);
+//                user.setDepartmentCode(userdata.getDepartment().getCode());
+//                user.setDepartmentName(userdata.getDepartment().getName());
+//                user.setGroupCode(userdata.getUserGroup().getCode());
+//                user.setGroupName(userdata.getUserGroup().getName());
+//                if (userdata.getGasTakeOverStatus() != null) {
+//                    user.setScanType(userdata.getGasTakeOverStatus().getIndex());
+//                } else {
+//                    user.setScanType(0);
+//                }
+//                AppContext appContext = (AppContext) LoginActivity.this.getApplicationContext();
+//                appContext.setUser(user);
+//                MediaPlayer.create(LoginActivity.this, R.raw.start_working).start();
+//                if (user.getGroupCode().equals("00005") || user.getGroupCode().equals("00006")) {
+//                    Intent starter = new Intent(LoginActivity.this, StockManagerActivity.class);
+//                    startActivity(starter);
+//                    LoginActivity.this.finish();
+//                    return;
+//                }
+//                if (user.getGroupCode().equals("00003")) {
+//                    //配送员
+//                    Intent starter = new Intent(LoginActivity.this, MainlyActivity.class);
+//                    startActivity(starter);
+//                    LoginActivity.this.finish();
+//                    return;
+//                }
+//                if (user.getGroupCode().equals("00007")) {
+//                    //调拨员
+//                    Intent starter = new Intent(LoginActivity.this, DiaoBoActivity.class);
+//                    startActivity(starter);
+//                    LoginActivity.this.finish();
+//                }
+//            }
+//        });
     }
 
     private void progressAnimator(View paramView) {

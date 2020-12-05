@@ -54,7 +54,6 @@ import com.dk.bleNfc.Exception.CardNoResponseException;
 import com.dk.bleNfc.Exception.DeviceNoResponseException;
 import com.dk.bleNfc.Tool.StringTool;
 import com.dk.bleNfc.card.Ntag21x;
-
 import com.example.weightscaler.ScaleDevice;
 import com.example.weightscaler.scalerSDK;
 import com.gc.nfc.R;
@@ -66,10 +65,7 @@ import com.gc.nfc.domain.Data_UserBottles;
 import com.gc.nfc.domain.Data_UserCard;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
 import com.gc.nfc.interfaces.Netcallback;
-//import com.gc.nfc.sca.ScaleDevice;
-//import com.gc.nfc.sca.scalerSDK;
 import com.gc.nfc.utils.SharedPreferencesHelper;
 import com.gc.nfc.utils.Tools;
 import com.google.gson.Gson;
@@ -79,7 +75,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -89,8 +84,8 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import okhttp3.Request;
-import okhttp3.Response;
+//import com.gc.nfc.sca.ScaleDevice;
+//import com.gc.nfc.sca.scalerSDK;
 
 
 public class BottleExchangeActivity extends BaseActivity implements View.OnClickListener, TextToSpeech.OnInitListener {
@@ -458,74 +453,46 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     TextView tv;
 
     private void GetUserCard() {
-        Map<String, String> map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/UserCard/";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("userId", this.m_curUserId);
         map.put("status", String.valueOf(1));
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/UserCard/", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                String string = response.body().string();
-                Logger.e("GetUserCard: " + string);
-                Gson gson = new Gson();
-                setData(gson.fromJson(string, Data_UserCard.class));
-            }
-
-            private void setData(Data_UserCard userCard) {
-                int size = userCard.getItems().size();
-                if (size == 1) {
-                    m_handedUserCard = userCard.getItems().get(0).getNumber();
-                    return;
-                }
-                m_handedUserCard = null;
-                showToast("该用户未绑定用户卡");
-            }
-        });
-    }
-
-    private void OrdersBindGasCynNumber() {
-        if (this.m_BottlesMapZP.size() != 0) {
-            OkHttpUtil okHttpUtil = OkHttpUtil.getInstance(this);
-            Map hashMap = new HashMap();
-            hashMap.put("orderSn", this.m_orderId);
-            String str = "";
-            boolean bool = true;
-            for (Map.Entry<String, String> entry : this.m_BottlesMapZP.entrySet()) {
-                if (bool) {
-                    bool = false;
-                } else {
-                    str = str + ",";
-                }
-                str = str + entry.getKey();
-            }
-            hashMap.put("gasCynNumbers", str);
-            okHttpUtil.postForm(OkHttpUtil.URL + "Orders/Bind/GasCynNumber", new OkHttpUtil.ResultCallback() {
-                @Override
-                public void onError(Request request, Exception e) {
-                    Toast.makeText(BottleExchangeActivity.this, "无数据", Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onResponse(Response response) throws IOException {
-                    if (response.code() != 200) {
-                        Toast.makeText(BottleExchangeActivity.this, "重瓶绑定订单失败" + response.code(), Toast.LENGTH_LONG).show();
-                        return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("GetUserCard: " + string);
+                            Gson gson = new Gson();
+                            Data_UserCard userCard = gson.fromJson(string, Data_UserCard.class);
+                            int size = userCard.getItems().size();
+                            if (size == 1) {
+                                m_handedUserCard = userCard.getItems().get(0).getNumber();
+                                return;
+                            }
+                            m_handedUserCard = null;
+                            showToast("该用户未绑定用户卡");
+                        }else{
+                            Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(BottleExchangeActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
                     }
-                    String string = response.body().string();
-                    Logger.e("refleshVaildBottles: " + string);
-                    Toast.makeText(BottleExchangeActivity.this, "重瓶绑定订单失败" + response.code(), Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(BottleExchangeActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-            });
-        }
+            }
+        }, nrc);
     }
 
     private void addEditViewChanged(EditText paramEditText, final View layout) {
@@ -614,35 +581,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         //ble_nfc服务初始化
         Intent gattServiceIntent = new Intent(this, BleNfcDeviceService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-    }
-
-    private void createElectDep() {
-        Map map = new HashMap();
-        map.put("customerId", this.m_curUserId);
-        map.put("operId", this.m_deliveryUser.getUsername());
-        map.put("actualAmount", this.m_yjp_ss_total);
-        JSONArray jSONArray = createElectDepDetails();
-        if (jSONArray == null) {
-            jumpToOrderDeal();
-            return;
-        }
-        map.put("electDepositDetails", jSONArray);
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.postForm(OkHttpUtil.URL + "/ElectDeposit/", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 201) {
-                    Toast.makeText(BottleExchangeActivity.this, "电子押金单上传失败，" + response.code(), Toast.LENGTH_LONG).show();
-                    return;
-                }
-                jumpToOrderDeal();
-            }
-        });
     }
 
     private JSONArray createElectDepDetails() {
@@ -986,7 +924,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
 
     private void orderServiceQualityUpload(boolean paramBoolean) {
         NetRequestConstant netRequestConstant = new NetRequestConstant();
-        netRequestConstant.setType(BaseActivity.HttpRequestType.PUT);
+        netRequestConstant.setType(HttpRequestType.PUT);
         netRequestConstant.requestUrl = NetUrlConstant.BASEURL+"/api/Orders/" + this.m_orderId;
         netRequestConstant.context = (Context)this;
         HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
@@ -1283,9 +1221,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                 m_bfp_price_50kg = getEditTextToInt(view.findViewById(R.id.textView_bfp_50kg_ys));
                 m_yjp_ys_total = getTextViewToString(view.findViewById(R.id.textView_ys));
                 m_yjp_ss_total = getTextViewToString(view.findViewById(R.id.textView_ys));
-                if(!judgeBottle()){
-                    return;
-                }
+
                 if (m_deliveryUser.getScanType() == 2 || m_deliveryUser.getScanType() == 3) {
                     orderServiceQualityUpload(true);
                     return;
@@ -1297,108 +1233,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         });
         builder.setCancelable(false);
         builder.show();
-    }
-
-    private boolean judgeBottle() {
-        try {
-            JSONArray jSONArray = m_OrderJson.getJSONArray("orderDetailList");
-            //订单内的瓶子数量
-            int length = jSONArray.length();
-            //用户添加的空瓶数量
-            int kpsize = m_BottlesMapKP.size();
-            int zpsize = m_BottlesMapZP.size();
-            //每一个类别的瓶子数量
-            int size5 = 0;
-            int size15 = 0;
-            int size50 = 0;
-            int zpsize5 = 0;
-            int zpsize15 = 0;
-            int zpsize50 = 0;
-            for (byte b = 0; b < jSONArray.length(); b++) {
-                JSONObject jSONObject = jSONArray.getJSONObject(b);
-                int weight = jSONObject.getJSONObject("goods").getInt("weight");
-                if(weight==5){
-                    size5++;
-                    zpsize5++;
-                }else if(weight==15){
-                    size15++;
-                    zpsize5++;
-                }else if(weight==50){
-                    size50++;
-                    zpsize5++;
-                }
-            }
-            Logger.e("每一个类别的瓶子数量: "+"5KG "+size5);
-            Logger.e("每一个类别的瓶子数量: "+"15KG "+size15);
-            Logger.e("每一个类别的瓶子数量: "+"50KG "+size50);
-            //没有回收的瓶子数量
-            Logger.e("处理空瓶回收》》》》");
-            for (Map.Entry<String, String> entry : m_BottlesMapKP.entrySet()) {
-                String bottleSpec = getBottleSpec(entry.getKey());
-                if(bottleSpec.equals("0001")){
-                    size5--;
-                }else if(bottleSpec.equals("0002")){
-                    size15--;
-                }else if(bottleSpec.equals("0003")){
-                    size50--;
-                }
-            }
-            Logger.e("每一个类别的瓶子数量: "+"5KG "+size5);
-            Logger.e("每一个类别的瓶子数量: "+"15KG "+size15);
-            Logger.e("每一个类别的瓶子数量: "+"50KG "+size50);
-            Logger.e("处理重瓶》》》》");
-            for (Map.Entry<String, String> entry : m_BottlesMapZP.entrySet()) {
-                String bottleSpec = getBottleSpec(entry.getKey());
-                if(bottleSpec.equals("0001")){
-                    zpsize5--;
-                }else if(bottleSpec.equals("0002")){
-                    zpsize15--;
-                }else if(bottleSpec.equals("0003")){
-                    zpsize50--;
-                }
-            }
-            Logger.e("重瓶误差: "+"5KG "+zpsize5);
-            Logger.e("重瓶误差: "+"15KG "+zpsize15);
-            Logger.e("重瓶误差: "+"50KG "+zpsize50);
-            if(zpsize5!=0||zpsize15!=0||zpsize50!=0){
-                showToast("重瓶数量与订单不符");
-                return false;
-            }
-            //判断空瓶
-            if(kpsize<length){
-                Logger.e("空瓶区钢瓶的规格和数量少于订单内的规格和数量");
-                if(size5+size15+size50 > 0){
-                    Logger.e("瓶子没有被回收");
-                    //瓶子没有被回收
-                    int page5 = m_ptp_quantity_5kg + m_qp_quantity_5kg + m_yjp_quantity_5kg;
-                    int page15 = m_ptp_quantity_15kg + m_qp_quantity_15kg + m_yjp_quantity_15kg;
-                    int page50 = m_ptp_quantity_50kg + m_qp_quantity_50kg + m_yjp_quantity_50kg;
-                    Logger.e("押金单填入的瓶子数: "+"5KG "+page5);
-                    Logger.e("押金单填入的瓶子数: "+"15KG "+page15);
-                    Logger.e("押金单填入的瓶子数: "+"50KG "+page50);
-                    //5KG瓶子校验
-                    if(page5 != size5){
-                        showToast("交接钢瓶与订单不符，请填写押金单");
-                        return false;
-                    }
-                    //15KG瓶子校验
-                    if(page15 != size15){
-                        showToast("交接钢瓶与订单不符，请填写押金单");
-                        return false;
-                    }
-                    //50KG瓶子校验
-                    if(page50 != size50){
-                        showToast("交接钢瓶与订单不符，请填写押金单");
-                        return false;
-                    }
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            showToast("数据异常");
-            return false;
-        }
-        return true;
     }
 
     private boolean startAutoSearchCard() throws DeviceNoResponseException {
@@ -1451,32 +1285,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
         return str;
     }
 
-    private boolean upLoadGasCylinder() {
-        Map map = new HashMap();
-        map.put("recycleGasCylinder", this.m_BottlesMapKP.toString());
-        map.put("deliveryGasCylinder", this.m_BottlesMapZP.toString());
-        if (this.m_BottlesMapKP.size() == 0 && this.m_BottlesMapZP.size() == 0)
-            return false;
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.postForm(OkHttpUtil.URL + "/Orders/" + this.m_orderId, map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    if (response.code() == 404) {
-                        Toast.makeText(BottleExchangeActivity.this, "订单不存在", Toast.LENGTH_LONG).show();
-                    }
-                    Toast.makeText(BottleExchangeActivity.this, "瓶号上传失败，" + response.code(), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        return true;
-    }
-
     public void bottleTakeOverUnit(final String bottleCode, String paramString2, String paramString3, String paramString4, String paramString5, boolean paramBoolean1, final boolean isKP) {
         boolean bool = false;
         if (this.m_BottlesMapKP.containsKey(bottleCode))
@@ -1487,55 +1295,61 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             Toast.makeText(this, "钢瓶号：" + bottleCode + "    请勿重复提交！", Toast.LENGTH_SHORT).show();
             return;
         }
-        Map map = new HashMap();
-        String url=OkHttpUtil.URL + "/GasCylinder/check/" + bottleCode+"?srcUserId="+paramString2+"&targetUserId="+paramString3+"&serviceStatus="+paramString4+"&enableForce="+String.valueOf(paramBoolean1)+"&note="+paramString5;
-        Logger.e("URL: " + url);
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.PUT(url, map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                Logger.e("bottleTakeOverUnit: " + response.code());
-                Logger.e("bottleTakeOverUnit: "+response.message());
-                Logger.e("bottleTakeOverUnit: "+response.body().string());
-                if (response.code() == 200) {
-                    if (isKP) {
-                        addKP(bottleCode);
-                        return;
-                    }
-                    addZP(bottleCode);
-                    return;
-                }
-                MediaPlayer.create(BottleExchangeActivity.this, R.raw.alarm).start();
-                if (response.code() == 409) {
-                    (new AlertDialog.Builder(BottleExchangeActivity.this)).setTitle("钢瓶异常流转！").
-                            setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + response.message() + "\r\n确认强制交接吗？").setIcon(R.mipmap.icon_common_user).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface param2DialogInterface, int param2Int) {
-                            if (Tools.isFastClick()) {
-                                MediaPlayer.create( BottleExchangeActivity.this, R.raw.music).start();
-                                if (isKP) {
-                                    addKP(bottleCode);
-                                }else{
-                                    addZP(bottleCode);
-                                }
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.PUT);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/GasCylinder/check/" + bottleCode+"?srcUserId="+paramString2+"&targetUserId="+paramString3+"&serviceStatus="+paramString4+"&enableForce="+String.valueOf(paramBoolean1)+"&note="+paramString5;;
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if (response.getStatusLine().getStatusCode() == 200) {
+                            if (isKP) {
+                                addKP(bottleCode);
+                                return;
                             }
+                            addZP(bottleCode);
+                            return;
                         }
-                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface param2DialogInterface, int param2Int) {
+                        MediaPlayer.create(BottleExchangeActivity.this, R.raw.alarm).start();
+                        if (response.getStatusLine().getStatusCode() == 409) {
+                            (new AlertDialog.Builder(BottleExchangeActivity.this)).setTitle("钢瓶异常流转！").
+                                    setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + response.getStatusLine().getReasonPhrase() + "\r\n确认强制交接吗？").setIcon(R.mipmap.icon_common_user).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface param2DialogInterface, int param2Int) {
+                                    if (Tools.isFastClick()) {
+                                        MediaPlayer.create( BottleExchangeActivity.this, R.raw.music).start();
+                                        if (isKP) {
+                                            addKP(bottleCode);
+                                        }else{
+                                            addZP(bottleCode);
+                                        }
+                                    }
+                                }
+                            }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface param2DialogInterface, int param2Int) {
+                                }
+                            }).show();
+                            return;
                         }
-                    }).show();
-                    return;
-                }
-                (new AlertDialog.Builder(BottleExchangeActivity.this)).setTitle("钢瓶异常流转！").setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + response.message()).setIcon(R.mipmap.icon_common_user).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface param2DialogInterface, int param2Int) {
+                        (new AlertDialog.Builder(BottleExchangeActivity.this)).setTitle("钢瓶异常流转！").setMessage("钢瓶号 :" + bottleCode + "\r\n错误原因:" + response.getStatusLine().getReasonPhrase()).setIcon(R.mipmap.icon_common_user).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface param2DialogInterface, int param2Int) {
+                            }
+                        }).show();
+                    }else {
+                        Toast.makeText(BottleExchangeActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
                     }
-                }).show();
+                } else {
+                    Toast.makeText(BottleExchangeActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
+                }
             }
-        });
+        }, nrc);
     }
 
     public void deleteKP(final int position) {
@@ -1583,27 +1397,38 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     public void getMyBottles() {
-        Map<String, String> map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/GasCylinder/";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("liableUserId", this.m_deliveryUser.getUsername());
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/GasCylinder/", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("getMyBottles: " + string);
+                            Gson gson = new Gson();
+                            Data_UserBottles userBottles = gson.fromJson(string, Data_UserBottles.class);
+                            setData(userBottles);
+                        }else{
+                            Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(BottleExchangeActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(BottleExchangeActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                String string = response.body().string();
-                Logger.e("getMyBottles: " + string);
-                Gson gson = new Gson();
-                setData(gson.fromJson(string, Data_UserBottles.class));
             }
-
             private void setData(Data_UserBottles userBottles) {
                 try {
                     m_myBottlesMap.clear();
@@ -1618,7 +1443,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                     Toast.makeText(BottleExchangeActivity.this, "异常" + e.toString(), Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        }, nrc);
     }
 
     public String getSpecName(String paramString) {
@@ -1635,27 +1460,37 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     public void getUserBottles() {
-        Map<String, String> map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/GasCylinder/";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("liableUserId", this.m_curUserId);
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/GasCylinder/", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("getUserBottles: " + string);
+                            Gson gson = new Gson();
+                            setData(gson.fromJson(string, Data_UserBottles.class));
+                        }else{
+                            Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(BottleExchangeActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(BottleExchangeActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                String string = response.body().string();
-                Logger.e("getUserBottles: " + string);
-                Gson gson = new Gson();
-                setData(gson.fromJson(string, Data_UserBottles.class));
             }
-
             private void setData(Data_UserBottles userBottles) {
                 int size = userBottles.getItems().size();
                 for (int b = 0; b < size; b++) {
@@ -1669,7 +1504,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                     }
                 }
             }
-        });
+        }, nrc);
     }
 
     void init() {
@@ -1920,41 +1755,53 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
     }
 
     public void updateBottleSpec(final String bottleCode) {
-        Map map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/GasCylinder/";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("number", bottleCode);
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/GasCylinder/", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(BottleExchangeActivity.this, "网络未连接！", Toast.LENGTH_LONG).show();
-                }
-                String s = response.body().string();
-                Logger.e("updateBottleSpec: "+s);
-                Gson gson = new Gson();
-                Data_UpdateBottleSpec data_updateBottleSpec = gson.fromJson(JSONTokener(s), Data_UpdateBottleSpec.class);
-                List<Data_UpdateBottleSpec.ItemsBean> items = data_updateBottleSpec.getItems();
-                for (byte b = 0; b< items.size(); b++) {
-                    if (b < items.size()) {
-                        Data_UpdateBottleSpec.ItemsBean itemsBean = items.get(b);
-                        if (itemsBean.getNumber().equals(bottleCode)) {
-                            Logger.e("getSpec code : "+itemsBean.getSpec().getCode());
-                            m_BottlesSpecMap.put(bottleCode, itemsBean.getSpec().getCode());
-                            refleshBottlesListZP();
-                            refleshBottlesListKP();
-                            return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("updateBottleSpec: "+string);
+                            Gson gson = new Gson();
+                            Data_UpdateBottleSpec data_updateBottleSpec = gson.fromJson(JSONTokener(string), Data_UpdateBottleSpec.class);
+                            List<Data_UpdateBottleSpec.ItemsBean> items = data_updateBottleSpec.getItems();
+                            for (byte b = 0; b< items.size(); b++) {
+                                if (b < items.size()) {
+                                    Data_UpdateBottleSpec.ItemsBean itemsBean = items.get(b);
+                                    if (itemsBean.getNumber().equals(bottleCode)) {
+                                        Logger.e("getSpec code : "+itemsBean.getSpec().getCode());
+                                        m_BottlesSpecMap.put(bottleCode, itemsBean.getSpec().getCode());
+                                        refleshBottlesListZP();
+                                        refleshBottlesListKP();
+                                        return;
+                                    }
+                                } else {
+                                    return;
+                                }
+                            }
+                        }else{
+                            Toast.makeText(BottleExchangeActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
-                    } else {
-                        return;
+                    }else {
+                        Toast.makeText(BottleExchangeActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    Toast.makeText(BottleExchangeActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        }, nrc);
     }
 
     public String JSONTokener(String in) {

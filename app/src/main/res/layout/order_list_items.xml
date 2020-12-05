@@ -88,6 +88,7 @@
         n1:id="@+id/linearLayout_orderThird"
         n1:layout_width="fill_parent"
         n1:layout_height="wrap_content"
+        n1:gravity="center_vertical"
         n1:layout_below="@id/linearLayout_orderSecond"
         n1:orientation="horizontal">
 
@@ -95,19 +96,16 @@
             n1:id="@+id/items_addressStatic"
             n1:layout_width="wrap_content"
             n1:layout_height="wrap_content"
-            n1:layout_below="@id/linearLayout_orderSecond"
             n1:layout_marginLeft="16.0dip"
             n1:hint="地 址："
+            n1:layout_weight="1"
             n1:textColorHint="@color/textColorPrimary"
             n1:textSize="14.0sp" />
 
         <TextView
             n1:id="@+id/items_address"
-            n1:layout_width="fill_parent"
+            n1:layout_width="wrap_content"
             n1:layout_height="wrap_content"
-            n1:layout_below="@id/linearLayout_orderSecond"
-            n1:layout_toRightOf="@id/items_addressStatic"
-            n1:layout_weight="1"
             n1:textColor="@color/textColorPrimary"
             n1:textSize="14.0sp" />
 
@@ -115,11 +113,8 @@
             n1:id="@+id/items_orderStatus"
             n1:layout_width="80dip"
             n1:layout_height="30dip"
-            n1:layout_alignParentRight="true"
-            n1:layout_below="@id/items_address"
             n1:layout_marginRight="10.0dip"
             n1:singleLine="true"
-            n1:layout_marginTop="8.0dip"
             n1:gravity="center"
             n1:background="@drawable/ratio_button"
             n1:clickable="false"

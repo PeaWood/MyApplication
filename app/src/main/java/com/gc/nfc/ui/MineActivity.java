@@ -17,20 +17,20 @@ import android.widget.Toast;
 
 import com.gc.nfc.R;
 import com.gc.nfc.app.AppContext;
+import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_Mend;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
+import com.gc.nfc.interfaces.Netcallback;
 import com.google.gson.Gson;
 
-import java.io.IOException;
+import org.apache.http.HttpResponse;
+
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import okhttp3.Request;
-import okhttp3.Response;
 import q.rorbin.badgeview.Badge;
 import q.rorbin.badgeview.QBadgeView;
 
@@ -44,24 +44,36 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
     private void loginOut() {
         AppContext appContext = (AppContext) getApplicationContext();
         appContext.logout();
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/sysusers/logout/" + user.getUsername(), null, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(MineActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) {
-                if (response.code() == 200) {
-                    Intent intent = new Intent(MineActivity.this.getApplicationContext(), LoginActivity.class);
-                    MineActivity.this.startActivity(intent);
-                    MineActivity.this.finish();
-                    return;
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/sysusers/logout/" + user.getUsername();
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            Intent intent = new Intent(MineActivity.this.getApplicationContext(), LoginActivity.class);
+                            MineActivity.this.startActivity(intent);
+                            MineActivity.this.finish();
+                        }else{
+                            Toast.makeText(MineActivity.this, "退出登录失败！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(MineActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(MineActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                Toast.makeText(MineActivity.this, "退出登录失败", Toast.LENGTH_LONG).show();
             }
-        });
+        }, nrc);
     }
 
     private void showIdentification() {
@@ -219,31 +231,42 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
             startActivity(new Intent(this, AutoLoginActivity.class));
             finish();
         }
-        Map<String, String> map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/Mend";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("dealedUserId", user.getUsername());
         map.put("processStatus", "PTHandling");
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/Mend", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(MineActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(MineActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("refleshVaildMends: " + string);
+                            Gson gson = new Gson();
+                            Data_Mend dataMend = gson.fromJson(string, Data_Mend.class);
+                            int size = dataMend.getItems().size();
+                            badgeMends.setBadgeNumber(size);
+                            badgeMends.setBadgeGravity(Gravity.END | Gravity.TOP);
+                        }else{
+                            Toast.makeText(MineActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(MineActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(MineActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                String string = response.body().string();
-                Logger.e("refleshVaildMends: " + string);
-                Gson gson = new Gson();
-                Data_Mend dataMend = gson.fromJson(string, Data_Mend.class);
-                int size = dataMend.getItems().size();
-                badgeMends.setBadgeNumber(size);
-                badgeMends.setBadgeGravity(Gravity.END | Gravity.TOP);
             }
-        });
+        }, nrc);
     }
 
     /**
@@ -256,31 +279,42 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
             startActivity(new Intent(this, AutoLoginActivity.class));
             finish();
         }
-        Map<String, String> map = new HashMap();
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/Security";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("dealedUserId", user.getUsername());
         map.put("processStatus", "PTHandling");
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/Security", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(MineActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(MineActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("refleshVaildSecuritys: " + string);
+                            Gson gson = new Gson();
+                            Data_Mend mendData = gson.fromJson(string, Data_Mend.class);
+                            int size = mendData.getItems().size();
+                            badgeSecurity.setBadgeNumber(size);
+                            badgeSecurity.setBadgeGravity(Gravity.END | Gravity.TOP);
+                        }else{
+                            Toast.makeText(MineActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(MineActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(MineActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                String string = response.body().string();
-                Logger.e("refleshVaildSecuritys: " + string);
-                Gson gson = new Gson();
-                Data_Mend mendData = gson.fromJson(string, Data_Mend.class);
-                int size = mendData.getItems().size();
-                badgeSecurity.setBadgeNumber(size);
-                badgeSecurity.setBadgeGravity(Gravity.END | Gravity.TOP);
             }
-        });
+        }, nrc);
     }
 }
 

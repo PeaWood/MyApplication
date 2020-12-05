@@ -17,17 +17,17 @@ import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.MarkerOptions;
 import com.amap.api.maps2d.model.MyLocationStyle;
 import com.gc.nfc.R;
+import com.gc.nfc.common.NetRequestConstant;
+import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_SysUsers;
 import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
+import com.gc.nfc.interfaces.Netcallback;
 import com.google.gson.Gson;
 
-import java.io.IOException;
+import org.apache.http.HttpResponse;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class MapViewActivity extends BaseActivity {
     private AMap aMap;
@@ -46,42 +46,53 @@ public class MapViewActivity extends BaseActivity {
     };
 
     private void get_ps_location() {
-        Map<String, String> hashMap = new HashMap();
-        hashMap.put("aliveStatus", "1");
-        hashMap.put("groupCode", "00003");
-        hashMap.put("pageSize", "150");
-        hashMap.put("pageNo", "1");
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/sysusers/", hashMap, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(MapViewActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(MapViewActivity.this, "查询配送工位置失败", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                String string = response.body().string();
-                Logger.e("get_ps_location: " + string);
-                MapViewActivity.this.clean_marksers();
-                Gson gson = new Gson();
-                Data_SysUsers data_sysUsers = gson.fromJson(string, Data_SysUsers.class);
-                for (byte b = 0; b < data_sysUsers.getItems().size(); b++) {
-                    Data_SysUsers.ItemsBean itemsBean = data_sysUsers.getItems().get(b);
-                    String str1 = itemsBean.getUserId();
-                    String str2 = itemsBean.getName();
-                    Data_SysUsers.ItemsBean.UserPositionBean userPosition = itemsBean.getUserPosition();
-                    if (userPosition != null) {
-                        double d1 = userPosition.getLongitude();
-                        double d2 = userPosition.getLatitude();
-                        MapViewActivity.this.reflesh_makers(str1, str2, d1, d2);
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/sysusers/";
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("aliveStatus", "1");
+        map.put("groupCode", "00003");
+        map.put("pageSize", "150");
+        map.put("pageNo", "1");
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            String string = getString(response);
+                            Logger.e("get_ps_location: " + string);
+                            MapViewActivity.this.clean_marksers();
+                            Gson gson = new Gson();
+                            Data_SysUsers data_sysUsers = gson.fromJson(string, Data_SysUsers.class);
+                            for (int b = 0; b < data_sysUsers.getItems().size(); b++) {
+                                Data_SysUsers.ItemsBean itemsBean = data_sysUsers.getItems().get(b);
+                                String str1 = itemsBean.getUserId();
+                                String str2 = itemsBean.getName();
+                                Data_SysUsers.ItemsBean.UserPositionBean userPosition = itemsBean.getUserPosition();
+                                if (userPosition != null) {
+                                    double d1 = userPosition.getLongitude();
+                                    double d2 = userPosition.getLatitude();
+                                    MapViewActivity.this.reflesh_makers(str1, str2, d1, d2);
+                                }
+                            }
+                        }else{
+                            Toast.makeText(MapViewActivity.this, "无数据！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(MapViewActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    Toast.makeText(MapViewActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        }, nrc);
     }
 
     private void setUpMap() {

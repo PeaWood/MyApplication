@@ -1,22 +1,14 @@
 package com.gc.nfc.ui;
 
 import android.app.AlertDialog;
-import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.os.Process;
-import android.support.annotation.RequiresApi;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -30,63 +22,62 @@ import com.gc.nfc.app.AppContext;
 import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.User;
-import com.gc.nfc.http.OkHttpUtil;
+import com.gc.nfc.http.Logger;
 import com.gc.nfc.interfaces.Netcallback;
-//import com.gc.nfc.utils.AmapLocationService;
-//import com.gc.nfc.utils.OnePixelReceiver;
-import com.gc.nfc.utils.SharedPreferencesHelper;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
+import org.apache.http.HttpResponse;
+
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
-import okhttp3.Request;
-import okhttp3.Response;
+//import com.gc.nfc.utils.AmapLocationService;
+//import com.gc.nfc.utils.OnePixelReceiver;
 
 public class DiaoBoActivity extends BaseActivity implements View.OnClickListener {
     private AppContext appContext;
-
     private ImageView imageView_userQRcode;
-
     private LinearLayout lL_myAppVersion;
-
     private LinearLayout lL_myBottle;
-
     private LinearLayout lL_myLogout;
-
     private JobScheduler mJobScheduler;
-
-    //  private OnePixelReceiver mOnepxReceiver;
-
     private Intent m_IntentAmapServeice;
-
     private TextView textview_username;
-
     private User user;
 
     private void loginOut() {
-        AppContext appContext = (AppContext) DiaoBoActivity.this.getApplicationContext();
+        AppContext appContext = (AppContext) getApplicationContext();
         appContext.logout();
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/sysusers/logout/" + user.getUsername(), null, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(DiaoBoActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) {
-                if (response.code() == 200) {
-                    Intent intent = new Intent(DiaoBoActivity.this.getApplicationContext(), LoginActivity.class);
-                    DiaoBoActivity.this.startActivity(intent);
-                    DiaoBoActivity.this.finish();
-                    return;
+        NetRequestConstant nrc = new NetRequestConstant();
+        nrc.setType(HttpRequestType.GET);
+        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/sysusers/logout/" + user.getUsername();
+        nrc.context = this;
+        Map<String, Object> map = new HashMap<String, Object>();
+        nrc.setParams(map);
+        getServer(new Netcallback() {
+            public void preccess(Object res, boolean flag) {
+                Logger.e("http success :"+flag);
+                if(flag){
+                    HttpResponse response=(HttpResponse)res;
+                    if(response!=null){
+                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
+                        if(response.getStatusLine().getStatusCode()==200){
+                            Intent intent = new Intent(DiaoBoActivity.this.getApplicationContext(), LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            Toast.makeText(DiaoBoActivity.this, "退出登录失败！", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(DiaoBoActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(DiaoBoActivity.this, "网络未连接！",
+                            Toast.LENGTH_LONG).show();
                 }
-                Toast.makeText(DiaoBoActivity.this, "退出登录失败", Toast.LENGTH_LONG).show();
-                return;
             }
-        });
+        }, nrc);
     }
 
     private void showIdentification() {
@@ -203,40 +194,9 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
             e.printStackTrace();
         }
         isOpenGPS();
-        //    this.mOnepxReceiver = new OnePixelReceiver();
-        //    IntentFilter intentFilter = new IntentFilter();
-        //    intentFilter.addAction("android.intent.action.SCREEN_OFF");
-        //    intentFilter.addAction("android.intent.action.SCREEN_ON");
-        //    intentFilter.addAction("android.intent.action.USER_PRESENT");
-        //    registerReceiver((BroadcastReceiver)this.mOnepxReceiver, intentFilter);
-        //    startJobScheduler(this.user.getUsername());
     }
 
     public void onDestroy() {
-//        stopService(this.m_IntentAmapServeice);
         super.onDestroy();
-    }
-
-    @RequiresApi(21)
-    public void startJobScheduler(String paramString) {
-        this.mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        this.mJobScheduler.cancel(55);
-        //    JobInfo.Builder builder = new JobInfo.Builder(55, new ComponentName((Context)this, MyJobService.class));
-        //    if (Build.VERSION.SDK_INT >= 21) {
-        //      builder.setMinimumLatency(5000L);
-        //      builder.setOverrideDeadline(6000L);
-        //      builder.setBackoffCriteria(30000L, JobInfo.BACKOFF_POLICY_LINEAR);
-        //    } else {
-        //      builder.setPeriodic(30000L);
-        //    }
-        //    builder.setPersisted(true);
-        //    builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-        //    builder.setRequiresCharging(true);
-        //    PersistableBundle persistableBundle = new PersistableBundle();
-        //    persistableBundle.putString("servicename", AmapLocationService.class.getName());
-        //    persistableBundle.putString("userId", paramString);
-        //    builder.setExtras(persistableBundle);
-        //    JobInfo jobInfo = builder.build();
-        //    this.mJobScheduler.schedule(jobInfo);
     }
 }

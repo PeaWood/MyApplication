@@ -20,25 +20,16 @@ import com.gc.nfc.common.NetRequestConstant;
 import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.Data_User;
 import com.gc.nfc.domain.User;
-import com.gc.nfc.http.Logger;
-import com.gc.nfc.http.OkHttpUtil;
 import com.gc.nfc.interfaces.Netcallback;
 import com.gc.nfc.utils.JellyInterpolator;
 import com.gc.nfc.utils.NetUtil;
 import com.gc.nfc.utils.SharedPreferencesHelper;
 import com.google.gson.Gson;
 
-import java.io.IOException;
+import org.apache.http.HttpResponse;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class AutoLoginActivity extends BaseActivity {
     private ObjectAnimator m_animator;
@@ -69,40 +60,48 @@ public class AutoLoginActivity extends BaseActivity {
                     HttpResponse response = (HttpResponse) res;
                     if (response != null) {
                         if (response.getStatusLine().getStatusCode() == 200) {
-                            try {
-                                //设置登录会话的cookies
-                                NetUtil.setLoginCookies();
-                                JSONObject userJson = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
-                                JSONObject groupJson = userJson.getJSONObject("userGroup");
-                                JSONObject departmentJson = userJson.getJSONObject("department");
-                                String groupCode = groupJson.optString("code");
-                                String groupName = groupJson.optString("name");
-                                String departmentCode = departmentJson.optString("code");
-                                String departmentName = departmentJson.optString("name");
-                                Intent data = new Intent();
-                                data.putExtra("userId", name);
-                                AppContext appContext = (AppContext) getApplicationContext();
-                                User user = new User();
-                                user.setUsername(name);
-                                user.setPassword(password);
-                                user.setDepartmentCode(departmentCode);
-                                user.setDepartmentName(departmentName);
-                                user.setGroupCode(groupCode);
-                                user.setGroupName(groupName);
-                                appContext.setUser(user);
-                                setResult(12, data);
-                                SharedPreferencesHelper.put("username", name);
-                                SharedPreferencesHelper.put("password", password);
-                                MediaPlayer music = MediaPlayer.create(AutoLoginActivity.this, R.raw.start_working);
-                                music.start();
-                            } catch (IOException e) {
-                                Toast.makeText(AutoLoginActivity.this, "未知错误，异常！",
-                                        Toast.LENGTH_LONG).show();
-                            } catch (JSONException e) {
-                                Toast.makeText(AutoLoginActivity.this, "未知错误，异常！",
-                                        Toast.LENGTH_LONG).show();
+                            //设置登录会话的cookies
+                            NetUtil.setLoginCookies();
+                            Intent data = new Intent();
+                            data.putExtra("userId", name);
+                            setResult(12, data);
+                            SharedPreferencesHelper.put("username", name);
+                            SharedPreferencesHelper.put("password", password);
+                            MediaPlayer music = MediaPlayer.create(AutoLoginActivity.this, R.raw.start_working);
+                            music.start();
+                            Gson gson = new Gson();
+                            Data_User userdata = gson.fromJson(getString(response), Data_User.class);
+                            User user = new User();
+                            user.setUsername(name);
+                            user.setPassword(password);
+                            user.setDepartmentCode(userdata.getDepartment().getCode());
+                            user.setDepartmentName(userdata.getDepartment().getName());
+                            user.setGroupCode(userdata.getUserGroup().getCode());
+                            user.setGroupName(userdata.getUserGroup().getName());
+                            if (userdata.getGasTakeOverStatus() != null) {
+                                user.setScanType(userdata.getGasTakeOverStatus().getIndex());
+                            } else {
+                                user.setScanType(0);
                             }
-
+                            AppContext appContext = (AppContext) AutoLoginActivity.this
+                                .getApplicationContext();
+                            appContext.setUser(user);
+                            MediaPlayer.create(AutoLoginActivity.this, R.raw.start_working).start();
+                            if (user.getGroupCode().equals("00005") || user.getGroupCode().equals("00006")) {
+                                //StockManagerActivity
+                                Toast.makeText(AutoLoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            if (user.getGroupCode().equals("00003")) {
+                                Intent starter = new Intent(AutoLoginActivity.this, MainlyActivity.class);
+                                startActivity(starter);
+                                AutoLoginActivity.this.finish();
+                                return;
+                            }
+                            if (user.getGroupCode().equals("00007")) {
+                                //DiaoBoActivity
+                                Toast.makeText(AutoLoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
+                            }
                         } else {
                             Toast.makeText(AutoLoginActivity.this, "账号或密码不正确", Toast.LENGTH_LONG).show();
                         }
@@ -116,58 +115,6 @@ public class AutoLoginActivity extends BaseActivity {
                 }
             }
         }, nrc);
-        Map map = new HashMap();
-        map.put("userId", name);
-        map.put("password", password);
-        OkHttpUtil util = OkHttpUtil.getInstance(this);
-        util.GET(OkHttpUtil.URL + "/sysusers/login", map, new OkHttpUtil.ResultCallback() {
-            @Override
-            public void onError(Request request, Exception e) {
-                Toast.makeText(AutoLoginActivity.this, "网络连接错误！", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                if (response.code() != 200) {
-                    Toast.makeText(AutoLoginActivity.this, "无数据！", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                String string = response.body().string();
-                Logger.e("login: " + string);
-                Gson gson = new Gson();
-                Data_User userdata = gson.fromJson(string, Data_User.class);
-                User user = new User();
-                user.setUsername(name);
-                user.setPassword(password);
-                user.setDepartmentCode(userdata.getDepartment().getCode());
-                user.setDepartmentName(userdata.getDepartment().getName());
-                user.setGroupCode(userdata.getUserGroup().getCode());
-                user.setGroupName(userdata.getUserGroup().getName());
-                if (userdata.getGasTakeOverStatus() != null) {
-                    user.setScanType(userdata.getGasTakeOverStatus().getIndex());
-                } else {
-                    user.setScanType(0);
-                }
-                AppContext appContext = (AppContext) AutoLoginActivity.this.getApplicationContext();
-                appContext.setUser(user);
-                MediaPlayer.create(AutoLoginActivity.this, R.raw.start_working).start();
-                if (user.getGroupCode().equals("00005") || user.getGroupCode().equals("00006")) {
-                    //StockManagerActivity
-                    Toast.makeText(AutoLoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (user.getGroupCode().equals("00003")) {
-                    Intent starter = new Intent(AutoLoginActivity.this, MainlyActivity.class);
-                    startActivity(starter);
-                    AutoLoginActivity.this.finish();
-                    return;
-                }
-                if (user.getGroupCode().equals("00007")) {
-                    //DiaoBoActivity
-                    Toast.makeText(AutoLoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
     }
 
     private void inputAnimator() {
