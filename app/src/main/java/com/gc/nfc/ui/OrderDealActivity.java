@@ -790,7 +790,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             m_BottlesMapZPL = (Map<String, String>) JSON.parseObject(str2, typeReference1, new com.alibaba.fastjson.parser.Feature[0]);
             m_yjys = bundle.getString("YJD_YS");
             m_yjss = bundle.getString("YJD_SS");
-            TextView textView3 = (TextView) findViewById(R.id.textview_SSFee);//押金实收（不太确定是不是这个id）
+            TextView textView3 = (TextView) findViewById(R.id.textview_YJSSFee);
             StringBuilder stringBuilder2 = new StringBuilder();
             textView3.setText(stringBuilder2.append(m_yjss).append("元 (现金或门店二维码收取)").toString());
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -826,7 +826,7 @@ public class OrderDealActivity extends BaseActivity implements View.OnClickListe
             textView1.setText(stringBuilder3.append("￥").append(m_totalFee).toString());
             double i = Double.valueOf(m_totalFee);
             double j = Double.valueOf(m_yjss);
-            TextView textView2 = (TextView) findViewById(R.id.textview_YJSSFee);//钢瓶其他费用（不太确定是不是这个id）
+            TextView textView2 = (TextView) findViewById(R.id.textview_SSFee);//钢瓶其他费用（不太确定是不是这个id）
             StringBuilder stringBuilder1 = new StringBuilder();
             textView2.setText(stringBuilder1.append(i + j).append("元").toString());
             swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.main_srl);

@@ -324,8 +324,8 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
                             Toast.makeText(MainlyActivity.this, "网络连接失败！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(MainlyActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MainlyActivity.this, "未知错误，异常2！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(MainlyActivity.this, "网络未连接！",
@@ -365,8 +365,8 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
                             Toast.makeText(MainlyActivity.this, "网络连接失败！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(MainlyActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MainlyActivity.this, "未知错误，异常3！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(MainlyActivity.this, "网络未连接！",
@@ -405,8 +405,8 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
                             Toast.makeText(MainlyActivity.this, "网络连接失败！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(MainlyActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MainlyActivity.this, "未知错误，异常1！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(MainlyActivity.this, "网络未连接！",

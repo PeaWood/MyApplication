@@ -114,8 +114,8 @@ public class MyMendActivity extends BaseActivity implements View.OnClickListener
                             Toast.makeText(MyMendActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(MyMendActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MyMendActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(MyMendActivity.this, "网络未连接！",

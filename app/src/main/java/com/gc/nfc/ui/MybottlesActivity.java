@@ -98,8 +98,8 @@ public class MybottlesActivity extends BaseActivity implements View.OnClickListe
                             Toast.makeText(MybottlesActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(MybottlesActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MybottlesActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(MybottlesActivity.this, "网络未连接！",

@@ -96,8 +96,8 @@ public class ValidOrdersActivity extends BaseActivity {
                             Toast.makeText(ValidOrdersActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(ValidOrdersActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(ValidOrdersActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(ValidOrdersActivity.this, "网络未连接！",
@@ -141,12 +141,16 @@ public class ValidOrdersActivity extends BaseActivity {
                 strings[3] = "已结束";
                 strings[4] = "已作废";
                 hashMap.put("orderStatus", strings[orderStatus]);
-                if (itemsBean.getObject().getCustomer().getSettlementType().getCode().equals("00003")) {
-                    hashMap.put("userIcon", R.mipmap.icon_ticket_user);
-                } else if (itemsBean.getObject().getCustomer().getSettlementType().getCode().equals("00002")) {
-                    hashMap.put("userIcon", R.mipmap.icon_month_user);
-                } else {
+                if(itemsBean.getObject().getCustomer()==null){
                     hashMap.put("userIcon", R.mipmap.icon_common_user);
+                }else{
+                    if (itemsBean.getObject().getCustomer().getSettlementType().getCode().equals("00003")) {
+                        hashMap.put("userIcon", R.mipmap.icon_ticket_user);
+                    } else if (itemsBean.getObject().getCustomer().getSettlementType().getCode().equals("00002")) {
+                        hashMap.put("userIcon", R.mipmap.icon_month_user);
+                    } else {
+                        hashMap.put("userIcon", R.mipmap.icon_common_user);
+                    }
                 }
                 if (itemsBean.getObject().isUrgent()) {
                     hashMap.put("urgent", "加急");

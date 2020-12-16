@@ -215,8 +215,8 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
                             Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(TrayOrderDealActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(TrayOrderDealActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(TrayOrderDealActivity.this, "网络未连接！",
@@ -606,6 +606,9 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
             double d1 = double_1.doubleValue();
             double d2 = double_3.doubleValue();
             double d3 = double_2.doubleValue();
+            Logger.e("d1"+" "+d1);
+            Logger.e("d2"+" "+d2);
+            Logger.e("d3"+" "+d3);
             TextView textView2 = m_textViewCouponAmount;
             StringBuilder stringBuilder2 = new StringBuilder();
             textView2.setText(stringBuilder2.append("￥").append(String.format("%.2f", new Object[]{Double.valueOf(d1 - d2 - d3)})).toString());
@@ -853,8 +856,8 @@ public class TrayOrderDealActivity extends BaseActivity implements View.OnClickL
                             Toast.makeText(TrayOrderDealActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(TrayOrderDealActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(TrayOrderDealActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(TrayOrderDealActivity.this, "网络未连接！",

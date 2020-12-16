@@ -102,8 +102,8 @@ public class MyOrdersActivity extends BaseActivity implements AbsListView.OnScro
                             Toast.makeText(MyOrdersActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(MyOrdersActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MyOrdersActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(MyOrdersActivity.this, "网络未连接！",

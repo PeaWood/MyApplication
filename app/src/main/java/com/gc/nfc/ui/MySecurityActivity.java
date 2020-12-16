@@ -117,8 +117,8 @@ public class MySecurityActivity extends BaseActivity {
                             Toast.makeText(MySecurityActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(MySecurityActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MySecurityActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(MySecurityActivity.this, "网络未连接！",

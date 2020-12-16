@@ -65,8 +65,8 @@ public class MineActivity extends BaseActivity implements View.OnClickListener {
                             Toast.makeText(MineActivity.this, "退出登录失败！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(MineActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MineActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(MineActivity.this, "网络未连接！",

@@ -129,8 +129,8 @@ public class HistoryOrdersActivity extends BaseActivity {
                             Toast.makeText(HistoryOrdersActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(HistoryOrdersActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(HistoryOrdersActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(HistoryOrdersActivity.this, "网络未连接！",

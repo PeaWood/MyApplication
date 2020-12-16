@@ -69,8 +69,8 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
                             Toast.makeText(DiaoBoActivity.this, "退出登录失败！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(DiaoBoActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(DiaoBoActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(DiaoBoActivity.this, "网络未连接！",

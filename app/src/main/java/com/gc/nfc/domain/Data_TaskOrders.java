@@ -195,7 +195,7 @@ public class Data_TaskOrders {
             private Object completeTime;
             private String createTime;
             private String updateTime;
-            private int dispatchFee;
+            private double dispatchFee;
             private OperUserBean operUser;
             private List<?> gasRefoundDetailList;
             private List<OrderDetailListBean> orderDetailList;
@@ -504,11 +504,11 @@ public class Data_TaskOrders {
                 this.updateTime = updateTime;
             }
 
-            public int getDispatchFee() {
+            public double getDispatchFee() {
                 return dispatchFee;
             }
 
-            public void setDispatchFee(int dispatchFee) {
+            public void setDispatchFee(double dispatchFee) {
                 this.dispatchFee = dispatchFee;
             }
 
@@ -1754,7 +1754,7 @@ public class Data_TaskOrders {
                 private int dealPrice;
                 private int quantity;
                 private int subtotal;
-                private int dispatchFee;
+                private double dispatchFee;
                 private int tenancyIdx;
                 private String createTime;
                 private String updateTime;
@@ -1815,11 +1815,11 @@ public class Data_TaskOrders {
                     this.subtotal = subtotal;
                 }
 
-                public int getDispatchFee() {
+                public double getDispatchFee() {
                     return dispatchFee;
                 }
 
-                public void setDispatchFee(int dispatchFee) {
+                public void setDispatchFee(double dispatchFee) {
                     this.dispatchFee = dispatchFee;
                 }
 
@@ -1873,8 +1873,8 @@ public class Data_TaskOrders {
                     private String name;
                     private String specifications;
                     private String unit;
-                    private int weight;
-                    private int price;
+                    private double weight;
+                    private double price;
                     private Object realPrice;
                     private GasCylinderSpecBean gasCylinderSpec;
                     private int status;
@@ -1886,7 +1886,7 @@ public class Data_TaskOrders {
                     private String createTime;
                     private String updateTime;
 
-                    public int getId() {
+                    public double getId() {
                         return id;
                     }
 
@@ -1926,19 +1926,19 @@ public class Data_TaskOrders {
                         this.unit = unit;
                     }
 
-                    public int getWeight() {
+                    public double getWeight() {
                         return weight;
                     }
 
-                    public void setWeight(int weight) {
+                    public void setWeight(double weight) {
                         this.weight = weight;
                     }
 
-                    public int getPrice() {
+                    public double getPrice() {
                         return price;
                     }
 
-                    public void setPrice(int price) {
+                    public void setPrice(double price) {
                         this.price = price;
                     }
 

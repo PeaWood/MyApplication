@@ -122,8 +122,8 @@ public class HistoryCheckActivity extends BaseActivity {
                             Toast.makeText(HistoryCheckActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(HistoryCheckActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(HistoryCheckActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(HistoryCheckActivity.this, "网络未连接！",

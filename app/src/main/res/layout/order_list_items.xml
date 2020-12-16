@@ -91,23 +91,28 @@
         n1:gravity="center_vertical"
         n1:layout_below="@id/linearLayout_orderSecond"
         n1:orientation="horizontal">
-
-        <TextView
-            n1:id="@+id/items_addressStatic"
+        <LinearLayout
             n1:layout_width="wrap_content"
             n1:layout_height="wrap_content"
-            n1:layout_marginLeft="16.0dip"
-            n1:hint="地 址："
+            n1:orientation="horizontal"
             n1:layout_weight="1"
-            n1:textColorHint="@color/textColorPrimary"
-            n1:textSize="14.0sp" />
+            n1:layout_gravity="center_vertical">
+            <TextView
+                n1:id="@+id/items_addressStatic"
+                n1:layout_width="wrap_content"
+                n1:layout_height="wrap_content"
+                n1:layout_marginLeft="16.0dip"
+                n1:hint="地 址："
+                n1:textColorHint="@color/textColorPrimary"
+                n1:textSize="14.0sp" />
 
-        <TextView
-            n1:id="@+id/items_address"
-            n1:layout_width="wrap_content"
-            n1:layout_height="wrap_content"
-            n1:textColor="@color/textColorPrimary"
-            n1:textSize="14.0sp" />
+            <TextView
+                n1:id="@+id/items_address"
+                n1:layout_width="wrap_content"
+                n1:layout_height="wrap_content"
+                n1:textColor="@color/textColorPrimary"
+                n1:textSize="14.0sp" />
+        </LinearLayout>
 
         <TextView
             n1:id="@+id/items_orderStatus"

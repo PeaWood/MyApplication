@@ -155,8 +155,8 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
                             Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(OrderDetailActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(OrderDetailActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(OrderDetailActivity.this, "网络未连接！",
@@ -199,8 +199,8 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
                             Toast.makeText(OrderDetailActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(OrderDetailActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(OrderDetailActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(OrderDetailActivity.this, "网络未连接！",
@@ -263,8 +263,8 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
                             }
                         }
                     }else {
-                        Toast.makeText(OrderDetailActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(OrderDetailActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(OrderDetailActivity.this, "网络未连接！",

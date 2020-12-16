@@ -117,8 +117,8 @@ public class MyCheckActivity extends BaseActivity {
                             Toast.makeText(MyCheckActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(MyCheckActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MyCheckActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(MyCheckActivity.this, "网络未连接！",

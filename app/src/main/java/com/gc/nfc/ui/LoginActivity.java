@@ -121,8 +121,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             Toast.makeText(LoginActivity.this, "账号或密码不正确", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(LoginActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(LoginActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(LoginActivity.this, "网络未连接！",

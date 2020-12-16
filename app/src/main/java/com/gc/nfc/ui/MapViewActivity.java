@@ -84,8 +84,8 @@ public class MapViewActivity extends BaseActivity {
                             Toast.makeText(MapViewActivity.this, "无数据！", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        Toast.makeText(MapViewActivity.this, "未知错误，异常！",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MapViewActivity.this, "未知错误，异常！",
+//                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(MapViewActivity.this, "网络未连接！",
