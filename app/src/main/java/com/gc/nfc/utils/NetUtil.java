@@ -114,7 +114,7 @@ public class NetUtil {
 				bodyJson.put(entry.getKey(), entry.getValue());
 			}
 
-			StringEntity stringEntity = new StringEntity(bodyJson.toString());
+			StringEntity stringEntity = new StringEntity(bodyJson.toString(), "UTF-8");
 			//stringEntity.setContentEncoding("UTF-8");
 			stringEntity.setContentType("application/json");
 
@@ -168,23 +168,23 @@ public class NetUtil {
 				requestUrl += "?" + EntityUtils.toString(new UrlEncodedFormEntity(pairs, "UTF-8"));
 			}
 			HttpPut httpRequest=new HttpPut(requestUrl);
-			httpRequest.setHeader("Content-Type", "application/json");
+			httpRequest.setHeader("Content-Type", "application/json;chartset=utf-8");
 
 			//发送请求的参数
 			if(nrc.body!=null){
 				Map<String, Object> body = nrc.body;
 				if (body.size() == 1 && nrc.isBodyJsonArray) {
 					JSONArray jSONArray = (JSONArray)body.get("jsonArray");
-					StringEntity stringEntity = new StringEntity(jSONArray.toString());
-					stringEntity.setContentType("application/json");
+					StringEntity stringEntity = new StringEntity(jSONArray.toString(), "UTF-8");
+					stringEntity.setContentType("application/json;");
 					httpRequest.setEntity(stringEntity);
 				} else{
 					JSONObject bodyJson = new JSONObject();  ;
 					for(Map.Entry<String, Object> entry : body.entrySet()){
 						bodyJson.put(entry.getKey(), entry.getValue());
 					}
-					StringEntity stringEntity = new StringEntity(bodyJson.toString());
-					stringEntity.setContentType("application/json");
+					StringEntity stringEntity = new StringEntity(bodyJson.toString(), "UTF-8");
+					stringEntity.setContentType("application/json;");
 					httpRequest.setEntity(stringEntity);
 				}
 			}
