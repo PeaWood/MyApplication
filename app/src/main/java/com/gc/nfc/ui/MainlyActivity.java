@@ -1,15 +1,22 @@
 package com.gc.nfc.ui;
 
 import android.app.AlertDialog;
+import android.app.Service;
 import android.app.TabActivity;
+import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.StrictMode;
 import android.support.annotation.RequiresApi;
@@ -33,7 +40,10 @@ import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.http.ThreadPool;
 import com.gc.nfc.interfaces.Netcallback;
+import com.gc.nfc.service.AmapLocationService;
+import com.gc.nfc.service.MyJobService;
 import com.gc.nfc.utils.NetUtil;
+import com.gc.nfc.utils.SharedPreferencesHelper;
 import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
@@ -67,6 +77,7 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
     private TextView text_mycheck;
     private TextView text_myorders;
     private TextView text_validorders;
+    private String m_userId;
 
     private void addAlias(String paramString) {
     }
@@ -264,6 +275,7 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
         setValidOrdersTab();
         setMyOrdersTab();
         setMyCheckTab();
+        this.m_userId = (String)SharedPreferencesHelper.get("username", "default");
         paramBundle = getIntent().getExtras();
         if (paramBundle == null) {
             this.host.setCurrentTabByTag("MYSELF_STRING");
@@ -278,6 +290,11 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
             }
         }
         initialCloudPushService();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.intent.action.SCREEN_OFF");
+        intentFilter.addAction("android.intent.action.SCREEN_ON");
+        intentFilter.addAction("android.intent.action.USER_PRESENT");
+        startJobScheduler(this.m_userId);
     }
 
     public void onDestroy() {
@@ -487,5 +504,28 @@ public class MainlyActivity extends TabActivity implements View.OnClickListener 
         } catch (IOException e) {
             return null;
         }
+    }
+
+    @RequiresApi(21)
+    public void startJobScheduler(String paramString) {
+        this.mJobScheduler = (JobScheduler) getSystemService(Service.JOB_SCHEDULER_SERVICE);
+        this.mJobScheduler.cancel(55);
+        JobInfo.Builder builder = new JobInfo.Builder(55, new ComponentName((Context) this, MyJobService.class));
+        if (Build.VERSION.SDK_INT >= 21) {
+            builder.setMinimumLatency(5000L);
+            builder.setOverrideDeadline(6000L);
+            builder.setBackoffCriteria(30000L, JobInfo.BACKOFF_POLICY_LINEAR);
+        } else {
+            builder.setPeriodic(30000L);
+        }
+        builder.setPersisted(true);
+        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+        builder.setRequiresCharging(true);
+        PersistableBundle persistableBundle = new PersistableBundle();
+        persistableBundle.putString("servicename", AmapLocationService.class.getName());
+        persistableBundle.putString("userId", paramString);
+        builder.setExtras(persistableBundle);
+        JobInfo jobInfo = builder.build();
+        this.mJobScheduler.schedule(jobInfo);
     }
 }

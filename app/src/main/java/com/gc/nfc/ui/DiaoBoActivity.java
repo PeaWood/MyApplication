@@ -1,14 +1,21 @@
 package com.gc.nfc.ui;
 
 import android.app.AlertDialog;
+import android.app.Service;
+import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.os.Process;
+import android.support.annotation.RequiresApi;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -24,6 +31,8 @@ import com.gc.nfc.common.NetUrlConstant;
 import com.gc.nfc.domain.User;
 import com.gc.nfc.http.Logger;
 import com.gc.nfc.interfaces.Netcallback;
+import com.gc.nfc.service.AmapLocationService;
+import com.gc.nfc.service.MyJobService;
 
 import org.apache.http.HttpResponse;
 
@@ -50,27 +59,27 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
         appContext.logout();
         NetRequestConstant nrc = new NetRequestConstant();
         nrc.setType(HttpRequestType.GET);
-        nrc.requestUrl = NetUrlConstant.BASEURL+"/api" + "/sysusers/logout/" + user.getUsername();
+        nrc.requestUrl = NetUrlConstant.BASEURL + "/api" + "/sysusers/logout/" + user.getUsername();
         nrc.context = this;
         Map<String, Object> map = new HashMap<String, Object>();
         nrc.setParams(map);
         getServer(new Netcallback() {
             public void preccess(Object res, boolean flag) {
-                Logger.e("http success :"+flag);
-                if(flag){
-                    HttpResponse response=(HttpResponse)res;
-                    if(response!=null){
-                        Logger.e("http statuscode :"+response.getStatusLine().getStatusCode());
-                        if(response.getStatusLine().getStatusCode()==200){
+                Logger.e("http success :" + flag);
+                if (flag) {
+                    HttpResponse response = (HttpResponse) res;
+                    if (response != null) {
+                        Logger.e("http statuscode :" + response.getStatusLine().getStatusCode());
+                        if (response.getStatusLine().getStatusCode() == 200) {
                             Intent intent = new Intent(DiaoBoActivity.this.getApplicationContext(), LoginActivity.class);
                             startActivity(intent);
                             finish();
-                        }else{
+                        } else {
                             Toast.makeText(DiaoBoActivity.this, "退出登录失败！", Toast.LENGTH_LONG).show();
                         }
-                    }else {
-//                        Toast.makeText(DiaoBoActivity.this, "未知错误，异常！",
-//                                Toast.LENGTH_LONG).show();
+                    } else {
+                        //                        Toast.makeText(DiaoBoActivity.this, "未知错误，异常！",
+                        //                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(DiaoBoActivity.this, "网络未连接！",
@@ -84,7 +93,7 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
         AlertDialog.Builder builder = new AlertDialog.Builder((Context) this);
         View view = View.inflate((Context) this, R.layout.pay_on_scan, null);
         ImageView imageView = (ImageView) view.findViewById(R.id.items_imageViewScanCode);
-        String str = NetUrlConstant.BASEURL+"/api/pay/QRCode?text=" + user.getUsername();
+        String str = NetUrlConstant.BASEURL + "/api/pay/QRCode?text=" + user.getUsername();
         try {
             URL uRL = new URL(str);
             imageView.setImageBitmap(BitmapFactory.decodeStream(uRL.openStream()));
@@ -111,7 +120,7 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
         if (paramKeyEvent.getKeyCode() == 4 && paramKeyEvent.getRepeatCount() == 0 && paramKeyEvent.getAction() == 0) {
             (new AlertDialog.Builder((Context) this)).setTitle("提示").setMessage("确认退出吗？").setIcon(R.drawable.icon_logo).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface param1DialogInterface, int param1Int) {
-//                    DiaoBoActivity.this.stopService(DiaoBoActivity.this.m_IntentAmapServeice);
+                    //                    DiaoBoActivity.this.stopService(DiaoBoActivity.this.m_IntentAmapServeice);
                     Process.killProcess(Process.myPid());
                 }
             }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -137,17 +146,17 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
     }
 
     public void isOpenGPS() {
-        //    if (!((LocationManager)getSystemService("location")).isProviderEnabled("gps")) {
-        //      AlertDialog.Builder builder = new AlertDialog.Builder((Context)this);
-        //      builder.setMessage("GPS未打开，本配送程序必须打开!");
-        //      builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-        //            public void onClick(DialogInterface param1DialogInterface, int param1Int) {
-        //              Intent intent = new Intent("android.settings.LOCATION_SOURCE_SETTINGS");
-        //              DiaoBoActivity.this.startActivityForResult(intent, 0);
-        //            }
-        //          });
-        //      builder.show();
-        //    }
+        if (!((LocationManager) getSystemService(Service.LOCATION_SERVICE)).isProviderEnabled("gps")) {
+            AlertDialog.Builder builder = new AlertDialog.Builder((Context) this);
+            builder.setMessage("GPS未打开，本配送程序必须打开!");
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface param1DialogInterface, int param1Int) {
+                    Intent intent = new Intent("android.settings.LOCATION_SOURCE_SETTINGS");
+                    DiaoBoActivity.this.startActivityForResult(intent, 0);
+                }
+            });
+            builder.show();
+        }
     }
 
     public void onClick(View paramView) {
@@ -173,6 +182,7 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void onCreate(Bundle paramBundle) {
         super.onCreate(paramBundle);
         this.appContext = (AppContext) getApplicationContext();
@@ -185,7 +195,7 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
         }
         String name = this.user.getUsername();
         this.textview_username.setText(name + "\n(" + this.user.getGroupName() + "|" + this.user.getDepartmentName() + ")");
-        String str = NetUrlConstant.BASEURL+"/api/pay/QRCode?text=" + name;
+        String str = NetUrlConstant.BASEURL + "/api/pay/QRCode?text=" + name;
         try {
             URL uRL = new URL(str);
             Bitmap bitmap = BitmapFactory.decodeStream(uRL.openStream());
@@ -194,9 +204,33 @@ public class DiaoBoActivity extends BaseActivity implements View.OnClickListener
             e.printStackTrace();
         }
         isOpenGPS();
+        startJobScheduler(this.user.getUsername());
     }
 
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @RequiresApi(21)
+    public void startJobScheduler(String paramString) {
+        this.mJobScheduler = (JobScheduler) getSystemService(Service.JOB_SCHEDULER_SERVICE);
+        this.mJobScheduler.cancel(55);
+        JobInfo.Builder builder = new JobInfo.Builder(55, new ComponentName((Context) this, MyJobService.class));
+        if (Build.VERSION.SDK_INT >= 21) {
+            builder.setMinimumLatency(5000L);
+            builder.setOverrideDeadline(6000L);
+            builder.setBackoffCriteria(30000L, JobInfo.BACKOFF_POLICY_LINEAR);
+        } else {
+            builder.setPeriodic(30000L);
+        }
+        builder.setPersisted(true);
+        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+        builder.setRequiresCharging(true);
+        PersistableBundle persistableBundle = new PersistableBundle();
+        persistableBundle.putString("servicename", AmapLocationService.class.getName());
+        persistableBundle.putString("userId", paramString);
+        builder.setExtras(persistableBundle);
+        JobInfo jobInfo = builder.build();
+        this.mJobScheduler.schedule(jobInfo);
     }
 }

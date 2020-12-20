@@ -54,8 +54,8 @@
 
     <permission
         android:name="com.gc.nfc.permission.MIPUSH_RECEIVE"
-        tools:replace="android:protectionLevel"
-        android:protectionLevel="signatureOrSystem" />
+        android:protectionLevel="signatureOrSystem"
+        tools:replace="android:protectionLevel" />
     <permission
         android:name="com.gc.nfc.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
@@ -63,37 +63,49 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
+        android:name=".app.AppContext"
         android:allowBackup="true"
+        android:appComponentFactory="111"
         android:icon="@drawable/icon_app_cetc"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:name=".app.AppContext"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-        tools:replace="android:appComponentFactory"
-        android:appComponentFactory="111"
         android:networkSecurityConfig="@xml/network_security_config"
-        tools:ignore="GoogleAppIndexingWarning">
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:appComponentFactory">
 
-        <meta-data android:name="com.amap.api.v2.apikey"
-            android:value="ffda4c68ede19c14999d37d75ab1d20a"/>
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="ffda4c68ede19c14999d37d75ab1d20a" />
 
-        <service android:name="com.amap.api.location.APSService"/>
+        <service android:name="com.amap.api.location.APSService" />
 
-        <meta-data android:name="com.alibaba.app.appkey"
-            android:value="27568238"/> <!-- 请填写你自己的- appKey -->
+        <meta-data
+            android:name="com.alibaba.app.appkey"
+            android:value="27568238" /> <!-- 请填写你自己的- appKey -->
 
-        <meta-data android:name="com.alibaba.app.appsecret"
-            android:value="4426d78842565ad66df7d712915cf59d"/> <!-- 请填写你自己的appSecret -->
+        <meta-data
+            android:name="com.alibaba.app.appsecret"
+            android:value="4426d78842565ad66df7d712915cf59d" /> <!-- 请填写你自己的appSecret -->
 
         <!--<service android:name="com.dk.bleNfc.BleNfcDeviceService"/>-->
-        <!--<service android:enabled="true" android:exported="true" android:name="com.gc.nfc.utils.AmapLocationService"/>-->
+        <service
+            android:name="com.gc.nfc.service.AmapLocationService"
+            android:enabled="true"
+            android:exported="true" />
 
-        <provider android:authorities="com.gc.nfc.provider"
-                   android:exported="false"
-                   android:grantUriPermissions="true"
-                   android:name="com.luck.picture.lib.PictureFileProvider">
-            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
-                   android:resource="@xml/file_paths"/>
+        <service
+            android:name="com.gc.nfc.service.MyJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <provider
+            android:name="com.luck.picture.lib.PictureFileProvider"
+            android:authorities="com.gc.nfc.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
         </provider>
 
         <receiver
@@ -109,9 +121,11 @@
                 <action android:name="com.alibaba.sdk.android.push.RECEIVE" />
             </intent-filter>
         </receiver>
-        <activity android:configChanges="keyboardHidden|orientation|screenSize"
+
+        <activity
             android:name="com.amap.api.navi.AmapRouteActivity"
-            android:theme="@android:style/Theme.NoTitleBar"/>
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.NoTitleBar" />
         <activity
             android:name="com.gc.nfc.ui.WelcomeActivity"
             android:launchMode="singleTop"
@@ -227,12 +241,12 @@
             android:name=".ui.SecurityDetailActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
+        <activity android:name=".ui.QianZiActivity" />
         <activity
-            android:name=".ui.QianZiActivity"/>
-        <activity android:label="空瓶回收"
-            android:launchMode="singleTop"
             android:name=".ui.BottleRecycleActivity"
-            android:screenOrientation="portrait"/>
+            android:label="空瓶回收"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.DiaoBoActivity"
             android:launchMode="singleTop"
