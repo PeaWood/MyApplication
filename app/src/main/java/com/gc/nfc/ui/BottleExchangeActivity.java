@@ -1255,6 +1255,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             for (byte b = 0; b < jSONArray.length(); b++) {
                 JSONObject jSONObject = jSONArray.getJSONObject(b);
                 int weight = jSONObject.getJSONObject("goods").getInt("specifications");
+                Logger.e("weight specifications = "+weight);
                 if(weight==5){
                     size5++;
                     zpsize5++;
@@ -1333,8 +1334,6 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            showToast("数据异常");
-            return false;
         }
         return true;
     }

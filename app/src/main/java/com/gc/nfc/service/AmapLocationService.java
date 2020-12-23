@@ -43,6 +43,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -150,8 +151,15 @@ public class AmapLocationService extends Service {
                 defaultHttpClient.setCookieStore(NetUtil.m_loginCookies);
             }
             HttpResponse httpResponse = defaultHttpClient.execute((HttpUriRequest) httpPost);
-            if (httpResponse != null && httpResponse.getStatusLine().getStatusCode() == 200)
+            if (httpResponse != null && httpResponse.getStatusLine().getStatusCode() == 200){
+                Logger.e(str);
+                Logger.e(paramLatLng.longitude);
+                Logger.e(paramLatLng.latitude);
                 Logger.e("send");
+                Logger.e(httpResponse.getStatusLine().toString());
+                String s = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+                Logger.e(s);
+            }
         } catch (UnsupportedEncodingException unsupportedEncodingException) {
             unsupportedEncodingException.printStackTrace();
         } catch (Exception e) {
