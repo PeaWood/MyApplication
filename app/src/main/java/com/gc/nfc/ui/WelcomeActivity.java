@@ -19,7 +19,7 @@ public class WelcomeActivity extends Activity {
     };
   
   public void getHome() {
-    startActivity(new Intent(this, LoginActivity.class));
+    startActivity(new Intent(this, AutoLoginActivity.class));
     finish();
   }
   

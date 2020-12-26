@@ -795,7 +795,7 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
                     return false;
                 }
                 if (str2.equals(str))
-                    integer1 = Integer.valueOf(stringBuilder.toString()) + 1;
+                    integer1 +=  1;
             }
             if (!integer1.equals(integer2)) {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -1255,16 +1255,17 @@ public class BottleExchangeActivity extends BaseActivity implements View.OnClick
             for (byte b = 0; b < jSONArray.length(); b++) {
                 JSONObject jSONObject = jSONArray.getJSONObject(b);
                 int weight = jSONObject.getJSONObject("goods").getInt("specifications");
-                Logger.e("weight specifications = "+weight);
+                int quantity = jSONObject.getInt("quantity");
+                Logger.e("weight specifications = "+weight+" quantity="+quantity);
                 if(weight==5){
-                    size5++;
-                    zpsize5++;
+                    size5+=quantity;
+                    zpsize5+=quantity;
                 }else if(weight==15){
-                    size15++;
-                    zpsize15++;
+                    size15+=quantity;
+                    zpsize15+=quantity;
                 }else if(weight==50){
-                    size50++;
-                    zpsize50++;
+                    size50+=quantity;
+                    zpsize50+=quantity;
                 }
             }
             Logger.e("空瓶和重瓶数量: "+"5KG "+size5);

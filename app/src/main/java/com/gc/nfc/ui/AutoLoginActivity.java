@@ -88,8 +88,9 @@ public class AutoLoginActivity extends BaseActivity {
                             appContext.setUser(user);
                             MediaPlayer.create(AutoLoginActivity.this, R.raw.start_working).start();
                             if (user.getGroupCode().equals("00005") || user.getGroupCode().equals("00006")) {
-                                //StockManagerActivity
-                                Toast.makeText(AutoLoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
+                                Intent starter = new Intent(AutoLoginActivity.this, StockManagerActivity.class);
+                                startActivity(starter);
+                                AutoLoginActivity.this.finish();
                                 return;
                             }
                             if (user.getGroupCode().equals("00003")) {
@@ -99,19 +100,30 @@ public class AutoLoginActivity extends BaseActivity {
                                 return;
                             }
                             if (user.getGroupCode().equals("00007")) {
-                                //DiaoBoActivity
-                                Toast.makeText(AutoLoginActivity.this, "更换角色！", Toast.LENGTH_LONG).show();
+                                //调拨员
+                                Intent starter = new Intent(AutoLoginActivity.this, DiaoBoActivity.class);
+                                startActivity(starter);
+                                AutoLoginActivity.this.finish();
                             }
                         } else {
                             Toast.makeText(AutoLoginActivity.this, "账号或密码不正确", Toast.LENGTH_LONG).show();
+                            Intent starter = new Intent(AutoLoginActivity.this, LoginActivity.class);
+                            startActivity(starter);
+                            AutoLoginActivity.this.finish();
                         }
                     } else {
-//                        Toast.makeText(AutoLoginActivity.this, "未知错误，异常！",
-//                                Toast.LENGTH_LONG).show();
+                        Toast.makeText(AutoLoginActivity.this, "未知错误，异常！",
+                                Toast.LENGTH_LONG).show();
+                        Intent starter = new Intent(AutoLoginActivity.this, LoginActivity.class);
+                        startActivity(starter);
+                        AutoLoginActivity.this.finish();
                     }
                 } else {
                     Toast.makeText(AutoLoginActivity.this, "网络未连接！",
                             Toast.LENGTH_LONG).show();
+                    Intent starter = new Intent(AutoLoginActivity.this, LoginActivity.class);
+                    startActivity(starter);
+                    AutoLoginActivity.this.finish();
                 }
             }
         }, nrc);
